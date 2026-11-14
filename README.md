@@ -1,5 +1,3 @@
-Tentu. Kalau mau langsung **copy-paste sebagai isi `README.md` GitHub**, pakai format Markdown berikut:
-
 # SIPADU
 
 Implementasi awal sistem peminjaman auditorium UPN Veteran Jakarta berbasis web menggunakan Laravel 12, Blade, dan MySQL.
