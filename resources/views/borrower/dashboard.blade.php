@@ -1,4 +1,3 @@
-
 @extends('layouts.panel')
 
 @section('panel')
@@ -8,10 +7,21 @@
 @endphp
 
 <style>
+    /* BACKGROUND GRADASI HALUS AGAR EFEK BLUR KACA TERLIHAT NYATA */
+    body,
+    .main-wrapper,
+    .content-wrapper,
+    main {
+        background-color: #b5d6c5 !important;
+        background-image: linear-gradient(135deg, #cfe6da 0%, #b5d6c5 52%, #a2c9b4 100%) !important;
+        background-attachment: fixed !important;
+        min-height: 100vh;
+    }
+
     .dashboard-page {
         width: 100%;
         box-sizing: border-box;
-        padding-bottom: 30px;
+        padding: 10px 10px 35px;
     }
 
     /* HEADER */
@@ -20,20 +30,21 @@
         align-items: center;
         justify-content: space-between;
         gap: 20px;
-        margin-bottom: 18px;
+        margin-bottom: 20px;
         flex-wrap: wrap;
     }
 
     .dashboard-welcome h1 {
         font-size: 27px;
         font-weight: 750;
-        color: #183b2b;
-        margin: 0 0 6px;
+        color: #163626;
+        margin: 0 0 5px;
+        letter-spacing: -0.3px;
     }
 
     .dashboard-welcome p {
         font-size: 13px;
-        color: #718078;
+        color: #324a3c;
         margin: 0;
     }
 
@@ -42,42 +53,45 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 11px 17px;
-        border-radius: 8px;
-        background: #21804d;
+        padding: 11px 18px;
+        border-radius: 10px;
+        background: #237c4d;
         color: white;
         text-decoration: none;
-        font-size: 12px;
+        font-size: 12.5px;
         font-weight: 700;
-        transition: .2s;
+        box-shadow: 0 4px 14px rgba(35, 124, 77, 0.25);
+        transition: .2s ease;
         white-space: nowrap;
     }
 
     .dashboard-action:hover {
-        background: #17683d;
+        background: #1a633c;
         color: white;
         transform: translateY(-2px);
     }
 
     .dashboard-action svg {
-        width: 17px;
-        height: 17px;
+        width: 16px;
+        height: 16px;
     }
 
-    /* STATISTIK */
+    /* STATISTIK (GLASSMORPHISM REALISTIS & STATIS) */
     .stats {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 15px;
+        gap: 16px;
         margin-bottom: 20px;
     }
 
     .stat-card {
-        background: #fff;
-        border: 1px solid #e1eae3;
-        border-radius: 12px;
-        padding: 17px;
-        box-shadow: 0 3px 12px rgba(20, 60, 35, .025);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.54) 0%, rgba(255, 255, 255, 0.28) 100%) !important;
+        backdrop-filter: blur(18px) saturate(150%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.38) !important;
+        border-radius: 15px;
+        padding: 17px 18px;
+        box-shadow: 0 8px 24px rgba(22, 54, 38, 0.05) !important;
     }
 
     .stat-top {
@@ -85,79 +99,95 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     .stat-top small {
-        color: #718078;
-        font-size: 12px;
-        font-weight: 500;
+        color: #324a3c;
+        font-size: 12.5px;
+        font-weight: 600;
     }
 
     .stat-icon {
-        width: 31px;
-        height: 31px;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 9px;
+        border-radius: 8px;
     }
 
     .stat-icon svg {
-        width: 17px;
-        height: 17px;
+        width: 16px;
+        height: 16px;
     }
 
     .stat-icon.blue {
-        background: #eaf2f7;
-        color: #47758c;
+        background: rgba(33, 128, 77, 0.16);
+        color: #1f7a49;
     }
 
     .stat-icon.amber {
-        background: #fff4df;
+        background: rgba(217, 119, 6, 0.16);
         color: #d97706;
     }
 
     .stat-icon.green {
-        background: #e5f5eb;
+        background: rgba(22, 128, 74, 0.18);
         color: #16804a;
     }
 
     .stat-icon.red {
-        background: #fff0f0;
+        background: rgba(220, 69, 69, 0.16);
         color: #dc4545;
     }
 
     .stat-card strong {
         display: block;
-        font-size: 25px;
+        font-size: 26px;
         font-weight: 750;
-        color: #183b2b;
+        color: #163626;
         line-height: 1.2;
     }
 
     .stat-card p {
         margin: 6px 0 0;
-        color: #849188;
+        color: #4c6456;
         font-size: 11px;
     }
 
     /* PANEL TENGAH */
     .dashboard-middle {
         display: grid;
-        grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
-        gap: 15px;
-        margin-bottom: 22px;
+        grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
         align-items: stretch;
     }
 
     .dashboard-panel {
-        background: white;
-        border: 1px solid #e1eae3;
-        border-radius: 12px;
-        padding: 16px 18px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.54) 0%, rgba(255, 255, 255, 0.28) 100%) !important;
+        backdrop-filter: blur(18px) saturate(150%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.38) !important;
+        border-radius: 16px;
+        padding: 14px 20px 18px 20px !important;
         min-width: 0;
-        box-shadow: 0 3px 12px rgba(20, 60, 35, .025);
+        box-shadow: 0 8px 24px rgba(22, 54, 38, 0.05) !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .dashboard-panel .section-head {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        margin-bottom: 14px;
+    }
+
+    .dashboard-panel .section-head h2 {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
     }
 
     .section-head {
@@ -165,61 +195,87 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        margin-bottom: 13px;
+        margin-bottom: 14px;
     }
 
     .section-head h2 {
-        font-size: 16px;
+        font-size: 15.5px;
         font-weight: 750;
-        color: #244332;
-        margin: 0 0 4px;
+        color: #163626;
+        margin: 0 0 2px;
     }
 
     .section-head p {
         font-size: 11px;
-        color: #849188;
+        color: #4c6456;
         margin: 0;
     }
 
     .section-head a {
-        color: #21804d;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: #1f7a49;
         text-decoration: none;
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 700;
         white-space: nowrap;
+        transition: gap 0.2s ease, color 0.2s ease;
+    }
+
+    .section-head a svg {
+        width: 14px;
+        height: 14px;
     }
 
     .section-head a:hover {
-        text-decoration: underline;
-        color: #17683d;
+        color: #155a35;
+        gap: 7px;
     }
 
-    /* TABEL PENGAJUAN */
+    /* TABEL PENGAJUAN (SEJAJAR ATAS & BAWAH DENGAN INFORMASI SIPADU) */
     .dashboard-table-wrap {
         width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin-top: 4px;
+        background: rgba(255, 255, 255, 0.42) !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
+        border-radius: 12px;
         overflow-x: auto;
+        overflow-y: hidden;
     }
 
     .dashboard-table {
         width: 100%;
+        height: 100%;
         border-collapse: collapse;
         font-size: 12px;
-        min-width: 490px;
+        min-width: 480px;
     }
 
     .dashboard-table th {
-        color: #718078;
+        background: rgba(35, 124, 77, 0.14) !important;
+        color: #163626 !important;
         font-size: 11px;
-        font-weight: 650;
+        font-weight: 750;
         text-align: left;
-        padding: 10px 8px;
-        border-bottom: 1px solid #e8eee9;
+        padding: 13px 14px;
+        border-bottom: none !important;
     }
 
     .dashboard-table td {
-        color: #405449;
-        padding: 13px 8px;
-        border-bottom: 1px solid #edf1ee;
+        color: #243b2e;
+        font-weight: 500;
+        padding: 14px 14px;
+        border-bottom: 1px solid rgba(22, 54, 38, 0.06);
+        vertical-align: middle;
+        transition: background 0.2s ease;
+    }
+
+    .dashboard-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.55) !important;
     }
 
     .dashboard-table tr:last-child td {
@@ -228,51 +284,63 @@
 
     .dashboard-table .empty {
         text-align: center;
-        color: #849188;
+        color: #4c6456;
         padding: 25px 10px;
     }
 
     .status {
         display: inline-block;
-        padding: 5px 9px;
+        padding: 4px 10px;
         border-radius: 20px;
-        font-size: 10px;
+        font-size: 10.5px;
         font-weight: 700;
         white-space: nowrap;
     }
 
     .status.pending {
-        color: #a96808;
-        background: #fff3dc;
+        color: #b4690e;
+        background: rgba(254, 240, 213, 0.92);
     }
 
     .status.disetujui {
-        color: #187447;
-        background: #e5f5eb;
+        color: #157343;
+        background: rgba(220, 243, 229, 0.92);
     }
 
     .status.ditolak {
-        color: #c23b3b;
-        background: #fff0f0;
+        color: #c53030;
+        background: rgba(254, 226, 226, 0.92);
     }
 
     .status.dibatalkan {
-        color: #64748b;
-        background: #f1f5f9;
+        color: #475569;
+        background: rgba(226, 232, 240, 0.92);
     }
 
-    /* INFORMASI SIPADU */
+    /* INFORMASI SIPADU (KOTAK GLASS SUB-ITEM SIMETRIS) */
     .guide-list {
         display: flex;
         flex-direction: column;
-        gap: 15px;
-        margin-top: 15px;
+        gap: 10px;
+        margin-top: 4px;
+        flex: 1;
     }
 
     .guide-item {
         display: flex;
-        align-items: flex-start;
-        gap: 11px;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        background: rgba(255, 255, 255, 0.42) !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
+        border-radius: 12px;
+        padding: 11px 13px;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .guide-item:hover {
+        background: rgba(255, 255, 255, 0.65) !important;
+        transform: translateX(2px);
     }
 
     .guide-icon {
@@ -282,9 +350,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 9px;
-        background: #e9f5ed;
-        color: #21804d;
+        border-radius: 8px;
+        background: rgba(33, 128, 77, 0.16);
+        color: #1f7a49;
     }
 
     .guide-icon svg {
@@ -294,68 +362,72 @@
 
     .guide-item strong {
         display: block;
-        font-size: 12px;
-        color: #304638;
-        margin-bottom: 4px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #163626;
+        margin-bottom: 2px;
     }
 
     .guide-item p {
         font-size: 11px;
-        color: #849188;
-        line-height: 1.5;
+        color: #4c6456;
+        line-height: 1.4;
         margin: 0;
     }
 
-    /* AUDITORIUM */
+    /* AUDITORIUM (GLASS SUB-ITEM & GAMBAR FULL BLEED) */
     .auditorium-section {
-        margin-top: 5px;
+        margin-top: 0;
     }
 
     .auditorium-cards {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 16px;
     }
 
     .auditorium-card {
-        background: #fff;
-        border: 1px solid #e1eae3;
-        border-radius: 12px;
-        overflow: hidden;
+        background: rgba(255, 255, 255, 0.42) !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
+        border-radius: 14px !important;
+        overflow: hidden !important;
         min-width: 0;
-        box-shadow: 0 3px 12px rgba(20, 60, 35, .025);
+        box-shadow: 0 4px 16px rgba(22, 54, 38, 0.04) !important;
         display: flex;
         flex-direction: column;
         cursor: pointer;
-
-        transition:
-            transform .25s ease,
-            box-shadow .25s ease,
-            border-color .25s ease;
+        padding: 0 !important;
+        transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
     }
 
-    /* HOVER SELURUH KARTU */
     .auditorium-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 28px rgba(20, 80, 45, .15);
-        border-color: #21804d;
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.68) !important;
+        box-shadow: 0 12px 26px rgba(22, 54, 38, 0.1) !important;
     }
 
     .auditorium-card:focus-visible {
-        outline: 2px solid #21804d;
+        outline: 2px solid #237c4d;
         outline-offset: 3px;
     }
 
     .auditorium-image-wrap {
-        overflow: hidden;
+        width: 100% !important;
+        overflow: hidden !important;
         position: relative;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    .auditorium-card img {
-        width: 100%;
-        height: 145px;
-        object-fit: cover;
-        display: block;
+    .auditorium-card img,
+    .auditorium-image-wrap img {
+        width: 100% !important;
+        height: 175px !important;
+        object-fit: cover !important;
+        display: block !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
         transition: transform .3s ease;
     }
 
@@ -364,73 +436,76 @@
     }
 
     .auditorium-no-image {
-        width: 100%;
-        height: 145px;
+        width: 100% !important;
+        height: 175px !important;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #eaf5ed, #f4f8f5);
-        color: #21804d;
+        background: linear-gradient(135deg, #dff0e5, #eef7f1);
+        color: #237c4d;
+        border-radius: 0 !important;
+        margin: 0 !important;
     }
 
     .auditorium-no-image svg {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
     }
 
     .auditorium-card-content {
-        padding: 14px;
+        padding: 14px 16px 16px;
         display: flex;
         flex-direction: column;
         flex: 1;
     }
 
     .auditorium-card-content h3 {
-        margin: 0 0 9px;
-        color: #244332;
-        font-size: 14px;
+        margin: 0 0 6px;
+        color: #163626;
+        font-size: 16px;
         font-weight: 750;
-        line-height: 1.4;
+        line-height: 1.35;
     }
 
     .auditorium-description {
-        color: #718078;
-        font-size: 11px;
-        line-height: 1.6;
+        color: #4c6456;
+        font-size: 11.5px;
+        line-height: 1.5;
         margin: 0 0 10px;
         display: -webkit-box;
         line-clamp: 2;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        min-height: 35px;
+        min-height: 34px;
     }
 
     .auditorium-meta {
         display: flex;
         flex-direction: column;
-        gap: 7px;
-        margin-bottom: 12px;
+        gap: 6px;
+        margin-bottom: 14px;
     }
 
     .auditorium-meta span {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 7px;
-        font-size: 10px;
-        color: #849188;
+        font-size: 11px;
+        color: #3c5446;
+        font-weight: 500;
     }
 
     .auditorium-meta svg {
-        width: 13px;
-        height: 13px;
+        width: 14px;
+        height: 14px;
+        color: #237c4d;
         flex-shrink: 0;
     }
 
     .auditorium-actions {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 7px;
         margin-top: auto;
     }
 
@@ -438,35 +513,41 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 7px;
         text-align: center;
         text-decoration: none;
-        padding: 9px 6px;
-        border-radius: 7px;
-        font-size: 11px;
+        padding: 10px 12px;
+        border-radius: 9px;
+        font-size: 12px;
         font-weight: 700;
         transition: .2s;
         position: relative;
         z-index: 2;
     }
 
+    .auditorium-actions a svg {
+        width: 15px;
+        height: 15px;
+    }
+
     .btn-booking {
         color: white;
-        background: #21804d;
-        border: 1px solid #21804d;
+        background: #237c4d;
+        border: 1px solid #237c4d;
     }
 
     .btn-booking:hover {
-        background: #17683d;
+        background: #1a633c;
         color: white;
     }
 
     .empty-auditorium {
-        background: white;
-        border: 1px solid #e1eae3;
+        background: rgba(255, 255, 255, 0.42);
+        border: 1px solid rgba(255, 255, 255, 0.35);
         border-radius: 12px;
         padding: 25px;
         text-align: center;
-        color: #849188;
+        color: #4c6456;
         font-size: 13px;
         grid-column: 1 / -1;
     }
@@ -481,7 +562,7 @@
         justify-content: center;
         padding: 20px;
         background: rgba(12, 30, 20, .62);
-        backdrop-filter: blur(3px);
+        backdrop-filter: blur(4px);
     }
 
     .auditorium-modal.show {
@@ -495,7 +576,7 @@
         max-height: 90vh;
         overflow-y: auto;
         background: white;
-        border-radius: 15px;
+        border-radius: 16px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
         animation: modalAppear .22s ease;
     }
@@ -505,7 +586,6 @@
             opacity: 0;
             transform: translateY(15px) scale(.98);
         }
-
         to {
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -522,7 +602,7 @@
         border: none;
         border-radius: 50%;
         background: rgba(255, 255, 255, .95);
-        color: #244332;
+        color: #163626;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -553,7 +633,7 @@
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg, #eaf5ed, #f4f8f5);
-        color: #21804d;
+        color: #237c4d;
     }
 
     .modal-no-image svg {
@@ -566,7 +646,7 @@
     }
 
     .modal-content h2 {
-        color: #183b2b;
+        color: #163626;
         font-size: 21px;
         font-weight: 750;
         margin: 0 0 12px;
@@ -574,14 +654,14 @@
 
     .modal-description {
         font-size: 13px;
-        color: #718078;
+        color: #556b5e;
         line-height: 1.7;
         margin-bottom: 20px;
         white-space: pre-line;
     }
 
     .modal-info-title {
-        color: #244332;
+        color: #163626;
         font-size: 13px;
         font-weight: 750;
         margin: 18px 0 10px;
@@ -606,7 +686,7 @@
         width: 16px;
         height: 16px;
         flex-shrink: 0;
-        color: #21804d;
+        color: #237c4d;
         margin-top: 1px;
     }
 
@@ -620,7 +700,7 @@
         padding: 7px 10px;
         border-radius: 7px;
         background: #eaf5ed;
-        color: #21804d;
+        color: #237c4d;
         font-size: 11px;
         font-weight: 600;
     }
@@ -636,7 +716,7 @@
         align-items: center;
         justify-content: center;
         gap: 7px;
-        background: #21804d;
+        background: #237c4d;
         color: white;
         text-decoration: none;
         border-radius: 8px;
@@ -646,7 +726,7 @@
     }
 
     .modal-actions a:hover {
-        background: #17683d;
+        background: #1a633c;
         color: white;
     }
 
@@ -701,7 +781,7 @@
         }
 
         .dashboard-panel {
-            padding: 14px;
+            padding: 12px 15px 15px 15px !important;
         }
 
         .modal-image {
@@ -712,21 +792,6 @@
             padding: 17px;
         }
     }
-
-/* FIX POSISI KONTEN PANEL DASHBOARD */
-.dashboard-page .dashboard-middle > .dashboard-panel {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: stretch !important;
-    padding-top: 15px !important;
-}
-
-.dashboard-page .dashboard-middle > .dashboard-panel > .section-head {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-
 </style>
 
 <div class="dashboard-page">
@@ -735,7 +800,7 @@
     <div class="dashboard-topbar">
         <div class="dashboard-welcome">
             <h1>Selamat datang, {{ $user->name }}!</h1>
-            <p>Temukan auditorium dan pantau pengajuan peminjaman Anda.</p>
+            <p>Temukan auditorium impian Anda untuk pengajuan peminjaman Anda.</p>
         </div>
 
         <a class="dashboard-action" href="{{ route('borrower.booking.create') }}">
@@ -750,7 +815,7 @@
             <div class="stat-top">
                 <small>Total Pengajuan</small>
                 <span class="stat-icon blue">
-                    <i data-lucide="clipboard-list"></i>
+                    <i data-lucide="calendar-days"></i>
                 </span>
             </div>
             <strong>{{ $stats['total'] }}</strong>
@@ -772,7 +837,7 @@
             <div class="stat-top">
                 <small>Disetujui</small>
                 <span class="stat-icon green">
-                    <i data-lucide="check-circle"></i>
+                    <i data-lucide="check-circle-2"></i>
                 </span>
             </div>
             <strong>{{ $stats['approved'] }}</strong>
@@ -787,14 +852,14 @@
                 </span>
             </div>
             <strong>{{ $stats['rejected'] }}</strong>
-            <p>Lihat detail riwayat</p>
+            <p>Lihat detail alasan</p>
         </div>
     </div>
 
     {{-- PENGAJUAN DAN INFORMASI --}}
     <div class="dashboard-middle">
 
-        {{-- PENGAJUAN TERBARU --}}
+        {{-- PENGAJUAN TERBARU (DIBATASI 3 DATA AGAR SEJAJAR) --}}
         <div class="dashboard-panel">
             <div class="section-head">
                 <div>
@@ -803,7 +868,8 @@
                 </div>
 
                 <a href="{{ route('borrower.bookings') }}">
-                    Lihat semua →
+                    Lihat semua
+                    <i data-lucide="arrow-right"></i>
                 </a>
             </div>
 
@@ -819,7 +885,7 @@
                     </thead>
 
                     <tbody>
-                        @forelse($bookings as $b)
+                        @forelse($bookings->take(3) as $b)
                             <tr>
                                 <td>{{ $b->auditorium->name ?? '-' }}</td>
                                 <td>{{ $b->event_name }}</td>
@@ -854,9 +920,9 @@
                     <p>Panduan singkat peminjaman</p>
                 </div>
 
-                {{-- INFORMASI LEBIH LANJUT DI ATAS --}}
                 <a href="{{ route('borrower.guides') }}">
-                    Informasi lebih lanjut →
+                    Informasi lebih lanjut
+                    <i data-lucide="arrow-right"></i>
                 </a>
             </div>
 
@@ -887,7 +953,7 @@
                     </div>
                     <div>
                         <strong>Pantau Status</strong>
-                        <p>Periksa perkembangan pengajuan melalui menu Peminjaman Saya.</p>
+                        <p>Pantau perkembangan pengajuan di menu Peminjaman Saya.</p>
                     </div>
                 </div>
             </div>
@@ -895,11 +961,11 @@
     </div>
 
     {{-- DAFTAR AUDITORIUM --}}
-    <div class="auditorium-section">
+    <div class="dashboard-panel auditorium-section">
         <div class="section-head">
             <div>
                 <h2>Pilihan Auditorium</h2>
-                <p>Daftar auditorium yang tercatat pada SIPADU</p>
+                <p>Daftar auditorium yang tersedia pada SIPADU</p>
             </div>
         </div>
 
@@ -933,7 +999,7 @@
                     );
                 @endphp
 
-                {{-- KARTU AUDITORIUM: DIKLIK LANGSUNG BUKA MODAL --}}
+                {{-- KARTU AUDITORIUM --}}
                 <article
                     class="auditorium-card"
                     onclick="openAuditoriumModal('auditorium-modal-{{ $a->id }}')"
@@ -976,15 +1042,13 @@
                             </span>
                         </div>
 
-                        {{-- TIDAK ADA TOMBOL LIHAT DETAIL LAGI --}}
-                        {{-- SELURUH KARTU BISA DIKLIK --}}
-
                         <div class="auditorium-actions">
                             <a
                                 href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
                                 class="btn-booking"
                                 onclick="event.stopPropagation()"
                             >
+                                <i data-lucide="calendar-plus"></i>
                                 Ajukan Peminjaman
                             </a>
                         </div>
@@ -1008,7 +1072,6 @@
                             <i data-lucide="x"></i>
                         </button>
 
-                        {{-- FOTO DETAIL --}}
                         @if($a->image_path)
                             <img
                                 class="modal-image"
@@ -1024,7 +1087,6 @@
                         <div class="modal-content">
                             <h2>{{ $a->name }}</h2>
 
-                            {{-- DESKRIPSI LENGKAP --}}
                             <div class="modal-description">
                                 {{ $description }}
                             </div>
@@ -1051,7 +1113,6 @@
                                 </div>
                             </div>
 
-                            {{-- FASILITAS --}}
                             <h3 class="modal-info-title">
                                 Fasilitas Auditorium
                             </h3>
@@ -1070,7 +1131,6 @@
                                 </p>
                             @endif
 
-                            {{-- TOMBOL PENGAJUAN --}}
                             <div class="modal-actions">
                                 <a
                                     href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
@@ -1096,7 +1156,6 @@
 <script>
     function openAuditoriumModal(modalId) {
         const modal = document.getElementById(modalId);
-
         if (!modal) return;
 
         modal.classList.add('show');
@@ -1109,7 +1168,6 @@
 
     function closeAuditoriumModal(modalId) {
         const modal = document.getElementById(modalId);
-
         if (!modal) return;
 
         modal.classList.remove('show');
@@ -1119,7 +1177,6 @@
         }
     }
 
-    // Tutup modal dengan tombol ESC
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             document.querySelectorAll('.auditorium-modal.show')
@@ -1131,7 +1188,6 @@
         }
     });
 
-    // Inisialisasi ikon
     if (window.lucide) {
         window.lucide.createIcons();
     }
