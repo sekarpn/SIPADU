@@ -3,10 +3,7 @@
 @endphp
 
 <style>
-    /* =========================================================
-       SIDEBAR
-    ========================================================= */
-
+    /* sidebar */
     .sidebar {
         display: flex !important;
         flex-direction: column !important;
@@ -14,10 +11,7 @@
         background: rgba(255, 255, 255, 0.88) !important;
     }
 
-    /* =========================================================
-       BRAND / LOGO
-    ========================================================= */
-
+    /* logo */
     .sidebar .sidebar-brand {
         display: flex !important;
         align-items: center !important;
@@ -31,11 +25,11 @@
 
     .sidebar .brand-icon {
         display: flex !important;
+        align-items: center;
+        justify-content: center;
         width: 40px !important;
         height: 40px !important;
         min-width: 40px !important;
-        align-items: center;
-        justify-content: center;
     }
 
     .sidebar .brand-icon img {
@@ -63,9 +57,7 @@
         white-space: nowrap;
     }
 
-    /* =========================================================
-       NAVIGATION
-    ========================================================= */
+    /* navigation */
 
     .sidebar .nav-caption {
         display: block !important;
@@ -104,19 +96,31 @@
         display: inline !important;
     }
 
-    .sidebar .nav-link.active {
-        background: var(--bg-soft) !important;
-        color: var(--brand-primary) !important;
-    }
-
     .sidebar .nav-link:hover {
-        background: #F4F8F5 !important;
+        background: #f4f8f5 !important;
         color: var(--brand-primary) !important;
     }
 
-    /* =========================================================
-       LOGOUT
-    ========================================================= */
+    /* active menu */
+
+    .sidebar .nav-link.active {
+        position: relative !important;
+        background: #e8f6ee !important;
+        color: var(--brand-primary) !important;
+    }
+
+    .sidebar .nav-link.active::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 9px !important;
+        bottom: 9px !important;
+        left: 0 !important;
+        width: 3px !important;
+        border-radius: 0 4px 4px 0 !important;
+        background: #238458 !important;
+    }
+
+    /* logout */
 
     .sidebar .logout {
         margin-top: auto !important;
@@ -150,9 +154,7 @@
         color: #b91c1c !important;
     }
 
-    /* =========================================================
-       COLLAPSED ICON RAIL
-    ========================================================= */
+    /* collapsed sidebar */
 
     .app-layout.sidebar-closed .sidebar,
     html.sipadu-sidebar-closed .app-layout .sidebar {
@@ -203,9 +205,13 @@
         border-radius: 12px !important;
     }
 
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
+    .app-layout.sidebar-closed .sidebar .nav-link.active::before,
+    html.sipadu-sidebar-closed .app-layout .sidebar .nav-link.active::before {
+        top: 8px !important;
+        bottom: 8px !important;
+    }
+
+    /* mobile */
 
     @media (max-width: 900px) {
         .sidebar {
@@ -239,10 +245,7 @@
 
 <aside class="sidebar" id="mainSidebar">
 
-    {{-- =====================================================
-       LOGO SIPADU
-    ====================================================== --}}
-
+    {{-- LOGO SIPADU --}}
     <a
         class="brand sidebar-brand"
         href="{{ $isAdmin ? route('admin.dashboard') : route('borrower.dashboard') }}"
@@ -261,16 +264,15 @@
         </span>
     </a>
 
-    {{-- MENU CAPTION --}}
+    {{-- MENU TITLE --}}
     <div class="nav-caption">
         {{ $isAdmin ? 'MENU ADMIN' : 'MENU PEMINJAM' }}
     </div>
 
+    {{-- =========================
+         MENU ADMIN
+    ========================= --}}
     @if ($isAdmin)
-
-        {{-- =====================================================
-           MENU ADMIN
-        ====================================================== --}}
 
         <a
             class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
@@ -326,11 +328,10 @@
             <span>Profil Akun</span>
         </a>
 
+    {{-- =========================
+         MENU PEMINJAM
+    ========================= --}}
     @else
-
-        {{-- =====================================================
-           MENU PEMINJAM
-        ====================================================== --}}
 
         <a
             class="nav-link {{ request()->routeIs('borrower.dashboard') ? 'active' : '' }}"
@@ -379,10 +380,9 @@
 
     @endif
 
-    {{-- =====================================================
-       LOGOUT
-    ====================================================== --}}
-
+    {{-- =========================
+         LOGOUT
+    ========================= --}}
     <form
         method="POST"
         action="{{ route('logout') }}"
@@ -398,9 +398,10 @@
 
 </aside>
 
+{{-- LUCIDE ICON --}}
 <script
     src="https://unpkg.com/lucide@latest"
-    onload="if(window.lucide){window.lucide.createIcons();}"
+    onload="if (window.lucide) { window.lucide.createIcons(); }"
 ></script>
 
 <script>
@@ -420,9 +421,6 @@
             renderSidebarIcons();
         }
 
-        window.addEventListener(
-            'load',
-            renderSidebarIcons
-        );
+        window.addEventListener('load', renderSidebarIcons);
     })();
 </script>

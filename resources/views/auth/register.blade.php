@@ -140,7 +140,7 @@
 
     <div class="auth-form">
 
-        <a href="/" class="back">← Kembali ke landing page</a>
+        <a href="/" class="back"><i data-lucide="arrow-left"></i><span>Kembali ke landing page</span></a>
 
         <h2>Daftar Akun</h2>
 

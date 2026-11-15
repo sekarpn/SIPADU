@@ -1,36 +1,24 @@
 /* SIPADU UI/UX refresh inspired by the v2.2 interface.
-   Backend markup and behavior are intentionally preserved. */
-
-/* =========================================================
-   ROOT VARIABLES
-========================================================= */
+   Backend markup and behavior are intentionally preserved.
+*/
 
 :root {
     --bg-canvas: #e9efec;
     --bg-card: #fff;
     --bg-soft: #e6f2ea;
     --border-hairline: #dce5e0;
-
     --text-main: #14201a;
     --text-muted: #4b5b53;
-
     --brand-primary: #316f4f;
     --brand-dark: #123824;
     --brand-on-primary: #fff;
-
     --status-ok-bg: #dcfce7;
     --status-ok-text: #166534;
-
     --status-warn-bg: #fef3c7;
     --status-warn-text: #92400e;
-
     --status-err-bg: #fee2e2;
     --status-err-text: #b91c1c;
 }
-
-/* =========================================================
-   GLOBAL
-========================================================= */
 
 * {
     box-sizing: border-box;
@@ -47,10 +35,6 @@ body {
 body {
     margin: 0;
 }
-
-/* =========================================================
-   FLASH MESSAGE
-========================================================= */
 
 .flash {
     position: fixed;
@@ -74,9 +58,7 @@ body {
     color: var(--status-err-text);
 }
 
-/* =========================================================
-   COMMON PAGE COMPONENTS
-========================================================= */
+/* Common page components */
 
 .page-heading {
     display: flex;
@@ -112,10 +94,6 @@ body {
     border-radius: 18px !important;
     box-shadow: 0 1px 2px rgba(20, 32, 26, 0.03) !important;
 }
-
-/* =========================================================
-   TABLE
-========================================================= */
 
 .table-wrap {
     overflow: auto;
@@ -162,10 +140,6 @@ tr:hover td {
     padding: 32px !important;
 }
 
-/* =========================================================
-   BUTTON
-========================================================= */
-
 .btn,
 .mini,
 button[type="submit"],
@@ -198,10 +172,6 @@ button[type="submit"]:hover,
     background: var(--brand-primary) !important;
 }
 
-/* =========================================================
-   STATUS
-========================================================= */
-
 .status {
     display: inline-flex !important;
     align-items: center;
@@ -228,10 +198,6 @@ button[type="submit"]:hover,
     color: var(--status-err-text) !important;
 }
 
-/* =========================================================
-   FORM
-========================================================= */
-
 input,
 select,
 textarea {
@@ -257,9 +223,7 @@ label {
     color: var(--text-main) !important;
 }
 
-/* =========================================================
-   AUTH
-========================================================= */
+/* Auth */
 
 .auth-shell {
     min-height: 100vh;
@@ -296,9 +260,7 @@ label {
     background: var(--brand-primary) !important;
 }
 
-/* =========================================================
-   DASHBOARD NORMALIZATION
-========================================================= */
+/* Dashboard normalization */
 
 .dashboard-page,
 .dashboard-page * {
@@ -331,8 +293,6 @@ label {
     border-radius: 12px !important;
 }
 
-/* Dashboard Stat Icons */
-
 .stat-icon.green {
     background: var(--status-ok-bg) !important;
     color: var(--status-ok-text) !important;
@@ -353,9 +313,7 @@ label {
     color: var(--brand-primary) !important;
 }
 
-/* =========================================================
-   BOOKING / FORM / ADMIN CARDS
-========================================================= */
+/* Booking/form/admin cards */
 
 .booking-card,
 .booking-item,
@@ -369,10 +327,6 @@ label {
     box-shadow: 0 1px 2px rgba(20, 32, 26, 0.03) !important;
 }
 
-/* =========================================================
-   PAGINATION
-========================================================= */
-
 .pagination {
     margin-top: 18px;
 }
@@ -383,10 +337,6 @@ label {
     border: 1px solid var(--border-hairline) !important;
     color: var(--text-muted) !important;
 }
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
 
 @media (max-width: 768px) {
     .page-heading {
@@ -404,5 +354,128 @@ label {
 
     .table-wrap {
         border-radius: 14px !important;
+    }
+}
+
+/* Mobile responsiveness reinforcement:
+   UI-only overrides, no application logic changed.
+*/
+
+@media (max-width: 900px) {
+    html,
+    body {
+        width: 100%;
+        overflow-x: hidden !important;
+    }
+
+    .main-content {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .dashboard-middle {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dashboard-table-wrap,
+    .table-wrap {
+        max-width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dashboard-table {
+        min-width: 520px !important;
+    }
+
+    .chart-content {
+        gap: 24px !important;
+    }
+
+    .chart-legend {
+        min-width: 0 !important;
+    }
+
+    .pie-chart {
+        width: min(230px, 70vw) !important;
+        height: min(230px, 70vw) !important;
+    }
+
+    .form-row,
+    .form-grid,
+    .grid-2,
+    .two-col,
+    .profile-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .page-heading {
+        gap: 10px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .stat-card,
+    .dashboard-panel,
+    .recent-bookings-card,
+    .card,
+    .panel,
+    .table-wrap,
+    .form-card,
+    .profile-card,
+    .content-card,
+    .guide-card {
+        border-radius: 14px !important;
+    }
+
+    .dashboard-topbar,
+    .page-heading {
+        align-items: stretch !important;
+        flex-direction: column !important;
+    }
+
+    .dashboard-action,
+    .page-heading .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .section-head {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+    }
+
+    .chart-card {
+        padding: 16px !important;
+    }
+
+    .pie-center {
+        width: 58% !important;
+        height: 58% !important;
+    }
+
+    .pie-center strong {
+        font-size: 26px !important;
+    }
+
+    input,
+    select,
+    textarea {
+        max-width: 100% !important;
+    }
+
+    table th,
+    table td {
+        white-space: nowrap;
     }
 }

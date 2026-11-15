@@ -28,10 +28,58 @@ class DatabaseSeeder extends Seeder
         /* data auditorium */
         Auditorium::firstOrCreate(
             [
-                'name' => 'Auditorium Utama',
+                'name' => 'Auditorium Bhineka Tunggal Ika (BTI)',
             ],
             [
-                'location' => 'UPN Veteran Jakarta',
+                'location' => 'UPN Veteran Jakarta - Kampus Pondok Labu',
+                'capacity' => null,
+                'description' =>
+                    'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
+                'facilities' => [
+                    'Informasi menyusul',
+                ],
+                'is_active' => true,
+            ]
+        );
+
+       Auditorium::firstOrCreate(
+            [
+                'name' => 'Auditorium Gd. Dr. Wahidin Sudiro Husodo',
+            ],
+            [
+                'location' => 'UPN Veteran Jakarta - Kampus Pondok Labu',
+                'capacity' => null,
+                'description' =>
+                    'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
+                'facilities' => [
+                    'Informasi menyusul',
+                ],
+                'is_active' => true,
+            ]
+        );
+
+       Auditorium::firstOrCreate(
+            [
+                'name' => 'Auditorium MERCe',
+            ],
+            [
+                'location' => 'UPN Veteran Jakarta - Kampus Limo',
+                'capacity' => null,
+                'description' =>
+                    'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
+                'facilities' => [
+                    'Informasi menyusul',
+                ],
+                'is_active' => true,
+            ]
+        );
+
+       Auditorium::firstOrCreate(
+            [
+                'name' => 'Auditorium Tanah Airku',
+            ],
+            [
+                'location' => 'UPN Veteran Jakarta - Kampus Limo',
                 'capacity' => null,
                 'description' =>
                     'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',

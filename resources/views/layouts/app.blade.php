@@ -40,6 +40,19 @@
                 }
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.flash').forEach(function (notif) {
+                setTimeout(function () {
+                    notif.style.transition = 'opacity 0.5s ease';
+                    notif.style.opacity = '0';
+
+                    setTimeout(function () {
+                        notif.remove();
+                    }, 500);
+                }, 3000);
+            });
+        });
     </script>
 
 </body>

@@ -141,7 +141,7 @@
 
     <div class="auth-form">
 
-        <a href="/" class="back">← Kembali ke landing page</a>
+        <a href="/" class="back"><i data-lucide="arrow-left"></i><span>Kembali ke landing page</span></a>
 
         <h2>Login</h2>
         <p>Masuk menggunakan email dan password akun Anda.</p>
