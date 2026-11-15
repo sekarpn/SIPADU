@@ -1,158 +1,183 @@
-
 @extends('layouts.app')
 
 @section('content')
 
-<style>
-    * {
-        box-sizing: border-box;
-    }
+<script>
+    /* Apply sidebar state before the layout is painted to prevent page-change flicker. */
+    (function () {
+        try {
+            if (localStorage.getItem('sipadu-sidebar-state') === 'closed') {
+                document.documentElement.classList.add('sipadu-sidebar-closed');
+            }
+        } catch (e) {}
+    })();
+</script>
 
+<style>
     .app-layout {
         display: flex;
         width: 100%;
-        height: 100vh;
         min-height: 100vh;
-        overflow: hidden;
-        background: #f5f7f6;
+        background: var(--bg-canvas);
+        overflow: visible;
     }
 
-    /* SIDEBAR */
     .app-layout > .sidebar {
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        width: 76px;
-        min-width: 76px;
-        flex: 0 0 76px;
-        height: 100vh;
+        position: fixed !important;
+        inset: 0 auto 0 0 !important;
+        width: 248px !important;
+        min-width: 248px !important;
+        height: 100vh !important;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.88) !important;
+        border-right: 1px solid rgba(220, 229, 224, 0.82) !important;
         overflow-x: hidden;
         overflow-y: auto;
-        transition: width .3s ease, min-width .3s ease, flex-basis .3s ease;
-        z-index: 10;
+        transition: width 0.24s ease, min-width 0.24s ease !important;
     }
 
-    .app-layout > .sidebar.expanded {
-        width: 260px;
-        min-width: 260px;
-        flex: 0 0 260px;
-    }
-
-    /* AREA UTAMA */
     .app-layout > main {
-        flex: 1 1 0;
+        margin-left: 248px !important;
+        flex: 1;
         min-width: 0;
-        width: 0;
-        height: 100vh;
-        margin: 0 !important;
-        overflow-y: auto;
-        overflow-x: hidden;
-        background: #f5f7f6;
+        min-height: 100vh;
+        background: var(--bg-canvas) !important;
+        overflow: visible !important;
+        width: auto !important;
+        transition: margin-left 0.24s ease !important;
     }
 
-    /* TOPBAR */
+    /* Collapsed desktop sidebar: icon rail remains visible */
+    .app-layout.sidebar-closed > .sidebar,
+    html.sipadu-sidebar-closed .app-layout > .sidebar {
+        transform: none !important;
+        width: 78px !important;
+        min-width: 78px !important;
+    }
+
+    .app-layout.sidebar-closed > main,
+    html.sipadu-sidebar-closed .app-layout > main {
+        margin-left: 78px !important;
+    }
+
+    /* No animation during initial render, so the sidebar never flashes open/closed when changing pages. */
+    html:not(.sidebar-ready) .app-layout > .sidebar,
+    html:not(.sidebar-ready) .app-layout > main {
+        transition: none !important;
+    }
+
     .app-layout > main .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 40;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        min-height: 72px;
-        height: 72px;
-        padding: 0 28px;
-        background: #fff;
-        border-bottom: 1px solid #e8eee9;
-        position: sticky;
-        top: 0;
-        z-index: 5;
+        min-height: 60px;
+        height: 60px;
+        padding: 0 22px;
+        background: rgba(245, 249, 247, 0.72) !important;
+        border-bottom: 1px solid rgba(220, 229, 224, 0.68) !important;
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+        box-shadow: 0 8px 28px rgba(20, 32, 26, 0.025);
     }
 
-    /* TOMBOL SIDEBAR */
     #sidebarToggle {
-        display: flex;
+        display: flex !important;
+        width: 38px;
+        height: 38px;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        border: none;
-        border-radius: 8px;
-        background: transparent;
-        color: #34443a;
+        border: 1px solid rgba(220, 229, 224, 0.85) !important;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.78) !important;
+        color: var(--text-main) !important;
         cursor: pointer;
-        transition: background .2s ease;
-        flex-shrink: 0;
+        flex: none;
+        box-shadow: 0 2px 8px rgba(20, 32, 26, 0.035);
     }
 
     #sidebarToggle:hover {
-        background: #edf5ef;
+        background: var(--bg-soft) !important;
+        color: var(--brand-primary) !important;
     }
 
-    #sidebarToggle svg {
-        width: 25px;
-        height: 25px;
+    .topbar-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 18px;
     }
 
-    /* BAGIAN KANAN TOPBAR */
     .topbar-user {
         display: flex;
         align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: #244332;
-        min-width: 0;
+        gap: 10px;
+        text-decoration: none !important;
+        color: var(--text-main) !important;
     }
 
     .topbar-date {
-        font-size: 12px;
-        color: #718078;
-        margin-right: 12px;
+        font-size: 11px;
+        color: var(--text-muted);
         white-space: nowrap;
     }
 
     .topbar-user-info {
         text-align: right;
-        min-width: 0;
     }
 
     .topbar-user-info strong {
         display: block;
-        font-size: 13px;
-        font-weight: 700;
-        color: #244332;
+        font-size: 12px;
     }
 
     .topbar-user-info small {
-        display: block;
-        font-size: 11px;
-        color: #849188;
-        margin-top: 3px;
+        font-size: 10px;
+        color: var(--text-muted);
     }
 
     .topbar-avatar {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: #e8f5ec;
-        color: #187345;
+        background: var(--brand-primary);
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        font-weight: 700;
+        font-size: 11px;
+        font-weight: 800;
     }
 
-    /* KONTEN */
     .app-layout > main > .main-content {
-        width: 100%;
-        min-width: 0;
-        padding: 24px;
+        padding: 28px;
+        max-width: 1600px;
+        margin: 0 auto;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.18s ease, transform 0.18s ease;
     }
 
-    @media (max-width: 768px) {
-        .app-layout > .sidebar.expanded {
-            width: 220px;
-            min-width: 220px;
-            flex-basis: 220px;
+    html.page-ready .app-layout > main > .main-content {
+        opacity: 1;
+        transform: none;
+    }
+
+    @media (max-width: 900px) {
+        .app-layout > main {
+            margin-left: 0 !important;
+        }
+
+        .app-layout > .sidebar {
+            width: 248px !important;
+            min-width: 248px !important;
+            transform: translateX(-100%) !important;
+        }
+
+        .app-layout:not(.sidebar-closed) > .sidebar {
+            transform: translateX(0) !important;
         }
 
         .app-layout > main .topbar {
@@ -160,102 +185,145 @@
         }
 
         .app-layout > main > .main-content {
-            padding: 16px;
+            padding: 18px;
         }
 
         .topbar-date {
             display: none;
         }
-    }
 
-    @media (max-width: 420px) {
-        .topbar-user-info strong {
-            font-size: 11px;
-        }
-
-        .topbar-user-info small {
-            font-size: 10px;
-        }
-
-        .topbar-avatar {
-            width: 34px;
-            height: 34px;
-            min-width: 34px;
+        .topbar-right {
+            gap: 8px;
         }
     }
 </style>
 
 <div class="app-layout">
-
     @include('partials.nav')
 
     <main>
-
         <div class="topbar">
-
-            {{-- TOMBOL SIDEBAR --}}
-            <button type="button"
-                    id="sidebarToggle"
-                    aria-label="Buka atau tutup sidebar">
-                <i data-lucide="ellipsis"></i>
+            <button
+                type="button"
+                id="sidebarToggle"
+                aria-label="Buka atau tutup sidebar"
+            >
+                <i data-lucide="panel-left-open"></i>
             </button>
 
-            {{-- TANGGAL DAN PROFIL --}}
-            @auth
-                @php
-                    $topbarUser = auth()->user();
-                    $profileRoute = $topbarUser->role === 'admin'
-                        ? route('admin.profile')
-                        : route('borrower.profile');
-                @endphp
+            <div class="topbar-right">
+                @auth
+                    @php
+                        $topbarUser = auth()->user();
 
-                <a href="{{ $profileRoute }}" class="topbar-user">
+                        $profileRoute = $topbarUser->role === 'admin'
+                            ? route('admin.profile')
+                            : route('borrower.profile');
+                    @endphp
 
                     <span class="topbar-date">
                         {{ now()->format('d/m/Y') }}
                     </span>
 
-                    <span class="topbar-user-info">
-                        <strong>{{ $topbarUser->name }}</strong>
-                        <small>
-                            {{ $topbarUser->role === 'admin' ? 'Administrator' : 'Peminjam' }}
-                        </small>
-                    </span>
+                    <a href="{{ $profileRoute }}" class="topbar-user">
+                        <span class="topbar-user-info">
+                            <strong>{{ $topbarUser->name }}</strong>
 
-                    <span class="topbar-avatar">
-                        {{ strtoupper(substr($topbarUser->name, 0, 2)) }}
-                    </span>
+                            <small>
+                                {{ $topbarUser->role === 'admin'
+                                    ? 'Administrator'
+                                    : 'Peminjam' }}
+                            </small>
+                        </span>
 
-                </a>
-            @endauth
-
+                        <span class="topbar-avatar">
+                            {{ strtoupper(substr($topbarUser->name, 0, 2)) }}
+                        </span>
+                    </a>
+                @endauth
+            </div>
         </div>
 
         <div class="main-content">
             @yield('panel')
         </div>
-
     </main>
-
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        const layout = document.querySelector('.app-layout');
+        const toggle = document.getElementById('sidebarToggle');
+        const storageKey = 'sipadu-sidebar-state';
 
-    const sidebar = document.getElementById('mainSidebar');
-    const toggle = document.getElementById('sidebarToggle');
+        if (!layout || !toggle) return;
 
-    if (sidebar && toggle) {
-        toggle.addEventListener('click', function () {
-            sidebar.classList.toggle('expanded');
+        const isInitiallyClosed =
+            document.documentElement.classList.contains(
+                'sipadu-sidebar-closed'
+            );
+
+        layout.classList.toggle(
+            'sidebar-closed',
+            isInitiallyClosed
+        );
+
+        const renderToggleIcon = (open) => {
+            if (window.lucide) {
+                toggle.innerHTML = open
+                    ? '<i data-lucide="panel-left-close"></i>'
+                    : '<i data-lucide="panel-left-open"></i>';
+
+                window.lucide.createIcons();
+            }
+        };
+
+        const setSidebar = (open) => {
+            layout.classList.toggle(
+                'sidebar-closed',
+                !open
+            );
+
+            document.documentElement.classList.toggle(
+                'sipadu-sidebar-closed',
+                !open
+            );
+
+            try {
+                localStorage.setItem(
+                    storageKey,
+                    open ? 'open' : 'closed'
+                );
+            } catch (e) {}
+
+            renderToggleIcon(open);
+        };
+
+        renderToggleIcon(!isInitiallyClosed);
+
+        /* Enable animation only after the initial state has been applied. */
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                document.documentElement.classList.add(
+                    'sidebar-ready'
+                );
+
+                document.documentElement.classList.add(
+                    'page-ready'
+                );
+            });
         });
-    }
 
-    if (window.lucide) {
-        window.lucide.createIcons();
-    }
+        toggle.addEventListener('click', () => {
+            setSidebar(
+                layout.classList.contains('sidebar-closed')
+            );
+        });
 
-});
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    });
 </script>
 
 @endsection
