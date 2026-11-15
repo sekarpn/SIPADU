@@ -271,11 +271,7 @@ label {
 }
 
 .auth-art::after {
-    background: linear-gradient(
-        145deg,
-        rgba(18, 56, 36, 0.92),
-        rgba(49, 111, 79, 0.72)
-    ) !important;
+    background: linear-gradient(145deg, #78a58dcc, #91b49fa6) !important;
 }
 
 .auth-form {
