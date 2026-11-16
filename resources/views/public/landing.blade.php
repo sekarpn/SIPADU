@@ -28,8 +28,8 @@
         }
 
         .landing-shell {
-            width: min(1500px, calc(100% - 48px));
-            margin: 18px auto;
+            width: min(1680px, calc(100% - 80px));
+            margin: 0 auto 24px;
             border-radius: 20px;
             overflow: hidden;
             background: rgba(255, 255, 255, .80);
@@ -39,18 +39,23 @@
         }
 
         .lnav {
-            height: 76px;
+            width: min(1680px, calc(100% - 80px));
+            min-height: 76px;
             padding: 0 44px;
+            margin: 18px auto 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(255, 255, 255, .88);
-            border-bottom: 1px solid var(--lp-line);
-            backdrop-filter: blur(18px);
-
+            background: rgba(255, 255, 255, .95);
+            border: 1px solid rgba(255, 255, 255, .95);
+            border-radius: 18px;
+            box-shadow: 0 12px 35px rgba(18, 40, 32, .08);
+            -webkit-backdrop-filter: blur(22px) saturate(150%);
+            backdrop-filter: blur(22px) saturate(150%);
             position: sticky;
-            top: 0;
-            z-index: 1000;
+            top: 12px;
+            z-index: 1100;
+            isolation: isolate;
         }
 
         .brand {
@@ -588,16 +593,11 @@
 
         @media (max-width: 900px) {
             .lnav {
+                width: calc(100% - 24px);
+                min-height: 68px;
                 padding: 0 20px;
-                position: sticky;
-                top: 0;
-                z-index: 1000;
-            }
-
-            .lnav {
-                padding: 0 20px;
-                position: sticky;
-                top: 0;
+                margin: 12px auto 14px;
+                top: 8px;
             }
 
             .lnav-links {
@@ -605,7 +605,7 @@
             }
 
             .lnav-actions .login {
-                display: none;
+                display: inline-flex;
             }
 
             .hero {
@@ -705,11 +705,105 @@
                 font-size: 16px;
             }
         }
-    </style>
+    
+        /* Landing page sizing and three-step process cards */
 
-    <main class="landing-shell">
-        <nav class="lnav">
-            <a class="brand" href="{{ route('landing') }}">
+        .section#alur {
+            padding-top: 76px;
+            padding-bottom: 76px;
+        }
+
+        .section#alur .feature-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            padding: 14px;
+            border-radius: 20px;
+            background: #173f35;
+            border: 1px solid rgba(255,255,255,.12);
+            box-shadow: none;
+        }
+
+        .section#alur .feature,
+        .section#alur .feature.wide {
+            min-height: 160px;
+            padding: 22px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.075);
+            border: 1px solid rgba(255,255,255,.09);
+            display: block;
+        }
+
+        .section#alur .feature .num {
+            width: auto;
+            height: auto;
+            display: block;
+            padding: 0;
+            margin: 0 0 12px;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            color: #a9d8c2;
+            font-size: 32px;
+            line-height: 1;
+            font-weight: 800;
+        }
+
+        .section#alur .feature h3 {
+            margin: 0 0 8px;
+            color: #fff;
+            font-size: 16px;
+            letter-spacing: -.02em;
+        }
+
+        .section#alur .feature p {
+            max-width: 420px;
+            margin: 0;
+            color: rgba(238, 247, 242, .78);
+            font-size: 11px;
+            line-height: 1.75;
+        }
+
+        @media (max-width: 900px) {
+            .landing-shell {
+                width: calc(100% - 24px);
+                margin: 0 auto 18px;
+                border-radius: 16px;
+            }
+            .lnav {
+                width: calc(100% - 24px);
+                padding: 0 20px;
+            }
+            .section#alur .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .landing-shell {
+                width: calc(100% - 16px);
+                margin: 0 auto 14px;
+                border-radius: 13px;
+            }
+            .lnav {
+                width: calc(100% - 16px);
+                min-height: 64px;
+                height: auto;
+                padding: 10px 14px;
+                margin: 10px auto 12px;
+                top: 6px;
+            }
+            .lnav-actions .lbtn {
+                padding: 9px 14px;
+            }
+            .section#alur .feature {
+                min-height: 0;
+            }
+        }
+
+</style>
+
+    <nav class="lnav">
+            <a class="brand" href="#top">
                 <img src="{{ asset('images/logosipadu.png') }}" alt="SIPADU">
                 <span>SIPADU</span>
             </a>
@@ -723,11 +817,11 @@
 
             <div class="lnav-actions">
                 <a class="lbtn login" href="{{ route('login') }}">Login</a>
-                <a class="lbtn primary" href="{{ route('login') }}">Mulai</a>
             </div>
-        </nav>
+    </nav>
 
-        <section class="hero">
+    <main class="landing-shell">
+        <section class="hero" id="top">
             <div class="float-card note">
                 <b>Ajukan dengan lebih teratur.</b>
                 <p>
@@ -764,7 +858,7 @@
 
                 <div class="hero-actions">
                     <a class="lbtn primary" href="{{ route('login') }}">
-                        Mulai Pengajuan
+                        Ajukan Sekarang
                     </a>
 
                     <a class="lbtn login" href="#alur">
@@ -810,30 +904,22 @@
             </div>
 
             <div class="feature-grid">
-                <article class="feature wide">
-                    <div>
-                        <div class="num">01</div>
-                        <h3>Pilih Auditorium</h3>
-                        <p>Mulai dari auditorium dan kebutuhan kegiatan yang sesuai.</p>
-                    </div>
-
-                    <div class="big">SIPADU</div>
+                <article class="feature">
+                    <div class="num">1</div>
+                    <h3>Data Terpusat</h3>
+                    <p>Informasi pengajuan dan proses peminjaman tersimpan dalam satu sistem.</p>
                 </article>
 
                 <article class="feature">
-                    <div class="num">02</div>
-                    <h3>Buat Pengajuan</h3>
-                    <p>
-                        Lengkapi data acara, jadwal, serta kebutuhan sesuai formulir yang tersedia.
-                    </p>
+                    <div class="num">2</div>
+                    <h3>Verifikasi Terarah</h3>
+                    <p>Administrator dapat memproses pengajuan berdasarkan informasi yang tersedia.</p>
                 </article>
 
                 <article class="feature">
-                    <div class="num">03</div>
-                    <h3>Pantau Status</h3>
-                    <p>
-                        Perkembangan pengajuan dapat dipantau sampai keputusan diberikan.
-                    </p>
+                    <div class="num">3</div>
+                    <h3>Status Transparan</h3>
+                    <p>Pengguna dapat melihat perkembangan pengajuan dengan lebih mudah.</p>
                 </article>
             </div>
         </section>
@@ -930,7 +1016,7 @@
 
             <div class="hero-actions">
                 <a class="lbtn primary" href="{{ route('login') }}">
-                    Mulai Ajukan
+                    Ajukan Sekarang
                 </a>
 
                 <a class="lbtn login" href="{{ route('login') }}">
