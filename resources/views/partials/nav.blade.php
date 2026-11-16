@@ -1,17 +1,37 @@
+
 @php
     $isAdmin = auth()->user()->role === 'admin';
 @endphp
 
 <style>
-    /* sidebar */
-    .sidebar {
+    /* SIDEBAR GLASSMORPHISM */
+    .sidebar,
+    #mainSidebar {
         display: flex !important;
         flex-direction: column !important;
-        padding: 16px 14px !important;
-        background: rgba(255, 255, 255, 0.88) !important;
+        padding: 18px 14px !important;
+        top: 14px !important;
+        bottom: 14px !important;
+        left: 14px !important;
+        margin: 0 !important;
+        height: auto !important;
+        max-height: calc(100vh - 28px) !important;
+        border-radius: 16px !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        background: linear-gradient(
+            145deg,
+            rgba(255,255,255,.54) 0%,
+            rgba(255,255,255,.30) 100%
+        ) !important;
+        backdrop-filter: blur(18px) saturate(150%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+        border: 1px solid rgba(255,255,255,.38) !important;
+        box-shadow: 0 8px 28px rgba(22,54,38,.06) !important;
+        box-sizing: border-box !important;
     }
 
-    /* logo */
+    /* BRAND / LOGO */
     .sidebar .sidebar-brand {
         display: flex !important;
         align-items: center !important;
@@ -20,13 +40,13 @@
         padding: 0 8px 14px !important;
         margin-bottom: 10px !important;
         text-decoration: none !important;
-        border-bottom: 1px solid var(--border-hairline) !important;
+        border-bottom: 1px solid rgba(22,54,38,.08) !important;
     }
 
     .sidebar .brand-icon {
         display: flex !important;
-        align-items: center;
-        justify-content: center;
+        align-items: center !important;
+        justify-content: center !important;
         width: 40px !important;
         height: 40px !important;
         min-width: 40px !important;
@@ -42,30 +62,31 @@
     .sidebar .brand-text {
         display: flex !important;
         flex-direction: column !important;
-        color: var(--brand-primary) !important;
+        color: #163626 !important;
         white-space: nowrap;
     }
 
     .sidebar .brand-text b {
         font-size: 17px !important;
         font-weight: 800 !important;
+        color: #1f7a49 !important;
+        letter-spacing: -.2px;
     }
 
     .sidebar .brand-text small {
         font-size: 9px !important;
-        color: var(--text-muted) !important;
+        color: #4c6456 !important;
         white-space: nowrap;
     }
 
-    /* navigation */
-
+    /* NAVIGATION */
     .sidebar .nav-caption {
         display: block !important;
-        padding: 14px 10px 6px !important;
+        padding: 12px 10px 6px !important;
         font-size: 10px !important;
         font-weight: 800 !important;
-        letter-spacing: 0.08em !important;
-        color: var(--text-muted) !important;
+        letter-spacing: .08em !important;
+        color: #4c6456 !important;
         white-space: nowrap;
     }
 
@@ -76,14 +97,16 @@
         gap: 12px !important;
         width: 100% !important;
         min-height: 42px !important;
-        margin: 2px 0 !important;
+        margin: 3px 0 !important;
         padding: 10px 12px !important;
         border-radius: 12px !important;
         text-decoration: none !important;
-        color: var(--text-muted) !important;
-        font-size: 12px !important;
+        color: #3c5446 !important;
+        font-size: 12.5px !important;
         font-weight: 700 !important;
         white-space: nowrap;
+        border: 1px solid transparent !important;
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
     }
 
     .sidebar .nav-link svg {
@@ -96,17 +119,12 @@
         display: inline !important;
     }
 
-    .sidebar .nav-link:hover {
-        background: #f4f8f5 !important;
-        color: var(--brand-primary) !important;
-    }
-
-    /* active menu */
-
     .sidebar .nav-link.active {
         position: relative !important;
-        background: #e8f6ee !important;
-        color: var(--brand-primary) !important;
+        background: rgba(33,128,77,.16) !important;
+        color: #1f7a49 !important;
+        border: 1px solid rgba(255,255,255,.35) !important;
+        box-shadow: none !important;
     }
 
     .sidebar .nav-link.active::before {
@@ -120,12 +138,16 @@
         background: #238458 !important;
     }
 
-    /* logout */
+    .sidebar .nav-link:hover:not(.active) {
+        background: rgba(255,255,255,.52) !important;
+        color: #163626 !important;
+    }
 
+    /* LOGOUT */
     .sidebar .logout {
         margin-top: auto !important;
         padding-top: 14px !important;
-        border-top: 1px solid var(--border-hairline) !important;
+        border-top: 1px solid rgba(22,54,38,.08) !important;
     }
 
     .sidebar .logout button {
@@ -136,13 +158,14 @@
         width: 100% !important;
         min-height: 42px !important;
         padding: 10px 12px !important;
-        border: 0 !important;
+        border: none !important;
         border-radius: 12px !important;
         background: transparent !important;
-        color: var(--text-muted) !important;
-        font: 700 12px 'Plus Jakarta Sans', sans-serif !important;
+        color: #3c5446 !important;
+        font: 700 12.5px 'Plus Jakarta Sans', 'Instrument Sans', sans-serif !important;
         cursor: pointer;
         white-space: nowrap;
+        transition: background .2s ease, color .2s ease;
     }
 
     .sidebar .logout button span {
@@ -150,12 +173,11 @@
     }
 
     .sidebar .logout button:hover {
-        background: #fff4f4 !important;
-        color: #b91c1c !important;
+        background: rgba(254,226,226,.85) !important;
+        color: #c53030 !important;
     }
 
-    /* collapsed sidebar */
-
+    /* COLLAPSED SIDEBAR */
     .app-layout.sidebar-closed .sidebar,
     html.sipadu-sidebar-closed .app-layout .sidebar {
         padding: 16px 8px !important;
@@ -211,11 +233,18 @@
         bottom: 8px !important;
     }
 
-    /* mobile */
-
+    /* RESPONSIVE */
     @media (max-width: 900px) {
-        .sidebar {
+        .sidebar,
+        #mainSidebar {
             width: 248px !important;
+            min-width: 248px !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            max-height: 100vh !important;
+            border-radius: 0 16px 16px 0 !important;
+            background: rgba(255,255,255,.94) !important;
         }
 
         .app-layout.sidebar-closed .sidebar .brand-text,
@@ -226,16 +255,18 @@
         html.sipadu-sidebar-closed .app-layout .sidebar .nav-caption,
         html.sipadu-sidebar-closed .app-layout .sidebar .nav-link span,
         html.sipadu-sidebar-closed .app-layout .sidebar .logout button span {
-            display: flex !important;
+            display: inline !important;
         }
 
-        .app-layout.sidebar-closed .sidebar .nav-link {
+        .app-layout.sidebar-closed .sidebar .nav-link,
+        html.sipadu-sidebar-closed .app-layout .sidebar .nav-link {
             justify-content: flex-start !important;
             gap: 12px !important;
             padding: 10px 12px !important;
         }
 
-        .app-layout.sidebar-closed .sidebar .logout button {
+        .app-layout.sidebar-closed .sidebar .logout button,
+        html.sipadu-sidebar-closed .app-layout .sidebar .logout button {
             justify-content: flex-start !important;
             gap: 12px !important;
             padding: 10px 12px !important;
@@ -269,9 +300,7 @@
         {{ $isAdmin ? 'MENU ADMIN' : 'MENU PEMINJAM' }}
     </div>
 
-    {{-- =========================
-         MENU ADMIN
-    ========================= --}}
+    {{-- MENU ADMIN --}}
     @if ($isAdmin)
 
         <a
@@ -328,9 +357,7 @@
             <span>Profil Akun</span>
         </a>
 
-    {{-- =========================
-         MENU PEMINJAM
-    ========================= --}}
+    {{-- MENU PEMINJAM --}}
     @else
 
         <a
@@ -380,9 +407,7 @@
 
     @endif
 
-    {{-- =========================
-         LOGOUT
-    ========================= --}}
+    {{-- LOGOUT --}}
     <form
         method="POST"
         action="{{ route('logout') }}"
@@ -405,22 +430,19 @@
 ></script>
 
 <script>
-    (function () {
-        function renderSidebarIcons() {
-            if (window.lucide) {
-                window.lucide.createIcons();
-            }
+(function () {
+    function renderSidebarIcons() {
+        if (window.lucide) {
+            window.lucide.createIcons();
         }
+    }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener(
-                'DOMContentLoaded',
-                renderSidebarIcons
-            );
-        } else {
-            renderSidebarIcons();
-        }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderSidebarIcons);
+    } else {
+        renderSidebarIcons();
+    }
 
-        window.addEventListener('load', renderSidebarIcons);
-    })();
+    window.addEventListener('load', renderSidebarIcons);
+})();
 </script>
