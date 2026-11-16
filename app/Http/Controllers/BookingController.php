@@ -168,7 +168,7 @@ class BookingController extends Controller
         });
 
         return back()->with('success', 'Status pengajuan berhasil diperbarui.');
-
+    }
         public function downloadTemplateSurat(Request $request)
     {
         $user = $request->user();
