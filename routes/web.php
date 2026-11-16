@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -37,6 +36,10 @@ Route::middleware(['auth', 'role:peminjam'])
         Route::get('/ajukan', [BookingController::class, 'create'])->name('booking.create');
         Route::post('/ajukan', [BookingController::class, 'store'])->name('booking.store');
         Route::patch('/pengajuan/{booking}/batal', [BookingController::class, 'cancel'])->name('booking.cancel');
+
+        // DOWNLOAD TEMPLATE SURAT PENGAJUAN (SUDAH DIPERBAIKI)
+        Route::get('/template-surat', [BookingController::class, 'downloadTemplateSurat'])
+            ->name('booking.template');
 
         Route::get('/panduan', [DashboardController::class, 'guides'])->name('guides');
 

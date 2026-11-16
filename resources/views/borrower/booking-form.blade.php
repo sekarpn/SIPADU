@@ -232,6 +232,63 @@
     display: block !important;
     color: #15803d !important;
 }
+/* UPLOAD SURAT */
+.letter-upload {
+        margin: 22px 0;
+        padding: 18px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+    /* <--- TAMBAHKAN CSS INI ---> */
+    .template-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        flex-wrap: wrap;
+    }
+
+    .template-box-text strong {
+        display: block;
+        font-size: 13.5px;
+        color: #166534;
+        margin-bottom: 2px;
+    }
+
+    .template-box-text span {
+        display: block;
+        font-size: 12.5px;
+        color: #15803d;
+    }
+
+    .btn-template {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 14px;
+        background: #16a34a;
+        color: #ffffff !important;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        white-space: nowrap;
+        transition: .2s;
+    }
+
+    .btn-template:hover {
+        background: #15803d;
+    }
+    /* <--- BATAS TAMBAHAN CSS ---> */
+
 </style>
 
 <div class="page-heading">
@@ -404,6 +461,17 @@
 
             <h3>Dokumen Persyaratan</h3>
 
+            {{-- KOTAK DOWNLOAD TEMPLATE SURAT --}}
+            <div class="template-box">
+                <div class="template-box-text">
+                    <strong>Belum punya format Surat Peminjaman?</strong>
+                    <span>Unduh template resmi UPNVJ, isi detail acara, dan mintakan tanda tangan sebelum diunggah.</span>
+                </div>
+                <a href="{{ route('borrower.booking.template') }}" class="btn-template">
+                    ↓ Download Template Surat (PDF)
+                </a>
+            </div>
+
             <label for="surat">Upload Surat Peminjaman (PDF) *</label>
 
             <input
@@ -421,6 +489,8 @@
             @error('surat')
                 <p class="notice">{{ $message }}</p>
             @enderror
+
+        </div>
 
         </div>
 

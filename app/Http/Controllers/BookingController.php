@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\BookingHistory;
 use App\Models\Auditorium;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -167,5 +168,21 @@ class BookingController extends Controller
         });
 
         return back()->with('success', 'Status pengajuan berhasil diperbarui.');
+
+        public function downloadTemplateSurat(Request $request)
+    {
+        $user = $request->user();
+
+        $data = [
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+            'nama_pemohon'  => $user->name ?? '........................................',
+            'nomor_induk'   => $user->nim ?? $user->nip ?? $user->nomor_identitas ?? '........................................',
+            'no_telepon'    => $user->phone ?? $user->no_telepon ?? '........................................',
+        ];
+
+        $pdf = Pdf::loadView('pdf.template-surat-peminjaman', $data)
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Template_Surat_Permohonan_Auditorium_UPNVJ.pdf');
     }
 }
