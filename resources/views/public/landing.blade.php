@@ -705,7 +705,7 @@
                 font-size: 16px;
             }
         }
-    
+
         /* Landing page sizing and three-step process cards */
 
         .section#alur {
@@ -715,22 +715,29 @@
 
         .section#alur .feature-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-            padding: 14px;
-            border-radius: 20px;
-            background: #173f35;
-            border: 1px solid rgba(255,255,255,.12);
+            gap: 20px;
+            padding: 10px 0;
+            border-radius: 0;
+            background: transparent;
+            border: none;
             box-shadow: none;
         }
 
         .section#alur .feature,
         .section#alur .feature.wide {
-            min-height: 160px;
-            padding: 22px;
-            border-radius: 15px;
-            background: rgba(255,255,255,.075);
-            border: 1px solid rgba(255,255,255,.09);
+            min-height: 180px;
+            padding: 26px;
+            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid rgba(17, 47, 38, .08);
+            box-shadow: 0 8px 24px #cbe0d5;
             display: block;
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+
+        .section#alur .feature:hover {
+            transform: translateY(-9px);
+            box-shadow: 0 18px 35px rgba(18, 40, 32, .15);
         }
 
         .section#alur .feature .num {
@@ -738,19 +745,19 @@
             height: auto;
             display: block;
             padding: 0;
-            margin: 0 0 12px;
+            margin: 0 0 16px;
             border: 0;
             border-radius: 0;
             background: transparent;
-            color: #a9d8c2;
-            font-size: 32px;
+            color: var(--lp-green);
+            font-size: 34px;
             line-height: 1;
             font-weight: 800;
         }
 
         .section#alur .feature h3 {
-            margin: 0 0 8px;
-            color: #fff;
+            margin: 0 0 10px;
+            color: var(--lp-ink);
             font-size: 16px;
             letter-spacing: -.02em;
         }
@@ -758,48 +765,198 @@
         .section#alur .feature p {
             max-width: 420px;
             margin: 0;
-            color: rgba(238, 247, 242, .78);
-            font-size: 11px;
+            color: var(--lp-muted);
+            font-size: 12px;
             line-height: 1.75;
         }
 
         @media (max-width: 900px) {
-            .landing-shell {
-                width: calc(100% - 24px);
-                margin: 0 auto 18px;
-                border-radius: 16px;
-            }
-            .lnav {
-                width: calc(100% - 24px);
-                padding: 0 20px;
-            }
             .section#alur .feature-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 560px) {
-            .landing-shell {
-                width: calc(100% - 16px);
-                margin: 0 auto 14px;
-                border-radius: 13px;
-            }
-            .lnav {
-                width: calc(100% - 16px);
-                min-height: 64px;
-                height: auto;
-                padding: 10px 14px;
-                margin: 10px auto 12px;
-                top: 6px;
-            }
-            .lnav-actions .lbtn {
-                padding: 9px 14px;
-            }
             .section#alur .feature {
                 min-height: 0;
             }
         }
 
+/* SOP dan FAQ */
+
+.panduan-intro {
+    max-width: 700px;
+    margin: 0 auto 38px;
+    text-align: center;
+}
+
+.panduan-intro p {
+    color: var(--lp-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.panduan-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.panduan-heading {
+    font-size: 22px;
+    margin: 0 0 22px;
+    color: var(--lp-ink);
+}
+
+.sop-list,
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sop-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sop-symbol {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+    padding: 0;
+    line-height: 1;
+
+    background: #dceee3;
+    color: #438767;
+    border: 1px solid #cce4d5;
+    border-radius: 10px;
+
+    font-family: Arial, sans-serif;
+    font-size: 27px;
+    font-weight: 500;
+}
+
+.sop-detail {
+    flex: 1;
+    padding: 18px 20px;
+    background: #fff;
+    border: 1px solid var(--lp-line);
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.sop-detail:hover,
+.faq-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 30px rgba(18, 40, 32, .13);
+}
+
+.sop-detail p {
+    margin: 0;
+    color: var(--lp-muted);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.faq-item {
+    padding: 22px 24px;
+    background: #fff;
+    border: 1px solid var(--lp-line);
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.faq-question {
+    color: var(--lp-ink);
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.faq-answer {
+    color: var(--lp-muted);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.faq-answer b {
+    color: var(--lp-green);
+}
+
+@media (max-width: 900px) {
+    .panduan-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Kontainer utama SOP dan FAQ */
+.panduan-content > div {
+    padding: 30px;
+    background: #ffffff;
+    border: 1px solid rgba(17, 47, 38, .09);
+    border-radius: 22px;
+    box-shadow: 0 12px 35px rgba(18, 40, 32, .07);
+}
+
+/* Judul di dalam kontainer */
+.panduan-heading {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #edf1ee;
+}
+
+/* Kotak isi SOP */
+.sop-detail {
+    background: #f4f8f5;
+    border: 1px solid #e7eee9;
+    box-shadow: none;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.sop-detail:hover {
+    transform: translateY(-5px);
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
+}
+
+/* Kotak isi FAQ */
+.faq-item {
+    background: #f4f8f5;
+    border: 1px solid #e7eee9;
+    box-shadow: none;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-5px);
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
+}
+
+/* Simbol SOP */
+.sop-symbol {
+    flex-shrink: 0;
+    background: #dceee3;
+    border: 1px solid #cce4d5;
+}
+
+@media (max-width: 560px) {
+    .panduan-content > div {
+        padding: 20px;
+    }
+}
 </style>
 
     <nav class="lnav">
@@ -896,30 +1053,38 @@
             <div class="section-title">
                 <span class="eyebrow">Alur Pengajuan</span>
 
-                <h2>Pengajuan yang jelas dari awal sampai keputusan.</h2>
+                <h2>Alur peminjaman auditorium yang mudah dan terarah.</h2>
 
                 <p>
-                    {{ $alur?->body ?? 'SIPADU menyediakan alur pengajuan yang terstruktur agar pengguna dapat mengetahui tahapan peminjaman auditorium dengan lebih mudah.' }}
+                    Peminjam mengajukan permohonan peminjaman auditorium,
+                    kemudian admin melakukan verifikasi. Setelah pengajuan disetujui,
+                    auditorium siap digunakan sesuai jadwal.
                 </p>
             </div>
 
             <div class="feature-grid">
                 <article class="feature">
                     <div class="num">1</div>
-                    <h3>Data Terpusat</h3>
-                    <p>Informasi pengajuan dan proses peminjaman tersimpan dalam satu sistem.</p>
+                    <h3>Peminjam Mengajukan</h3>
+                    <p>
+                        Peminjam mengisi dan mengirim formulir pengajuan peminjaman auditorium.
+                    </p>
                 </article>
 
                 <article class="feature">
                     <div class="num">2</div>
-                    <h3>Verifikasi Terarah</h3>
-                    <p>Administrator dapat memproses pengajuan berdasarkan informasi yang tersedia.</p>
+                    <h3>Verifikasi Admin</h3>
+                    <p>
+                        Admin memeriksa pengajuan dan memberikan keputusan persetujuan.
+                    </p>
                 </article>
 
                 <article class="feature">
                     <div class="num">3</div>
-                    <h3>Status Transparan</h3>
-                    <p>Pengguna dapat melihat perkembangan pengajuan dengan lebih mudah.</p>
+                    <h3>Auditorium Siap Digunakan</h3>
+                    <p>
+                        Auditorium dapat digunakan sesuai jadwal setelah pengajuan disetujui.
+                    </p>
                 </article>
             </div>
         </section>
@@ -956,52 +1121,174 @@
             </div>
         </section>
 
-        <section class="section reveal" id="panduan">
-            <div class="section-title">
-                <span class="eyebrow">Panduan</span>
+<section class="section reveal" id="panduan">
+    <div class="section-title">
+        <span class="eyebrow">Panduan</span>
 
-                <h2>
-                    {{ $sop?->title ?? 'Informasi yang membantu proses peminjaman berjalan lebih jelas.' }}
-                </h2>
+        <h2>SOP dan FAQ Peminjaman Auditorium SIPADU</h2>
 
-                <p>
-                    {{ $sop?->body ?? ($faq?->body ?? 'Gunakan SOP dan informasi yang tersedia sebagai panduan sebelum melakukan pengajuan peminjaman auditorium.') }}
-                </p>
+        <p>
+            Pelajari prosedur peminjaman dan temukan jawaban
+            atas pertanyaan umum sebelum mengajukan auditorium.
+        </p>
+    </div>
+
+    <div class="panduan-content">
+
+        {{-- SOP --}}
+        <div>
+            <h3 class="panduan-heading">SOP Peminjaman</h3>
+
+            <div class="sop-list">
+
+                <div class="sop-item">
+                    <div class="sop-symbol">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-caret-right-fill"
+                            viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                    </div>
+                    <div class="sop-detail">
+                        <p>
+                            UKM, BEM, atau Himpunan mengajukan proposal
+                            dan surat peminjaman kepada Koordinator
+                            Bidang Kemahasiswaan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sop-item">
+                    <div class="sop-symbol">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-caret-right-fill"
+                            viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                    </div>
+                    <div class="sop-detail">
+                        <p>
+                            Apabila terdapat jadwal bersamaan dengan
+                            kegiatan pihak rektorat, kegiatan rektorat
+                            diprioritaskan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sop-item">
+                    <div class="sop-symbol">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-caret-right-fill"
+                            viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                    </div>
+                    <div class="sop-detail">
+                        <p>
+                            Jika pengajuan BEM dan Himpunan memiliki
+                            jadwal yang sama, tingkat urgensi dan
+                            kepentingan kegiatan menjadi pertimbangan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sop-item">
+                    <div class="sop-symbol">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-caret-right-fill"
+                            viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                    </div>
+                    <div class="sop-detail">
+                        <p>
+                            Pengajuan kegiatan eksternal dan internal
+                            UPN dinilai berdasarkan tujuan kegiatan
+                            serta asal narasumber.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sop-item">
+                    <div class="sop-symbol">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-caret-right-fill"
+                            viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                    </div>
+                    <div class="sop-detail">
+                        <p>
+                            Lihat panduan lengkap melalui
+                            <a href="http://bit.ly/AlurPeminjamanRuanganPerFakultas"
+                               target="_blank"
+                               style="color: var(--lp-green); font-weight: 700;">
+                                tautan SOP peminjaman ruangan
+                            </a>.
+                        </p>
+                    </div>
+                </div>
+
             </div>
+        </div>
 
-            <div class="info-grid">
-                <article class="info-card">
-                    <h3>SOP</h3>
-                    <p>
-                        {{ $sop?->title ?? 'Panduan prosedur peminjaman auditorium.' }}
-                    </p>
+        {{-- FAQ --}}
+        <div>
+            <h3 class="panduan-heading">Frequently Asked Questions (FAQ)</h3>
+
+            <div class="faq-list">
+
+                <article class="faq-item">
+                    <div class="faq-question">
+                        Q: Siapa saja yang dapat mengajukan peminjaman auditorium?
+                    </div>
+                    <div class="faq-answer">
+                        <b>A:</b> UKM, BEM, dan Himpunan dapat mengajukan
+                        peminjaman auditorium sesuai prosedur yang berlaku.
+                    </div>
                 </article>
 
-                <article class="info-card">
-                    <h3>FAQ</h3>
-                    <p>
-                        {{ $faq?->title ?? 'Jawaban untuk pertanyaan umum pengguna.' }}
-                    </p>
+                <article class="faq-item">
+                    <div class="faq-question">
+                        Q: Bagaimana cara mengajukan peminjaman auditorium?
+                    </div>
+                    <div class="faq-answer">
+                        <b>A:</b> Peminjam mengajukan proposal dan surat
+                        peminjaman kepada Admin Biro Umum & Keuangan sesuai
+                        prosedur peminjaman.
+                    </div>
                 </article>
+
+                <article class="faq-item">
+                    <div class="faq-question">
+                        Q: Bagaimana jika terdapat jadwal peminjaman yang bersamaan?
+                    </div>
+                    <div class="faq-answer">
+                        <b>A:</b> Pengajuan akan dipertimbangkan berdasarkan
+                        prioritas, tingkat urgensi, dan kepentingan kegiatan.
+                    </div>
+                </article>
+
             </div>
+        </div>
 
-            <div class="stats-row">
-                <div class="stat">
-                    <b>Alur</b>
-                    <span>Pengajuan terstruktur</span>
-                </div>
-
-                <div class="stat">
-                    <b>Status</b>
-                    <span>Proses mudah dipantau</span>
-                </div>
-
-                <div class="stat">
-                    <b>Informasi</b>
-                    <span>Panduan tersedia</span>
-                </div>
-            </div>
-        </section>
+    </div>
+</section>
 
         <section class="cta reveal" id="kontak">
             <div>
