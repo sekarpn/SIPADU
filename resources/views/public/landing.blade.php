@@ -29,7 +29,7 @@
 
         .landing-shell {
             width: min(1680px, calc(100% - 80px));
-            margin: 0 auto 24px;
+            margin: 18px auto 16px;
             border-radius: 20px;
             overflow: hidden;
             background: rgba(255, 255, 255, .80);
@@ -39,19 +39,23 @@
         }
 
         .lnav {
-            width: min(1680px, calc(100% - 80px));
+            width: min(1450px, calc(100% - 120px));
             min-height: 76px;
             padding: 0 44px;
             margin: 18px auto 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(255, 255, 255, .95);
-            border: 1px solid rgba(255, 255, 255, .95);
+
+            /* GLASS EFFECT */
+            background: rgba(255, 255, 255, .65);
+            border: 1px solid rgba(255, 255, 255, .45);
             border-radius: 18px;
-            box-shadow: 0 12px 35px rgba(18, 40, 32, .08);
-            -webkit-backdrop-filter: blur(22px) saturate(150%);
-            backdrop-filter: blur(22px) saturate(150%);
+            box-shadow: 0 8px 28px rgba(22, 54, 38, .05);
+
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+
             position: sticky;
             top: 12px;
             z-index: 1100;
@@ -158,11 +162,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
 
-            width: min(850px, 75%);
+            width: min(850px, calc(100% - 40px));
             max-width: 850px;
             padding: 0;
             margin: 0;
             text-align: center;
+            box-sizing: border-box;
         }
 
         .eyebrow {
@@ -616,6 +621,11 @@
                 overflow: hidden;
             }
 
+            .hero-copy {
+                width: calc(100% - 40px);
+                padding-top: 0;
+            }
+
             .note,
             .status-card {
                 display: none;
@@ -677,7 +687,8 @@
             }
 
             .hero h1 {
-                font-size: 50px;
+                font-size: clamp(30px, 8vw, 42px);
+                line-height: 1.12;
             }
 
             .hero-actions {
@@ -707,7 +718,6 @@
         }
 
         /* Landing page sizing and three-step process cards */
-
         .section#alur {
             padding-top: 76px;
             padding-bottom: 76px;
@@ -782,181 +792,215 @@
             }
         }
 
-/* SOP dan FAQ */
+        /* SOP dan FAQ */
+        .panduan-intro {
+            max-width: 700px;
+            margin: 0 auto 38px;
+            text-align: center;
+        }
 
-.panduan-intro {
-    max-width: 700px;
-    margin: 0 auto 38px;
-    text-align: center;
-}
+        .panduan-intro p {
+            color: var(--lp-muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
 
-.panduan-intro p {
-    color: var(--lp-muted);
-    font-size: 13px;
-    line-height: 1.8;
-}
+        .panduan-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
 
-.panduan-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    align-items: start;
-}
+        .panduan-heading {
+            font-size: 22px;
+            margin: 0 0 22px;
+            color: var(--lp-ink);
+        }
 
-.panduan-heading {
-    font-size: 22px;
-    margin: 0 0 22px;
-    color: var(--lp-ink);
-}
+        .sop-list,
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
 
-.sop-list,
-.faq-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
+        .sop-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-.sop-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+        .sop-symbol {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            flex-shrink: 0;
 
-.sop-symbol {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+            box-sizing: border-box;
+            padding: 0;
+            line-height: 1;
 
-    box-sizing: border-box;
-    padding: 0;
-    line-height: 1;
+            background: #dceee3;
+            color: #438767;
+            border: 1px solid #cce4d5;
+            border-radius: 10px;
 
-    background: #dceee3;
-    color: #438767;
-    border: 1px solid #cce4d5;
-    border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 27px;
+            font-weight: 500;
+        }
 
-    font-family: Arial, sans-serif;
-    font-size: 27px;
-    font-weight: 500;
-}
+        .sop-detail {
+            flex: 1;
+            padding: 18px 20px;
+            background: #fff;
+            border: 1px solid var(--lp-line);
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
 
-.sop-detail {
-    flex: 1;
-    padding: 18px 20px;
-    background: #fff;
-    border: 1px solid var(--lp-line);
-    border-radius: 14px;
-    box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
-    transition: transform .3s ease, box-shadow .3s ease;
-}
+        .sop-detail:hover,
+        .faq-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 30px rgba(18, 40, 32, .13);
+        }
 
-.sop-detail:hover,
-.faq-item:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 30px rgba(18, 40, 32, .13);
-}
+        .sop-detail p {
+            margin: 0;
+            color: var(--lp-muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
 
-.sop-detail p {
-    margin: 0;
-    color: var(--lp-muted);
-    font-size: 12px;
-    line-height: 1.8;
-}
+        .faq-item {
+            padding: 22px 24px;
+            background: #fff;
+            border: 1px solid var(--lp-line);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
 
-.faq-item {
-    padding: 22px 24px;
-    background: #fff;
-    border: 1px solid var(--lp-line);
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
-    transition: transform .3s ease, box-shadow .3s ease;
-}
+        .faq-question {
+            color: var(--lp-ink);
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
 
-.faq-question {
-    color: var(--lp-ink);
-    font-size: 13px;
-    font-weight: 800;
-    margin-bottom: 8px;
-}
+        .faq-answer {
+            color: var(--lp-muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
 
-.faq-answer {
-    color: var(--lp-muted);
-    font-size: 12px;
-    line-height: 1.8;
-}
+        .faq-answer b {
+            color: var(--lp-green);
+        }
 
-.faq-answer b {
-    color: var(--lp-green);
-}
+        @media (max-width: 900px) {
+            .panduan-content {
+                grid-template-columns: 1fr;
+            }
+        }
 
-@media (max-width: 900px) {
-    .panduan-content {
-        grid-template-columns: 1fr;
-    }
-}
+        /* Kontainer utama SOP dan FAQ */
+        .panduan-content > div {
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid rgba(17, 47, 38, .09);
+            border-radius: 22px;
+            box-shadow: 0 12px 35px rgba(18, 40, 32, .07);
+        }
 
-/* Kontainer utama SOP dan FAQ */
-.panduan-content > div {
-    padding: 30px;
-    background: #ffffff;
-    border: 1px solid rgba(17, 47, 38, .09);
-    border-radius: 22px;
-    box-shadow: 0 12px 35px rgba(18, 40, 32, .07);
-}
+        /* Judul di dalam kontainer */
+        .panduan-heading {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #edf1ee;
+        }
 
-/* Judul di dalam kontainer */
-.panduan-heading {
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #edf1ee;
-}
+        /* Kotak isi SOP */
+        .sop-detail {
+            background: #f4f8f5;
+            border: 1px solid #e7eee9;
+            box-shadow: none;
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
 
-/* Kotak isi SOP */
-.sop-detail {
-    background: #f4f8f5;
-    border: 1px solid #e7eee9;
-    box-shadow: none;
-    transition: transform .3s ease, box-shadow .3s ease;
-}
+        .sop-detail:hover {
+            transform: translateY(-5px);
+            background: #ffffff;
+            box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
+        }
 
-.sop-detail:hover {
-    transform: translateY(-5px);
-    background: #ffffff;
-    box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
-}
+        /* Kotak isi FAQ */
+        .faq-item {
+            background: #f4f8f5;
+            border: 1px solid #e7eee9;
+            box-shadow: none;
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
 
-/* Kotak isi FAQ */
-.faq-item {
-    background: #f4f8f5;
-    border: 1px solid #e7eee9;
-    box-shadow: none;
-    transition: transform .3s ease, box-shadow .3s ease;
-}
+        .faq-item:hover {
+            transform: translateY(-5px);
+            background: #ffffff;
+            box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
+        }
 
-.faq-item:hover {
-    transform: translateY(-5px);
-    background: #ffffff;
-    box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
-}
+        /* Simbol SOP */
+        .sop-symbol {
+            flex-shrink: 0;
+            background: #dceee3;
+            border: 1px solid #cce4d5;
+        }
 
-/* Simbol SOP */
-.sop-symbol {
-    flex-shrink: 0;
-    background: #dceee3;
-    border: 1px solid #cce4d5;
-}
+        @media (max-width: 560px) {
+            .panduan-content > div {
+                padding: 20px;
+            }
+        }
 
-@media (max-width: 560px) {
-    .panduan-content > div {
-        padding: 20px;
-    }
-}
+        @media (max-width: 560px) {
+            .landing-shell {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .hero {
+                min-height: 570px;
+            }
+
+            .hero-copy {
+                width: calc(100% - 36px);
+            }
+
+            .hero p {
+                font-size: 13px;
+            }
+
+            .section,
+            .dark-section {
+                padding: 48px 18px;
+            }
+
+            .cta {
+                margin: 0 18px 30px;
+                padding: 28px 22px;
+            }
+
+            .info-card,
+            .step {
+                padding: 22px;
+            }
+        }
 </style>
 
     <nav class="lnav">
