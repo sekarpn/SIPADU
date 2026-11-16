@@ -106,6 +106,28 @@
         background: transparent;
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
     }
+
+    /* FORM LOGIN TANPA KARTU PUTIH */
+    .auth-shell {
+        background: #e9efec !important;
+    }
+
+    .auth-form {
+        width: min(480px, calc(100% - 80px));
+        margin: auto;
+        padding: 0;
+        background: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    @media (max-width: 900px) {
+        .auth-form {
+            width: min(480px, calc(100% - 48px));
+            padding: 0;
+        }
+    }
 </style>
 
 <div class="auth-shell">
