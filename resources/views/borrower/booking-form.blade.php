@@ -1,81 +1,207 @@
-
 @extends('layouts.panel')
 
 @section('panel')
 
 <style>
-    /* LAYOUT UTAMA */
+    /* RESET CONTAINER AGAR LEBAR PENUH */
+    .booking-page-wrapper {
+        width: 100%;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* LAYOUT 2 KOLOM SEJAJAR */
     .booking-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.9fr);
-        gap: 24px;
-        align-items: start;
-        width: 100%;
-        max-width: 100%;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: flex-start !important;
+        gap: 0px;
+        width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box;
+        transition: gap 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .booking-layout > * {
-        min-width: 0;
-        max-width: 100%;
-        box-sizing: border-box;
+    .booking-layout.has-sidebar {
+        gap: 24px !important;
     }
 
-    .booking-form {
-        width: 100%;
-        min-width: 0;
+    /* KOLOM KIRI: FORMULIR (MENGECIL HALUS SAAT SIDEBAR MUNCUL) */
+    .booking-form-col {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
         box-sizing: border-box;
+        transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ATUR POSISI IKON DROPDOWN AGAR TIDAK TERLALU PINGGIR */
+    .booking-form select#auditoriumSelect {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        padding-right: 42px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 16px center !important;
+        background-size: 16px 16px !important;
+        cursor: pointer;
+    }
+
+    /* KOLOM KANAN: SIDEBAR RINGKASAN & PREVIEW (ANIMASI MELEBAR & FADE-IN) */
+    .booking-summary-col {
+        flex: 0 0 0px !important;
+        width: 0px !important;
+        max-width: 0px !important;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transform: translateX(16px);
+        position: sticky;
+        top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        box-sizing: border-box;
+        transition:
+            flex-basis 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.35s ease 0.1s,
+            transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .booking-summary-col.is-visible {
+        flex: 0 0 360px !important;
+        width: 360px !important;
+        max-width: 38% !important;
+        opacity: 1;
+        overflow: visible;
+        pointer-events: auto;
+        transform: translateX(0);
+    }
+
+    /* INNER WRAPPER AGAR TEKS DI DALAM SIDEBAR TIDAK TERJEPIT SAAT ANIMASI MELEBAR */
+    .summary-sidebar-inner {
+        min-width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    /* KARTU RINGKASAN PEMINJAMAN LIVE */
+    .summary-card {
+        background: #ffffff;
+        border: 1px solid #d1fae5;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 14px rgba(20, 83, 45, 0.05);
+        display: none;
+    }
+
+    .summary-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .summary-card-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #14532d;
+    }
+
+    .summary-badge {
+        background: #dcfce7;
+        color: #15803d;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 999px;
+    }
+
+    .summary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        font-size: 13.5px;
+    }
+
+    .summary-item {
+        display: none;
+        flex-direction: column;
+        gap: 2px;
+        padding-bottom: 9px;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .summary-item.visible:last-of-type {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .summary-label {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .summary-value {
+        font-weight: 600;
+        color: #0f172a;
+        word-break: break-word;
     }
 
     /* PREVIEW AUDITORIUM */
     .auditorium-preview {
-        position: sticky;
-        top: 20px;
         width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        background: #fff;
+        background: #ffffff;
         border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        border-radius: 14px;
         overflow: hidden;
+        box-sizing: border-box;
+        display: none;
     }
 
     .auditorium-preview img {
         width: 100%;
-        height: 230px;
+        height: 180px;
         object-fit: cover;
         display: block;
     }
 
-    .preview-placeholder {
-        height: 230px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 20px;
-        background: #f1f5f9;
-        color: #64748b;
-    }
-
     .preview-info {
-        padding: 18px;
+        padding: 16px;
         overflow-wrap: anywhere;
     }
 
-    .preview-info h3 {
-        margin: 0 0 12px;
+    .preview-info h4 {
+        margin: 0 0 8px;
+        font-size: 15px;
+        color: #0f172a;
     }
 
     .preview-info p {
-        margin: 8px 0;
+        margin: 5px 0;
         color: #64748b;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .preview-title {
-        padding: 16px 18px 0;
-        font-weight: 600;
+        padding: 14px 16px 10px;
+        font-weight: 700;
+        font-size: 14px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
     }
 
     /* PILIHAN SESI */
@@ -91,29 +217,34 @@
         min-width: 0;
         border: 1.5px solid #e2e8f0;
         border-radius: 12px;
-        background: #fff;
+        background: #ffffff !important;
         padding: 16px 10px;
         cursor: pointer;
         text-align: center;
         transition: .2s;
-        color: #334155;
+        color: #334155 !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
     }
 
     .session-card:hover {
-        border-color: #16a34a;
-        background: #f0fdf4;
+        border-color: #16a34a !important;
+        background: #f0fdf4 !important;
+        color: #15803d !important;
     }
 
-    .session-card.active {
-        border: 2px solid #16a34a;
-        background: #f0fdf4;
-        color: #15803d;
+    .session-card.active,
+    .session-card.active:hover {
+        border: 2px solid #16a34a !important;
+        background: #dcfce7 !important;
+        color: #15803d !important;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) !important;
     }
 
     .session-card strong {
         display: block;
         font-size: 14px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     .session-card span {
@@ -121,14 +252,18 @@
         font-size: 13px;
     }
 
-    /* CENTANG HANYA MUNCUL SETELAH DIKLIK */
+    .session-card.active strong,
+    .session-card.active span {
+        color: #15803d !important;
+    }
+
     .session-card .session-check {
         display: none !important;
         position: absolute;
         top: 7px;
         right: 9px;
         font-weight: bold;
-        color: #16a34a;
+        color: #15803d !important;
     }
 
     .session-card.active .session-check {
@@ -141,7 +276,7 @@
         margin: 0 0 12px;
     }
 
-    /* UPLOAD SURAT */
+    /* UPLOAD SURAT & TEMPLATE BOX */
     .letter-upload {
         margin: 22px 0;
         padding: 18px;
@@ -155,94 +290,6 @@
         margin-top: 0;
     }
 
-    .letter-upload input[type="file"] {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        margin-top: 10px;
-        padding: 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        background: white;
-        box-sizing: border-box;
-    }
-
-    .letter-upload small {
-        display: block;
-        color: #64748b;
-        margin-top: 8px;
-    }
-
-    /* RESPONSIVE TABLET DAN HP */
-    @media (max-width: 900px) {
-        .booking-layout {
-            grid-template-columns: minmax(0, 1fr);
-            gap: 20px;
-        }
-
-        .auditorium-preview {
-            position: static;
-            grid-row: 1;
-        }
-
-        .session-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-    }
-
-    @media (max-width: 520px) {
-        .session-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    /* FIX WARNA PILIHAN SESI */
-.booking-form .session-grid .session-card {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    background: #ffffff !important;
-    color: #334155 !important;
-    border: 1.5px solid #e2e8f0 !important;
-    box-shadow: none !important;
-}
-
-.booking-form .session-grid .session-card:hover {
-    background: #f0fdf4 !important;
-    color: #15803d !important;
-    border-color: #16a34a !important;
-}
-
-.booking-form .session-grid .session-card.active,
-.booking-form .session-grid .session-card.active:hover {
-    background: #dcfce7 !important;
-    color: #15803d !important;
-    border: 2px solid #16a34a !important;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) !important;
-}
-
-.booking-form .session-grid .session-card.active strong,
-.booking-form .session-grid .session-card.active span {
-    color: #15803d !important;
-}
-
-.booking-form .session-grid .session-card .session-check {
-    display: none !important;
-}
-
-.booking-form .session-grid .session-card.active .session-check {
-    display: block !important;
-    color: #15803d !important;
-}
-/* UPLOAD SURAT */
-.letter-upload {
-        margin: 22px 0;
-        padding: 18px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        box-sizing: border-box;
-    }
-
-    /* <--- TAMBAHKAN CSS INI ---> */
     .template-box {
         display: flex;
         align-items: center;
@@ -287,286 +334,360 @@
     .btn-template:hover {
         background: #15803d;
     }
-    /* <--- BATAS TAMBAHAN CSS ---> */
 
+    .letter-upload input[type="file"] {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: white;
+        box-sizing: border-box;
+    }
+
+    .letter-upload small {
+        display: block;
+        color: #64748b;
+        margin-top: 8px;
+    }
+
+    /* HANYA TUMPUK KE BAWAH DI LAYAR HP/TABLET KECIL */
+    @media (max-width: 960px) {
+        .booking-layout {
+            flex-direction: column !important;
+            flex-wrap: wrap !important;
+            gap: 20px !important;
+        }
+
+        .booking-summary-col {
+            display: none !important;
+        }
+
+        .booking-summary-col.is-visible {
+            display: flex !important;
+            flex: 1 1 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            position: static;
+            transform: none;
+        }
+
+        .summary-sidebar-inner {
+            min-width: 0;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .session-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
-<div class="page-heading">
-    <div>
-        <h1>Ajukan Peminjaman</h1>
-        <p>Isi informasi kegiatan dan jadwal auditorium yang dibutuhkan.</p>
-    </div>
-</div>
-
-<div class="booking-layout">
-
-    {{-- FORM PENGAJUAN --}}
-    <form class="form-card booking-form"
-          method="POST"
-          action="{{ route('borrower.booking.store') }}"
-          enctype="multipart/form-data">
-
-        @csrf
-
-        <h3>Informasi Peminjaman</h3>
-
-        <label>Pilih Auditorium *</label>
-
-        <select name="auditorium_id" id="auditoriumSelect" required>
-            <option value="">Pilih auditorium</option>
-
-            @foreach($auditoriums as $a)
-                <option
-                    value="{{ $a->id }}"
-                    data-name="{{ $a->name }}"
-                    data-image="{{ $a->image_path ? asset('storage/' . $a->image_path) : '' }}"
-                    data-location="{{ $a->location ?: 'Belum ditentukan' }}"
-                    data-capacity="{{ $a->capacity ?: 'Belum ditentukan' }}"
-                    data-facilities="{{ implode(', ', $a->facilities ?? []) ?: 'Belum tersedia' }}"
-                    data-description="{{ $a->description ?: 'Tidak ada deskripsi.' }}"
-                    @selected((string) old('auditorium_id', $selected) === (string) $a->id)
-                >
-                    {{ $a->name }}
-                </option>
-            @endforeach
-        </select>
-
-        @error('auditorium_id')
-            <p class="notice">{{ $message }}</p>
-        @enderror
-
-        <label>Tanggal Peminjaman *</label>
-
-        <input
-            type="date"
-            name="booking_date"
-            min="{{ date('Y-m-d') }}"
-            value="{{ old('booking_date') }}"
-            required
-        >
-
-        {{-- PILIHAN SESI --}}
-        <label>Pilih Sesi Peminjaman *</label>
-
-        <p class="session-help">
-            Pilih salah satu sesi waktu yang tersedia.
-        </p>
-
-        <div class="session-grid">
-
-            <button
-                type="button"
-                class="session-card"
-                data-start="08:00"
-                data-end="12:00"
-            >
-                <span class="session-check">✓</span>
-                <strong>Sesi Pagi</strong>
-                <span>08:00 - 12:00</span>
-            </button>
-
-            <button
-                type="button"
-                class="session-card"
-                data-start="13:00"
-                data-end="17:00"
-            >
-                <span class="session-check">✓</span>
-                <strong>Sesi Siang</strong>
-                <span>13:00 - 17:00</span>
-            </button>
-
-            <button
-                type="button"
-                class="session-card"
-                data-start="08:00"
-                data-end="17:00"
-            >
-                <span class="session-check">✓</span>
-                <strong>Full Day</strong>
-                <span>08:00 - 17:00</span>
-            </button>
-
+<div class="booking-page-wrapper">
+    <div class="page-heading">
+        <div>
+            <h1>Ajukan Peminjaman</h1>
+            <p>Isi informasi kegiatan dan jadwal auditorium yang dibutuhkan.</p>
         </div>
+    </div>
 
-        <input
-            type="hidden"
-            name="start_time"
-            id="start_time"
-            value="{{ old('start_time') }}"
-        >
+    <div class="booking-layout" id="bookingLayout">
 
-        <input
-            type="hidden"
-            name="end_time"
-            id="end_time"
-            value="{{ old('end_time') }}"
-        >
+        {{-- KOLOM KIRI: FORM PENGAJUAN --}}
+        <form class="form-card booking-form booking-form-col"
+              method="POST"
+              action="{{ route('borrower.booking.store') }}"
+              enctype="multipart/form-data">
 
-        <p id="sessionError" class="notice" style="display:none;">
-            Silakan pilih salah satu sesi peminjaman.
-        </p>
+            @csrf
 
-        @error('start_time')
-            <p class="notice">{{ $message }}</p>
-        @enderror
+            <h3>Informasi Peminjaman</h3>
 
-        @error('end_time')
-            <p class="notice">{{ $message }}</p>
-        @enderror
-
-        <h3>Informasi Kegiatan</h3>
-
-        <label>Nama Kegiatan *</label>
-
-        <input
-            name="event_name"
-            value="{{ old('event_name') }}"
-            required
-        >
-
-        <label>Organisasi/Unit *</label>
-
-        <input
-            name="organization"
-            value="{{ old('organization') }}"
-            placeholder="Himpunan, BEM, UKM, KSM, dll."
-            required
-        >
-
-        <label>Deskripsi Kegiatan</label>
-
-        <textarea name="event_description" rows="3">{{ old('event_description') }}</textarea>
-
-        <h3>Kontak Penanggung Jawab</h3>
-
-        <label>Nama Penanggung Jawab *</label>
-
-        <input
-            name="pic_name"
-            value="{{ old('pic_name', auth()->user()->name) }}"
-            required
-        >
-
-        <label>Nomor Telepon *</label>
-
-        <input
-            name="pic_phone"
-            value="{{ old('pic_phone') }}"
-            required
-        >
-
-        {{-- UPLOAD SURAT --}}
-        <div class="letter-upload">
-
-            <h3>Dokumen Persyaratan</h3>
-
-            {{-- KOTAK DOWNLOAD TEMPLATE SURAT --}}
-            <div class="template-box">
-                <div class="template-box-text">
-                    <strong>Belum punya format Surat Peminjaman?</strong>
-                    <span>Unduh template resmi UPNVJ, isi detail acara, dan mintakan tanda tangan sebelum diunggah.</span>
-                </div>
-                <a href="{{ route('borrower.booking.template') }}" class="btn-template">
-                    ↓ Download Template Surat (PDF)
-                </a>
-            </div>
-
-            <label for="surat">Upload Surat Peminjaman (PDF) *</label>
-
-            <input
-                type="file"
-                name="surat"
-                id="surat"
-                accept=".pdf,application/pdf"
-                required
-            >
-
-            <small>
-                Format file PDF dengan ukuran maksimal 5 MB.
-            </small>
-
-            @error('surat')
+            <label>Pilih Auditorium *</label>
+            <select name="auditorium_id" id="auditoriumSelect" required>
+                <option value="">Pilih auditorium</option>
+                @foreach($auditoriums as $a)
+                    <option
+                        value="{{ $a->id }}"
+                        data-name="{{ $a->name }}"
+                        data-image="{{ $a->image_path ? asset('storage/' . $a->image_path) : '' }}"
+                        data-location="{{ $a->location ?: 'Belum ditentukan' }}"
+                        data-capacity="{{ $a->capacity ?: 'Belum ditentukan' }}"
+                        data-facilities="{{ implode(', ', $a->facilities ?? []) ?: 'Belum tersedia' }}"
+                        @selected((string) old('auditorium_id', $selected) === (string) $a->id)
+                    >
+                        {{ $a->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('auditorium_id')
                 <p class="notice">{{ $message }}</p>
             @enderror
 
-        </div>
+            <label>Tanggal Peminjaman *</label>
+            <input
+                type="date"
+                name="booking_date"
+                id="bookingDateInput"
+                min="{{ date('Y-m-d') }}"
+                value="{{ old('booking_date') }}"
+                required
+            >
 
-        </div>
+            {{-- PILIHAN SESI --}}
+            <label>Pilih Sesi Peminjaman *</label>
+            <p class="session-help">Pilih salah satu sesi waktu yang tersedia.</p>
 
-        <p class="notice">
-            Pengajuan akan berstatus Pending sampai diperiksa oleh Admin.
-            Jadwal bentrok diperiksa terhadap peminjaman berstatus Disetujui.
-        </p>
+            <div class="session-grid">
+                <button type="button" class="session-card" data-label="Sesi Pagi" data-start="08:00" data-end="12:00">
+                    <span class="session-check">✓</span>
+                    <strong>Sesi Pagi</strong>
+                    <span>08:00 - 12:00</span>
+                </button>
 
-        <button type="submit" class="btn">
-            Kirim Pengajuan
-        </button>
+                <button type="button" class="session-card" data-label="Sesi Siang" data-start="13:00" data-end="17:00">
+                    <span class="session-check">✓</span>
+                    <strong>Sesi Siang</strong>
+                    <span>13:00 - 17:00</span>
+                </button>
 
-    </form>
+                <button type="button" class="session-card" data-label="Full Day" data-start="08:00" data-end="17:00">
+                    <span class="session-check">✓</span>
+                    <strong>Full Day</strong>
+                    <span>08:00 - 17:00</span>
+                </button>
+            </div>
 
-    {{-- PREVIEW AUDITORIUM --}}
-    <div class="auditorium-preview">
+            <input type="hidden" name="start_time" id="start_time" value="{{ old('start_time') }}">
+            <input type="hidden" name="end_time" id="end_time" value="{{ old('end_time') }}">
 
-        <div class="preview-title">
-            Auditorium yang Dipilih
-        </div>
+            <p id="sessionError" class="notice" style="display:none;">
+                Silakan pilih salah satu sesi peminjaman.
+            </p>
 
-        <div id="previewPlaceholder" class="preview-placeholder">
-            Pilih auditorium untuk melihat foto.
-        </div>
+            @error('start_time') <p class="notice">{{ $message }}</p> @enderror
+            @error('end_time') <p class="notice">{{ $message }}</p> @enderror
 
-        <img
-            id="previewImage"
-            src=""
-            alt="Foto auditorium"
-            style="display:none;"
-        >
+            <h3>Informasi Kegiatan</h3>
 
-        <div class="preview-info" id="previewInfo" style="display:none;">
-            <h3 id="previewName"></h3>
-            <p id="previewLocation"></p>
-            <p id="previewCapacity"></p>
-            <p id="previewFacilities"></p>
-            <p id="previewDescription"></p>
-        </div>
+            <label>Nama Kegiatan *</label>
+            <input name="event_name" id="eventNameInput" value="{{ old('event_name') }}" required>
+
+            <label>Organisasi/Unit *</label>
+            <input name="organization" id="organizationInput" value="{{ old('organization') }}" placeholder="Himpunan, BEM, UKM, KSM, dll." required>
+
+            <label>Deskripsi Kegiatan</label>
+            <textarea name="event_description" rows="3">{{ old('event_description') }}</textarea>
+
+            <h3>Kontak Penanggung Jawab</h3>
+
+            <label>Nama Penanggung Jawab *</label>
+            <input name="pic_name" id="picNameInput" value="{{ old('pic_name', auth()->user()->name) }}" required>
+
+            <label>Nomor Telepon *</label>
+            <input name="pic_phone" id="picPhoneInput" value="{{ old('pic_phone') }}" required>
+
+            {{-- UPLOAD SURAT --}}
+            <div class="letter-upload">
+                <h3>Dokumen Persyaratan</h3>
+
+                <div class="template-box">
+                    <div class="template-box-text">
+                        <strong>Belum punya format Surat Peminjaman?</strong>
+                        <span>Unduh template resmi UPNVJ, isi detail acara, dan mintakan tanda tangan sebelum diunggah.</span>
+                    </div>
+                    <a href="{{ route('borrower.booking.template') }}" class="btn-template">
+                        ↓ Download Template Surat
+                    </a>
+                </div>
+
+                <label for="surat">Upload Surat Peminjaman (PDF) *</label>
+                <input type="file" name="surat" id="surat" accept=".pdf,application/pdf" required>
+                <small>Format file PDF dengan ukuran maksimal 5 MB.</small>
+
+                @error('surat')
+                    <p class="notice">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <p class="notice">
+                Pengajuan akan berstatus Pending sampai diperiksa oleh Admin.
+                Jadwal bentrok diperiksa terhadap peminjaman berstatus Disetujui.
+            </p>
+
+            <button type="submit" class="btn">Kirim Pengajuan</button>
+        </form>
+
+        {{-- KOLOM KANAN: RINGKASAN PEMINJAMAN & PREVIEW AUDITORIUM --}}
+        <aside class="booking-summary-col" id="summarySidebar">
+            <div class="summary-sidebar-inner">
+
+                {{-- KARTU 1: RINGKASAN PEMINJAMAN (LIVE) --}}
+                <div class="summary-card" id="summaryCard">
+                    <div class="summary-card-header">
+                        <h3>Ringkasan Peminjaman</h3>
+                        <span class="summary-badge">Draft</span>
+                    </div>
+
+                    <div class="summary-list">
+                        <div class="summary-item" id="rowAuditorium">
+                            <span class="summary-label">Auditorium</span>
+                            <span class="summary-value" id="sumAuditorium"></span>
+                        </div>
+                        <div class="summary-item" id="rowDateTime">
+                            <span class="summary-label">Tanggal & Sesi</span>
+                            <span class="summary-value" id="sumDateTime"></span>
+                        </div>
+                        <div class="summary-item" id="rowEventName">
+                            <span class="summary-label">Nama Kegiatan</span>
+                            <span class="summary-value" id="sumEventName"></span>
+                        </div>
+                        <div class="summary-item" id="rowOrganization">
+                            <span class="summary-label">Organisasi / Unit</span>
+                            <span class="summary-value" id="sumOrganization"></span>
+                        </div>
+                        <div class="summary-item" id="rowPic">
+                            <span class="summary-label">Penanggung Jawab</span>
+                            <span class="summary-value" id="sumPic"></span>
+                        </div>
+                        <div class="summary-item" id="rowFile">
+                            <span class="summary-label">Berkas Surat (PDF)</span>
+                            <span class="summary-value" id="sumFile"></span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- KARTU 2: PREVIEW AUDITORIUM --}}
+                <div class="auditorium-preview" id="auditoriumPreviewCard">
+                    <div class="preview-title">Detail Ruangan Dipilih</div>
+                    <img id="previewImage" src="" alt="Foto auditorium" style="display:none;">
+                    <div class="preview-info" id="previewInfo">
+                        <h4 id="previewName"></h4>
+                        <p id="previewLocation"></p>
+                        <p id="previewCapacity"></p>
+                        <p id="previewFacilities"></p>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
 
     </div>
-
 </div>
 
 <script>
-    // PREVIEW AUDITORIUM
+    // ELEMEN LAYOUT & FORM
+    const bookingLayout = document.getElementById('bookingLayout');
     const auditoriumSelect = document.getElementById('auditoriumSelect');
+    const bookingDateInput = document.getElementById('bookingDateInput');
+    const eventNameInput = document.getElementById('eventNameInput');
+    const organizationInput = document.getElementById('organizationInput');
+    const picNameInput = document.getElementById('picNameInput');
+    const picPhoneInput = document.getElementById('picPhoneInput');
+    const suratInput = document.getElementById('surat');
 
-    const previewPlaceholder = document.getElementById('previewPlaceholder');
+    // ELEMEN SIDEBAR & RINGKASAN
+    const summarySidebar = document.getElementById('summarySidebar');
+    const summaryCard = document.getElementById('summaryCard');
+    const auditoriumPreviewCard = document.getElementById('auditoriumPreviewCard');
+
+    const sumAuditorium = document.getElementById('sumAuditorium');
+    const sumDateTime = document.getElementById('sumDateTime');
+    const sumEventName = document.getElementById('sumEventName');
+    const sumOrganization = document.getElementById('sumOrganization');
+    const sumPic = document.getElementById('sumPic');
+    const sumFile = document.getElementById('sumFile');
+
+    // ELEMEN PREVIEW AUDITORIUM
     const previewImage = document.getElementById('previewImage');
-    const previewInfo = document.getElementById('previewInfo');
-
     const previewName = document.getElementById('previewName');
     const previewLocation = document.getElementById('previewLocation');
     const previewCapacity = document.getElementById('previewCapacity');
     const previewFacilities = document.getElementById('previewFacilities');
-    const previewDescription = document.getElementById('previewDescription');
+
+    let selectedSessionLabel = '';
+
+    // Mengatur tampil/sembunyi tiap baris ringkasan & kotak utama
+    function toggleSummaryItem(rowId, valueEl, text) {
+        const row = document.getElementById(rowId);
+        if (text && text.trim() !== '') {
+            valueEl.textContent = text;
+            row.style.display = 'flex';
+            row.classList.add('visible');
+        } else {
+            valueEl.textContent = '';
+            row.style.display = 'none';
+            row.classList.remove('visible');
+        }
+        refreshSidebarVisibility();
+    }
+
+    function refreshSidebarVisibility() {
+        const visibleItems = document.querySelectorAll('#summaryCard .summary-item.visible');
+        const hasSummaryItems = visibleItems.length > 0;
+        const hasAuditoriumPreview = auditoriumPreviewCard.style.display === 'block';
+        const shouldShow = hasSummaryItems || hasAuditoriumPreview;
+
+        summaryCard.style.display = hasSummaryItems ? 'block' : 'none';
+
+        if (shouldShow) {
+            bookingLayout.classList.add('has-sidebar');
+            summarySidebar.classList.add('is-visible');
+        } else {
+            bookingLayout.classList.remove('has-sidebar');
+            summarySidebar.classList.remove('is-visible');
+        }
+
+        // Hilangkan garis bawah pada item terakhir yang tampil
+        visibleItems.forEach((item, index) => {
+            item.style.borderBottom = (index === visibleItems.length - 1) ? 'none' : '1px dashed #e2e8f0';
+            item.style.paddingBottom = (index === visibleItems.length - 1) ? '0' : '9px';
+        });
+    }
+
+    function updateSummarySchedule() {
+        const rawDate = bookingDateInput.value;
+        let formattedDate = '';
+        if (rawDate) {
+            const parts = rawDate.split('-');
+            formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        const start = startTimeInput.value;
+        const end = endTimeInput.value;
+        const sessionText = (start && end) ? `${selectedSessionLabel} (${start} - ${end})` : '';
+
+        const combined = [formattedDate, sessionText].filter(Boolean).join(' • ');
+        toggleSummaryItem('rowDateTime', sumDateTime, combined);
+    }
+
+    function updateSummaryInputs(includePic = true) {
+        toggleSummaryItem('rowEventName', sumEventName, eventNameInput.value);
+        toggleSummaryItem('rowOrganization', sumOrganization, organizationInput.value);
+
+        if (includePic) {
+            const picName = picNameInput.value.trim();
+            const picPhone = picPhoneInput.value.trim();
+            const picCombined = picName ? (picPhone ? `${picName} (${picPhone})` : picName) : '';
+            toggleSummaryItem('rowPic', sumPic, picCombined);
+        }
+    }
 
     function updateAuditoriumPreview() {
-        const selectedOption =
-            auditoriumSelect.options[auditoriumSelect.selectedIndex];
+        const selectedOption = auditoriumSelect.options[auditoriumSelect.selectedIndex];
 
         if (!selectedOption || !selectedOption.value) {
-            previewPlaceholder.style.display = 'flex';
+            auditoriumPreviewCard.style.display = 'none';
             previewImage.style.display = 'none';
-            previewInfo.style.display = 'none';
+            toggleSummaryItem('rowAuditorium', sumAuditorium, '');
             return;
         }
 
         const image = selectedOption.dataset.image;
-
-        previewPlaceholder.style.display = image ? 'none' : 'flex';
-        previewPlaceholder.textContent = image
-            ? ''
-            : 'Foto auditorium belum tersedia.';
-
         if (image) {
             previewImage.src = image;
             previewImage.style.display = 'block';
@@ -575,21 +696,26 @@
         }
 
         previewName.textContent = selectedOption.dataset.name;
-        previewLocation.textContent =
-            'Lokasi: ' + selectedOption.dataset.location;
-        previewCapacity.textContent =
-            'Kapasitas: ' + selectedOption.dataset.capacity + ' orang';
-        previewFacilities.textContent =
-            'Fasilitas: ' + selectedOption.dataset.facilities;
-        previewDescription.textContent =
-            selectedOption.dataset.description;
+        previewLocation.textContent = 'Lokasi: ' + selectedOption.dataset.location;
+        previewCapacity.textContent = 'Kapasitas: ' + selectedOption.dataset.capacity + ' orang';
+        previewFacilities.textContent = 'Fasilitas: ' + selectedOption.dataset.facilities;
+        auditoriumPreviewCard.style.display = 'block';
 
-        previewInfo.style.display = 'block';
+        toggleSummaryItem('rowAuditorium', sumAuditorium, selectedOption.dataset.name);
     }
 
+    // EVENT LISTENERS LIVE UPDATE
     auditoriumSelect.addEventListener('change', updateAuditoriumPreview);
-    updateAuditoriumPreview();
+    bookingDateInput.addEventListener('change', updateSummarySchedule);
+    eventNameInput.addEventListener('input', () => updateSummaryInputs(true));
+    organizationInput.addEventListener('input', () => updateSummaryInputs(true));
+    picNameInput.addEventListener('input', () => updateSummaryInputs(true));
+    picPhoneInput.addEventListener('input', () => updateSummaryInputs(true));
 
+    suratInput.addEventListener('change', function () {
+        const fileName = this.files && this.files[0] ? this.files[0].name : '';
+        toggleSummaryItem('rowFile', sumFile, fileName);
+    });
 
     // PILIHAN SESI PEMINJAMAN
     const sessionCards = document.querySelectorAll('.session-card');
@@ -599,16 +725,15 @@
     const bookingForm = document.querySelector('.booking-form');
 
     function selectSession(card) {
-        sessionCards.forEach(item => {
-            item.classList.remove('active');
-        });
-
+        sessionCards.forEach(item => item.classList.remove('active'));
         card.classList.add('active');
 
         startTimeInput.value = card.dataset.start;
         endTimeInput.value = card.dataset.end;
+        selectedSessionLabel = card.dataset.label;
 
         sessionError.style.display = 'none';
+        updateSummarySchedule();
     }
 
     sessionCards.forEach(card => {
@@ -617,32 +742,27 @@
         });
     });
 
-    // Pulihkan pilihan sesi jika validasi form sebelumnya gagal
+    // Pulihkan pilihan sesi jika validasi gagal
     const oldStart = startTimeInput.value;
     const oldEnd = endTimeInput.value;
-
     if (oldStart && oldEnd) {
         const oldCard = Array.from(sessionCards).find(card =>
-            card.dataset.start === oldStart &&
-            card.dataset.end === oldEnd
+            card.dataset.start === oldStart && card.dataset.end === oldEnd
         );
-
-        if (oldCard) {
-            selectSession(oldCard);
-        }
+        if (oldCard) selectSession(oldCard);
     }
+
+    // Inisialisasi awal: jangan munculkan ringkasan jika user belum memilih/mengisi apapun
+    updateAuditoriumPreview();
+    updateSummarySchedule();
+    updateSummaryInputs(false);
 
     // VALIDASI SEBELUM FORM DIKIRIM
     bookingForm.addEventListener('submit', function (event) {
         if (!startTimeInput.value || !endTimeInput.value) {
             event.preventDefault();
-
             sessionError.style.display = 'block';
-
-            sessionError.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
+            sessionError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
 </script>
