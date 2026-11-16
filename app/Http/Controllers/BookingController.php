@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\BookingHistory;
 use App\Models\Auditorium;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class BookingController extends Controller
 {
@@ -92,13 +93,44 @@ class BookingController extends Controller
         return back()->with('success', 'Pengajuan berhasil dibatalkan.');
     }
 
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
-        $bookings = Booking::with(['user', 'auditorium'])
-            ->latest()
-            ->paginate(15);
+        $query = Booking::with(['user', 'auditorium', 'histories'])->latest();
 
-        return view('admin.bookings', compact('bookings'));
+        if ($request->filled('q')) {
+            $term = trim($request->q);
+
+            $query->where(function ($q) use ($term) {
+                $q->where('event_name', 'like', "%{$term}%")
+                    ->orWhere('organization', 'like', "%{$term}%")
+                    ->orWhereHas('user', fn ($user) => $user->where('name', 'like', "%{$term}%"));
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('auditorium')) {
+            $query->where('auditorium_id', $request->auditorium);
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('booking_date', $request->date);
+        }
+
+        $bookings = $query->paginate(12)->withQueryString();
+
+        $stats = [
+            'pending' => Booking::where('status', 'Pending')->count(),
+            'approved' => Booking::where('status', 'Disetujui')->count(),
+            'rejected' => Booking::where('status', 'Ditolak')->count(),
+            'total' => Booking::count(),
+        ];
+
+        $auditoriums = Auditorium::orderBy('name')->get();
+
+        return view('admin.bookings', compact('bookings', 'stats', 'auditoriums'));
     }
 
     // Download surat peminjaman oleh admin
@@ -129,55 +161,101 @@ class BookingController extends Controller
     {
         $data = $r->validate([
             'status' => 'required|in:Disetujui,Ditolak',
-            'admin_note' => 'nullable|string',
+            'admin_note' => 'nullable|string|max:2000',
+            'conflict_rejection_reason' => 'nullable|string|max:2000',
         ]);
 
-        abort_unless($booking->status === 'Pending', 422);
-
-        if ($data['status'] === 'Disetujui') {
-            $conflict = Booking::where('id', '!=', $booking->id)
-                ->where('auditorium_id', $booking->auditorium_id)
-                ->whereDate('booking_date', $booking->booking_date)
-                ->where('status', 'Disetujui')
-                ->where('start_time', '<', $booking->end_time)
-                ->where('end_time', '>', $booking->start_time)
-                ->exists();
-
-            if ($conflict) {
-                return back()->withErrors([
-                    'conflict' => 'Jadwal telah disetujui untuk peminjaman lain.'
-                ]);
-            }
-        }
+        abort_unless($booking->status === 'Pending', 422, 'Pengajuan ini sudah diproses.');
 
         DB::transaction(function () use ($r, $booking, $data) {
-            $old = $booking->status;
+            $target = Booking::whereKey($booking->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            $booking->update([
+            if ($target->status !== 'Pending') {
+                abort(422, 'Pengajuan ini sudah diproses oleh admin lain.');
+            }
+
+            $overlapQuery = Booking::where('id', '!=', $target->id)
+                ->where('auditorium_id', $target->auditorium_id)
+                ->whereDate('booking_date', $target->booking_date)
+                ->where('start_time', '<', $target->end_time)
+                ->where('end_time', '>', $target->start_time);
+
+            if ($data['status'] === 'Disetujui') {
+                $approvedConflict = (clone $overlapQuery)
+                    ->where('status', 'Disetujui')
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($approvedConflict) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'conflict' => 'Jadwal tidak dapat disetujui karena slot auditorium sudah dikunci oleh peminjaman lain.'
+                    ]);
+                }
+
+                $pendingConflicts = (clone $overlapQuery)
+                    ->where('status', 'Pending')
+                    ->lockForUpdate()
+                    ->get();
+
+                if (
+                    $pendingConflicts->isNotEmpty() &&
+                    blank($data['conflict_rejection_reason'] ?? null)
+                ) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'conflict_rejection_reason' => 'Alasan penolakan otomatis wajib diisi karena terdapat pengajuan lain yang bentrok.'
+                    ]);
+                }
+
+                foreach ($pendingConflicts as $conflict) {
+                    $oldStatus = $conflict->status;
+                    $autoNote = '[Ditolak otomatis karena bentrok] ' . $data['conflict_rejection_reason'];
+
+                    $conflict->update([
+                        'status' => 'Ditolak',
+                        'admin_note' => $autoNote,
+                    ]);
+
+                    BookingHistory::create([
+                        'booking_id' => $conflict->id,
+                        'admin_id' => $r->user()->id,
+                        'from_status' => $oldStatus,
+                        'to_status' => 'Ditolak',
+                        'note' => $autoNote,
+                    ]);
+                }
+            }
+
+            $oldStatus = $target->status;
+
+            $target->update([
                 'status' => $data['status'],
                 'admin_note' => $data['admin_note'] ?? null,
             ]);
 
             BookingHistory::create([
-                'booking_id' => $booking->id,
+                'booking_id' => $target->id,
                 'admin_id' => $r->user()->id,
-                'from_status' => $old,
+                'from_status' => $oldStatus,
                 'to_status' => $data['status'],
                 'note' => $data['admin_note'] ?? null,
             ]);
         });
 
-        return back()->with('success', 'Status pengajuan berhasil diperbarui.');
+        return back()->with('success', 'Keputusan pengajuan berhasil disimpan.');
     }
-        public function downloadTemplateSurat(Request $request)
+
+    // Download template surat peminjaman dalam format PDF
+    public function downloadTemplateSurat(Request $request)
     {
         $user = $request->user();
 
         $data = [
             'tanggal_surat' => now()->translatedFormat('d F Y'),
-            'nama_pemohon'  => $user->name ?? '........................................',
-            'nomor_induk'   => $user->nim ?? $user->nip ?? $user->nomor_identitas ?? '........................................',
-            'no_telepon'    => $user->phone ?? $user->no_telepon ?? '........................................',
+            'nama_pemohon' => $user->name ?? '........................................',
+            'nomor_induk' => $user->nim ?? $user->nip ?? $user->nomor_identitas ?? '........................................',
+            'no_telepon' => $user->phone ?? $user->no_telepon ?? '........................................',
         ];
 
         $pdf = Pdf::loadView('pdf.template-surat-peminjaman', $data)
