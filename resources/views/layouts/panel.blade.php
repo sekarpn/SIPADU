@@ -21,12 +21,12 @@
 html,
 body,
 .app-layout {
-    background-color: #b5d6c5 !important;
+    background-color: #e8f1eb !important;
     background-image: linear-gradient(
         135deg,
-        #cfe6da 0%,
-        #b5d6c5 52%,
-        #a2c9b4 100%
+        #f1f6f2 0%,
+        #e8f1eb 52%,
+        #dcebe1 100%
     ) !important;
     background-attachment: fixed !important;
     color: #163626;
@@ -102,22 +102,29 @@ html:not(.sidebar-ready) .app-layout > main {
     transition: none !important;
 }
 
-/* TOPBAR */
+/* FLOATING GLASS TOPBAR, MATCHING THE SIDEBAR */
 .app-layout > main > .topbar {
     position: sticky;
-    top: 0;
+    top: 14px;
     z-index: 40;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: calc(100% - 28px);
     min-height: 64px;
     height: 64px;
-    padding: 14px 28px 6px;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    margin: 14px auto 0;
+    padding: 10px 22px;
+    border-radius: 16px !important;
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.54) 0%,
+        rgba(255,255,255,.30) 100%
+    ) !important;
+    border: 1px solid rgba(255,255,255,.38) !important;
+    box-shadow: 0 8px 28px rgba(22,54,38,.06) !important;
+    backdrop-filter: blur(18px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
 }
 
 /* SIDEBAR TOGGLE */
@@ -221,9 +228,10 @@ html:not(.sidebar-ready) .app-layout > main {
 
 /* PAGE CONTENT */
 .app-layout > main > .main-content {
-    padding: 12px 28px 28px;
+    padding: 0 28px 28px;
     max-width: 1600px;
-    margin: 0 auto;
+    margin: 16px auto 0;
+    zoom: .97;
     opacity: 0;
     transform: translateY(6px);
     transition: opacity .18s ease, transform .18s ease;
@@ -291,12 +299,18 @@ html.page-ready .app-layout > main > .main-content {
     }
 
     .app-layout > main .topbar {
-        padding: 12px 18px 4px !important;
-        width: 100% !important;
+        width: calc(100% - 28px) !important;
+        min-height: 60px !important;
+        height: 60px !important;
+        margin: 12px auto 0 !important;
+        padding: 10px 16px !important;
+        top: 10px !important;
+        border-radius: 16px !important;
     }
 
     .app-layout > main > .main-content {
-        padding: 12px 18px 24px !important;
+        margin-top: 14px !important;
+        padding: 0 18px 24px !important;
         width: 100% !important;
         max-width: 100% !important;
     }
@@ -312,11 +326,17 @@ html.page-ready .app-layout > main > .main-content {
 
 @media (max-width: 520px) {
     .app-layout > main > .main-content {
-        padding: 14px !important;
+        padding: 0 14px 20px !important;
+        margin-top: 12px !important;
     }
 
     .app-layout > main .topbar {
-        padding: 0 12px !important;
+        width: calc(100% - 20px) !important;
+        padding: 8px 12px !important;
+        margin-top: 10px !important;
+        min-height: 58px !important;
+        height: 58px !important;
+        border-radius: 15px !important;
     }
 
     .topbar-user-info {
