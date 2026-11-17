@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -69,6 +68,32 @@ body,
     overflow-x: hidden;
     overflow-y: auto;
     transition: width .24s ease, min-width .24s ease !important;
+}
+
+/* SIDEBAR NAVIGATION HOVER (SOFT GREEN ACCENT) */
+.app-layout > .sidebar a,
+.app-layout > .sidebar .nav-link,
+.app-layout > .sidebar .nav-item,
+.app-layout > .sidebar .side-link {
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .18s ease !important;
+}
+
+.app-layout > .sidebar a:not(.active):not(.is-active):not([aria-current="page"]):not(.sidebar-brand):not(.brand):not(.logo):hover,
+.app-layout > .sidebar .nav-link:not(.active):not(.is-active):not([aria-current="page"]):hover,
+.app-layout > .sidebar .nav-item:not(.active):not(.is-active):not([aria-current="page"]):hover,
+.app-layout > .sidebar .side-link:not(.active):not(.is-active):not([aria-current="page"]):hover {
+    background: rgba(33, 128, 77, .14) !important;
+    background-color: rgba(33, 128, 77, .14) !important;
+    color: #163626 !important;
+    border-color: rgba(33, 128, 77, .22) !important;
+}
+
+.app-layout > .sidebar a:not(.active):not(.is-active):not([aria-current="page"]):not(.sidebar-brand):not(.brand):not(.logo):hover svg,
+.app-layout > .sidebar .nav-link:not(.active):not(.is-active):not([aria-current="page"]):hover svg,
+.app-layout > .sidebar .nav-item:not(.active):not(.is-active):not([aria-current="page"]):hover svg,
+.app-layout > .sidebar .side-link:not(.active):not(.is-active):not([aria-current="page"]):hover svg {
+    color: #1f7a49 !important;
+    stroke: #1f7a49 !important;
 }
 
 /* MAIN CONTENT AREA */
@@ -240,6 +265,29 @@ html:not(.sidebar-ready) .app-layout > main {
 html.page-ready .app-layout > main > .main-content {
     opacity: 1;
     transform: none;
+}
+
+/* SAMAKAN JARAK TOPBAR KE JUDUL HALAMAN MENGIKUTI DASHBOARD ADMIN (padding-top: 10px) */
+.app-layout > main > .main-content > div:first-of-type:not([class*="card"]):not([class*="panel"]),
+.app-layout > main > .main-content > section:first-of-type {
+    margin-top: 0 !important;
+    padding-top: 10px !important;
+}
+
+.app-layout > main > .main-content > div:first-of-type > [class*="head"]:first-of-type,
+.app-layout > main > .main-content > div:first-of-type > [class*="topbar"]:first-of-type,
+.app-layout > main > .main-content > div:first-of-type > header:first-of-type,
+.app-layout > main > .main-content > div:first-of-type > div:first-of-type:has(> h1, > div > h1) {
+    margin-top: 0 !important;
+}
+
+.app-layout > main > .main-content h1 {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.app-layout > main > .main-content > h1:first-child {
+    margin-top: 10px !important;
 }
 
 /* MOBILE */
