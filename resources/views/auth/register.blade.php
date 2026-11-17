@@ -150,6 +150,7 @@
         }
     }
 
+    /* PANEL FORM */
     .auth-form-panel {
         display: flex;
         align-items: center;
@@ -157,15 +158,16 @@
         min-width: 0;
         min-height: 0;
         overflow: hidden;
-        padding: clamp(20px, 3.5vw, 52px);
+        padding: 24px clamp(20px, 3.5vw, 52px);
+        box-sizing: border-box;
         background: #fff;
     }
 
+    /* FORM REGISTRASI */
     .auth-form {
         width: min(440px, 100%);
-        max-height: 100%;
-        overflow: hidden;
-        margin: auto;
+        margin: 0;
+        flex-shrink: 0;
         color: #172b20;
     }
 
@@ -173,7 +175,7 @@
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        margin: 0 0 clamp(12px, 2vh, 22px);
+        margin: 0 0 12px;
         color: #64736a;
         font-size: 12px;
         text-decoration: none;
@@ -192,7 +194,7 @@
     }
 
     .auth-intro {
-        margin: 0 0 clamp(13px, 2vh, 20px);
+        margin: 0 0 13px;
         color: #68736c;
         font-size: 12px;
         line-height: 1.5;
@@ -204,7 +206,7 @@
     }
 
     .auth-form form > label {
-        margin: 0 0 5px;
+        margin: 0 0 4px;
         color: #20372a;
         font-size: 11px;
         font-weight: 700;
@@ -213,8 +215,8 @@
     .auth-form input:not([type=checkbox]) {
         box-sizing: border-box;
         width: 100%;
-        height: 39px;
-        margin: 0 0 10px;
+        height: 36px;
+        margin: 0 0 8px;
         padding: 0 12px;
         border: 1px solid #dce5e0;
         border-radius: 8px;
@@ -231,7 +233,7 @@
 
     .password-field {
         position: relative;
-        margin: 0 0 10px;
+        margin: 0 0 8px;
     }
 
     .auth-form .password-field input {
@@ -241,12 +243,12 @@
 
     .password-toggle {
         position: absolute;
-        top: 2px;
+        top: 1px;
         right: 5px;
         display: grid;
         place-items: center;
         width: 34px;
-        height: 34px;
+        height: 32px;
         padding: 0;
         border: 0;
         border-radius: 6px;
@@ -267,8 +269,8 @@
 
     .btn.wide {
         width: 100%;
-        min-height: 42px;
-        margin-top: 3px;
+        min-height: 38px;
+        margin-top: 2px;
         border: 1px solid #11643a;
         border-radius: 8px;
         background: #16834a !important;
@@ -283,7 +285,7 @@
     }
 
     .auth-switch {
-        margin: 15px 0 0;
+        margin: 11px 0 0;
         color: #68736c;
         font-size: 12px;
         text-align: center;
@@ -296,11 +298,12 @@
     }
 
     .auth-error {
-        margin: -6px 0 8px;
+        margin: -4px 0 7px;
         color: #b32e2e;
         font-size: 10px;
     }
 
+    /* TABLET */
     @media (max-width: 760px) {
         .auth-page {
             padding: 10px;
@@ -324,10 +327,11 @@
         }
 
         .auth-form-panel {
-            padding: 14px;
+            padding: 20px 16px;
         }
     }
 
+    /* MOBILE */
     @media (max-width: 560px) {
         .auth-shell {
             grid-template-columns: 1fr;
@@ -353,15 +357,15 @@
         }
 
         .auth-form-panel {
-            padding: 10px 20px;
+            padding: 16px 20px;
         }
 
         .auth-form .back {
-            margin-bottom: 7px;
+            margin-bottom: 8px;
         }
 
         .auth-intro {
-            margin-bottom: 9px;
+            margin-bottom: 10px;
         }
 
         .auth-form input:not([type=checkbox]) {
@@ -387,9 +391,11 @@
         }
     }
 
+    /* LAYAR PENDEK */
     @media (max-height: 700px) and (min-width: 561px) {
         .auth-form-panel {
-            padding: 12px 28px;
+            padding-top: 12px;
+            padding-bottom: 12px;
         }
 
         .auth-form .back {
@@ -401,25 +407,25 @@
         }
 
         .auth-form input:not([type=checkbox]) {
-            height: 34px;
-            margin-bottom: 7px;
+            height: 32px;
+            margin-bottom: 6px;
         }
 
         .password-field {
-            margin-bottom: 7px;
+            margin-bottom: 6px;
         }
 
         .password-toggle {
             top: 0;
-            height: 32px;
+            height: 30px;
         }
 
         .auth-switch {
-            margin-top: 9px;
+            margin-top: 8px;
         }
 
         .btn.wide {
-            min-height: 36px;
+            min-height: 34px;
         }
     }
 </style>

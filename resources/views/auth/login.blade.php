@@ -150,21 +150,23 @@
         }
     }
 
+    /* FORM PANEL */
     .auth-form-panel {
         display: flex;
         align-items: center;
         justify-content: center;
         min-width: 0;
         min-height: 0;
-        overflow: hidden;
-        padding: clamp(22px, 4vw, 62px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: clamp(24px, 4vw, 62px);
         background: #fff;
     }
 
     .auth-form {
         width: min(440px, 100%);
         max-height: 100%;
-        overflow: hidden;
+        overflow: visible;
         margin: auto;
         color: #172b20;
     }
@@ -173,7 +175,7 @@
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        margin: 0 0 clamp(22px, 4vh, 38px);
+        margin: 0 0 26px;
         color: #64736a;
         font-size: 12px;
         text-decoration: none;
@@ -184,7 +186,7 @@
     }
 
     .auth-form h2 {
-        margin: 0 0 8px;
+        margin: 0 0 9px;
         color: #172b20;
         font-size: clamp(25px, 2.4vw, 32px);
         line-height: 1.2;
@@ -192,7 +194,7 @@
     }
 
     .auth-intro {
-        margin: 0 0 clamp(20px, 3vh, 30px);
+        margin: 0 0 26px;
         color: #68736c;
         font-size: 13px;
         line-height: 1.6;
@@ -204,7 +206,7 @@
     }
 
     .auth-form form > label {
-        margin: 0 0 7px;
+        margin: 0 0 8px;
         color: #20372a;
         font-size: 12px;
         font-weight: 700;
@@ -214,7 +216,7 @@
         box-sizing: border-box;
         width: 100%;
         height: 44px;
-        margin: 0 0 16px;
+        margin: 0 0 18px;
         padding: 0 13px;
         border: 1px solid #dce5e0;
         border-radius: 8px;
@@ -231,7 +233,7 @@
 
     .password-field {
         position: relative;
-        margin: 0 0 16px;
+        margin: 0 0 18px;
     }
 
     .auth-form .password-field input {
@@ -307,7 +309,7 @@
     }
 
     .auth-switch {
-        margin: 22px 0 0;
+        margin: 24px 0 0;
         color: #68736c;
         font-size: 12px;
         text-align: center;
@@ -335,6 +337,7 @@
         max-width: min(520px, 90vw);
     }
 
+    /* TABLET */
     @media (max-width: 760px) {
         .auth-page {
             padding: 10px;
@@ -362,6 +365,7 @@
         }
     }
 
+    /* MOBILE */
     @media (max-width: 560px) {
         .auth-shell {
             grid-template-columns: 1fr;
@@ -388,24 +392,24 @@
         }
 
         .auth-form-panel {
-            padding: 14px 22px;
+            padding: 18px 22px;
         }
 
         .auth-form .back {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .auth-intro {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .auth-form input:not([type=checkbox]) {
             height: 40px;
-            margin-bottom: 11px;
+            margin-bottom: 13px;
         }
 
         .password-field {
-            margin-bottom: 11px;
+            margin-bottom: 13px;
         }
 
         .password-toggle {
@@ -413,14 +417,15 @@
         }
 
         .remember-row {
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .auth-switch {
-            margin-top: 13px;
+            margin-top: 16px;
         }
     }
 
+    /* SHORT SCREEN */
     @media (max-height: 650px) and (min-width: 561px) {
         .auth-form-panel {
             padding: 16px 30px;
@@ -459,6 +464,7 @@
 
 <div class="auth-page">
     <main class="auth-shell">
+
         <section class="auth-art" aria-label="Informasi SIPADU">
             <div class="auth-slideshow" aria-hidden="true">
                 <img src="{{ asset('images/slideshow/upnvjnew.jpg') }}" alt="">
@@ -480,6 +486,7 @@
 
         <section class="auth-form-panel">
             <div class="auth-form">
+
                 <a href="{{ route('landing') }}" class="back">
                     <i data-lucide="arrow-left"></i>
                     <span>Kembali ke landing page</span>
@@ -556,8 +563,10 @@
                     Belum punya akun?
                     <a href="{{ route('register') }}">Daftar</a>
                 </p>
+
             </div>
         </section>
+
     </main>
 </div>
 
