@@ -79,7 +79,7 @@
     justify-content: space-between;
     align-items: flex-end;
     gap: 18px;
-    margin: 4px 0 22px;
+    margin: 0 0 22px;
 }
 
 .booking-page .bp-heading h1 {
@@ -221,7 +221,7 @@
 .booking-page .bp-search input {
     width: 100%;
     height: 40px;
-    padding: 0 14px 0 38px;
+    padding: 0 34px 0 38px;
     border: 1px solid rgba(22, 54, 38, .12);
     border-radius: 12px;
     background: rgba(255, 255, 255, .78);
@@ -231,6 +231,41 @@
     outline: none;
     box-sizing: border-box;
     transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.booking-page .bp-search-clear {
+    position: absolute;
+    right: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(22, 54, 38, .08);
+    color: var(--bp-muted);
+    line-height: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+}
+
+.booking-page .bp-search-clear.show {
+    display: inline-flex;
+}
+
+.booking-page .bp-search-clear svg {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+
+.booking-page .bp-search-clear:hover {
+    background: rgba(31, 122, 73, .16);
+    color: var(--bp-green);
 }
 
 .booking-page .bp-search-icon {
@@ -334,6 +369,11 @@
 /* TABLE STYLING */
 .booking-page .bp-table-wrap {
     overflow-x: auto;
+    transition: opacity .15s ease;
+}
+
+.booking-page .bp-table-wrap.is-loading {
+    opacity: .55;
 }
 
 .booking-page table {
@@ -713,19 +753,27 @@
 
 .booking-page .bp-drawer-close,
 .booking-page .bp-pdf-header button {
-    display: grid;
-    place-items: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 36px;
     height: 36px;
+    padding: 0;
     flex-shrink: 0;
     border: 1px solid rgba(22, 54, 38, .12);
     border-radius: 50%;
     background: #fff;
     color: var(--bp-muted);
-    font-size: 22px;
-    line-height: 1;
+    line-height: 0;
     cursor: pointer;
     transition: background .2s ease, color .2s ease;
+}
+
+.booking-page .bp-drawer-close svg,
+.booking-page .bp-pdf-header button svg {
+    width: 17px;
+    height: 17px;
+    display: block;
 }
 
 .booking-page .bp-drawer-close:hover,
@@ -1312,7 +1360,7 @@ body.bp-drawer-open {
     <div class="bp-card">
 
         {{-- FILTER DAN PENCARIAN --}}
-        <form method="GET" action="{{ route('admin.bookings') }}" class="bp-toolbar">
+        <form method="GET" action="{{ route('admin.bookings') }}" class="bp-toolbar" id="bookingFilterForm">
             <div class="bp-search">
                 <span class="bp-search-icon">
                     <i data-lucide="search"></i>
@@ -1320,9 +1368,21 @@ body.bp-drawer-open {
                 <input
                     type="text"
                     name="q"
+                    id="bookingSearchInput"
                     value="{{ request('q') }}"
                     placeholder="Cari kode, kegiatan, peminjam, atau organisasi..."
+                    autocomplete="off"
                 >
+                <button
+                    type="button"
+                    class="bp-search-clear {{ request('q') ? 'show' : '' }}"
+                    id="clearBookingSearch"
+                    aria-label="Hapus pencarian"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <select class="bp-filter" name="status">
@@ -1359,13 +1419,13 @@ body.bp-drawer-open {
                 Terapkan Filter
             </button>
 
-            <a class="bp-reset" href="{{ route('admin.bookings') }}">
+            <a class="bp-reset" href="{{ route('admin.bookings') }}" id="resetBookingFilter">
                 Reset
             </a>
         </form>
 
         {{-- TAB STATUS --}}
-        <div class="bp-tabs">
+        <div class="bp-tabs" id="bookingStatusTabs">
             <a
                 class="bp-tab {{ !request('status') ? 'active' : '' }}"
                 href="{{ route('admin.bookings', request()->except('status', 'page')) }}"
@@ -1403,7 +1463,7 @@ body.bp-drawer-open {
         </div>
 
         {{-- DAFTAR PENGAJUAN --}}
-        <div class="bp-table-wrap">
+        <div class="bp-table-wrap" id="bookingTableWrap">
             <table>
                 <thead>
                     <tr>
@@ -1491,228 +1551,230 @@ body.bp-drawer-open {
         </div>
 
         {{-- PAGINATION --}}
-        <div class="bp-pagination">
+        <div class="bp-pagination" id="bookingPagination">
             {{ $bookings->withQueryString()->links() }}
         </div>
     </div>
 
     {{-- TEMPLATE PANEL TINJAUAN & PRIORITAS --}}
-    @foreach($drawerItems as $item)
-        @php
-            $itemStatusClass = $statusClasses[$item->status] ?? 'st-cancelled';
-            $itemCode = $formatBookingCode($item);
-            $itemSession = $formatSessionRange($item);
-            $itemConflicts = $item->relationLoaded('conflicts') ? $item->conflicts : collect();
-            $approvedConflicts = $itemConflicts->where('status', 'Disetujui')->count();
-            $pendingConflicts = $itemConflicts->where('status', 'Pending')->count();
-            $totalConflicts = $itemConflicts->count();
-        @endphp
+    <div id="bpDrawerTemplates">
+        @foreach($drawerItems as $item)
+            @php
+                $itemStatusClass = $statusClasses[$item->status] ?? 'st-cancelled';
+                $itemCode = $formatBookingCode($item);
+                $itemSession = $formatSessionRange($item);
+                $itemConflicts = $item->relationLoaded('conflicts') ? $item->conflicts : collect();
+                $approvedConflicts = $itemConflicts->where('status', 'Disetujui')->count();
+                $pendingConflicts = $itemConflicts->where('status', 'Pending')->count();
+                $totalConflicts = $itemConflicts->count();
+            @endphp
 
-        <template id="booking-drawer-{{ $item->id }}">
-            <div class="bp-drawer-content">
-                {{-- KARTU UTAMA PENGAJUAN --}}
-                <div class="bp-drawer-summary {{ $item->status === 'Pending' ? 'is-pending' : '' }}">
-                    <div class="bp-drawer-summary-top">
-                        <span class="bp-code">
-                            {{ $itemCode }} • {{ strtoupper($item->status === 'Pending' ? 'SEDANG DITINJAU' : $item->status) }}
-                        </span>
-                        <span class="bp-status {{ $itemStatusClass }}">
-                            <span class="bp-status-dot"></span>
-                            {{ $item->status === 'Pending' ? 'Sedang Diproses' : $item->status }}
-                        </span>
-                    </div>
+            <template id="booking-drawer-{{ $item->id }}">
+                <div class="bp-drawer-content">
+                    {{-- KARTU UTAMA PENGAJUAN --}}
+                    <div class="bp-drawer-summary {{ $item->status === 'Pending' ? 'is-pending' : '' }}">
+                        <div class="bp-drawer-summary-top">
+                            <span class="bp-code">
+                                {{ $itemCode }} • {{ strtoupper($item->status === 'Pending' ? 'SEDANG DITINJAU' : $item->status) }}
+                            </span>
+                            <span class="bp-status {{ $itemStatusClass }}">
+                                <span class="bp-status-dot"></span>
+                                {{ $item->status === 'Pending' ? 'Sedang Diproses' : $item->status }}
+                            </span>
+                        </div>
 
-                    <h3>{{ $item->event_name }}</h3>
-                    <p class="bp-drawer-date">
-                        {{ $item->booking_date->translatedFormat('d M Y') }} • {{ $itemSession }}
-                    </p>
+                        <h3>{{ $item->event_name }}</h3>
+                        <p class="bp-drawer-date">
+                            {{ $item->booking_date->translatedFormat('d M Y') }} • {{ $itemSession }}
+                        </p>
 
-                    <div class="bp-drawer-tags">
-                        <span>#{{ preg_replace('/\s+/', '', $item->organization) }}</span>
-                        <span>#{{ preg_replace('/\s+/', '', $item->auditorium->name) }}</span>
+                        <div class="bp-drawer-tags">
+                            <span>#{{ preg_replace('/\s+/', '', $item->organization) }}</span>
+                            <span>#{{ preg_replace('/\s+/', '', $item->auditorium->name) }}</span>
+                            @if($item->event_description)
+                                <span>#Kegiatan</span>
+                            @endif
+                        </div>
+
+                        <div class="bp-drawer-info-grid">
+                            <div>
+                                <small>Pengusul</small>
+                                <strong>{{ $item->organization }}</strong>
+                                <span>{{ $item->user->name }}</span>
+                            </div>
+                            <div>
+                                <small>Peserta</small>
+                                <strong>
+                                    {{ !empty($item->participant_count) ? $item->participant_count . ' pax' : 'Sesuai surat' }}
+                                </strong>
+                            </div>
+                            <div>
+                                <small>Penanggung Jawab</small>
+                                <strong>{{ $item->pic_name }}</strong>
+                                <span>{{ $item->pic_phone }}</span>
+                            </div>
+                            <div>
+                                <small>Waktu Masuk</small>
+                                <strong>{{ $item->created_at->translatedFormat('d M Y, H:i') }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="bp-drawer-check">
+                            <span class="bp-check-icon {{ $item->surat_path ? '' : 'is-missing' }}">
+                                {{ $item->surat_path ? '✓' : '!' }}
+                            </span>
+                            <div>
+                                @if($item->surat_path)
+                                    <p>
+                                        <strong>Kelengkapan Perizinan:</strong> Surat Permohonan peminjaman auditorium telah dilampirkan dan siap diverifikasi.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        class="bp-inline-pdf-link"
+                                        data-preview-pdf="{{ route('admin.booking.letter', $item) }}"
+                                    >
+                                        Lihat Surat Permohonan (PDF) ↗
+                                    </button>
+                                @else
+                                    <p>
+                                        <strong>Kelengkapan Perizinan:</strong> Dokumen surat permohonan belum diunggah oleh pemohon.
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+
                         @if($item->event_description)
-                            <span>#Kegiatan</span>
+                            <div class="bp-drawer-description">
+                                <small>Deskripsi Kegiatan</small>
+                                <p>{{ $item->event_description }}</p>
+                            </div>
+                        @endif
+
+                        @if($item->admin_note)
+                            <div class="bp-drawer-description">
+                                <small>Catatan Admin</small>
+                                <p>{{ $item->admin_note }}</p>
+                            </div>
                         @endif
                     </div>
 
-                    <div class="bp-drawer-info-grid">
-                        <div>
-                            <small>Pengusul</small>
-                            <strong>{{ $item->organization }}</strong>
-                            <span>{{ $item->user->name }}</span>
-                        </div>
-                        <div>
-                            <small>Peserta</small>
-                            <strong>
-                                {{ !empty($item->participant_count) ? $item->participant_count . ' pax' : 'Sesuai surat' }}
-                            </strong>
-                        </div>
-                        <div>
-                            <small>Penanggung Jawab</small>
-                            <strong>{{ $item->pic_name }}</strong>
-                            <span>{{ $item->pic_phone }}</span>
-                        </div>
-                        <div>
-                            <small>Waktu Masuk</small>
-                            <strong>{{ $item->created_at->translatedFormat('d M Y, H:i') }}</strong>
-                        </div>
-                    </div>
+                    {{-- DAFTAR PENGAJUAN BENTROK PADA SLOT INI --}}
+                    @if($totalConflicts > 0)
+                        <div class="bp-conflict-section">
+                            <div class="bp-conflict-header">
+                                <span class="bp-conflict-title">
+                                    ⚡ Total Pengajuan Bentrok di Slot Ini ({{ $totalConflicts + 1 }})
+                                </span>
+                                <span class="bp-conflict-hint">Pilih yang diprioritaskan</span>
+                            </div>
 
-                    <div class="bp-drawer-check">
-                        <span class="bp-check-icon {{ $item->surat_path ? '' : 'is-missing' }}">
-                            {{ $item->surat_path ? '✓' : '!' }}
-                        </span>
-                        <div>
-                            @if($item->surat_path)
-                                <p>
-                                    <strong>Kelengkapan Perizinan:</strong> Surat Permohonan peminjaman auditorium telah dilampirkan dan siap diverifikasi.
-                                </p>
-                                <button
-                                    type="button"
-                                    class="bp-inline-pdf-link"
-                                    data-preview-pdf="{{ route('admin.booking.letter', $item) }}"
-                                >
-                                    Lihat Surat Permohonan (PDF) ↗
-                                </button>
-                            @else
-                                <p>
-                                    <strong>Kelengkapan Perizinan:</strong> Dokumen surat permohonan belum diunggah oleh pemohon.
-                                </p>
-                            @endif
-                        </div>
-                    </div>
+                            <div class="bp-conflict-list">
+                                @foreach($itemConflicts as $conflict)
+                                    @php
+                                        $conflictCode = $formatBookingCode($conflict);
+                                        $conflictSession = $formatSessionRange($conflict);
+                                    @endphp
+                                    <div class="bp-conflict-card">
+                                        <div class="bp-conflict-card-top">
+                                            <span class="bp-conflict-code">{{ $conflictCode }}</span>
 
-                    @if($item->event_description)
-                        <div class="bp-drawer-description">
-                            <small>Deskripsi Kegiatan</small>
-                            <p>{{ $item->event_description }}</p>
+                                            @if($conflict->status === 'Disetujui')
+                                                <span class="bp-status st-approved">
+                                                    <span class="bp-status-dot"></span>
+                                                    Sudah Disetujui
+                                                </span>
+                                            @else
+                                                <button
+                                                    type="button"
+                                                    class="bp-prioritize-btn"
+                                                    data-open-drawer="{{ $conflict->id }}"
+                                                    data-booking-subtitle="{{ $conflictCode }} • {{ $conflict->auditorium->name }}"
+                                                >
+                                                    Prioritaskan Ini
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        <h4>{{ $conflict->event_name }}</h4>
+                                        <p class="bp-conflict-meta">
+                                            {{ $conflict->organization }} • {{ $conflictSession }}
+                                        </p>
+
+                                        <div class="bp-conflict-tags">
+                                            <span>#{{ preg_replace('/\s+/', '', $conflict->organization) }}</span>
+                                            <span>#{{ preg_replace('/\s+/', '', $conflict->auditorium->name) }}</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
 
-                    @if($item->admin_note)
-                        <div class="bp-drawer-description">
-                            <small>Catatan Admin</small>
-                            <p>{{ $item->admin_note }}</p>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- DAFTAR PENGAJUAN BENTROK PADA SLOT INI --}}
-                @if($totalConflicts > 0)
-                    <div class="bp-conflict-section">
-                        <div class="bp-conflict-header">
-                            <span class="bp-conflict-title">
-                                ⚡ Total Pengajuan Bentrok di Slot Ini ({{ $totalConflicts + 1 }})
-                            </span>
-                            <span class="bp-conflict-hint">Pilih yang diprioritaskan</span>
-                        </div>
-
-                        <div class="bp-conflict-list">
-                            @foreach($itemConflicts as $conflict)
-                                @php
-                                    $conflictCode = $formatBookingCode($conflict);
-                                    $conflictSession = $formatSessionRange($conflict);
-                                @endphp
-                                <div class="bp-conflict-card">
-                                    <div class="bp-conflict-card-top">
-                                        <span class="bp-conflict-code">{{ $conflictCode }}</span>
-
-                                        @if($conflict->status === 'Disetujui')
-                                            <span class="bp-status st-approved">
-                                                <span class="bp-status-dot"></span>
-                                                Sudah Disetujui
-                                            </span>
-                                        @else
-                                            <button
-                                                type="button"
-                                                class="bp-prioritize-btn"
-                                                data-open-drawer="{{ $conflict->id }}"
-                                                data-booking-subtitle="{{ $conflictCode }} • {{ $conflict->auditorium->name }}"
-                                            >
-                                                Prioritaskan Ini
-                                            </button>
-                                        @endif
-                                    </div>
-
-                                    <h4>{{ $conflict->event_name }}</h4>
-                                    <p class="bp-conflict-meta">
-                                        {{ $conflict->organization }} • {{ $conflictSession }}
-                                    </p>
-
-                                    <div class="bp-conflict-tags">
-                                        <span>#{{ preg_replace('/\s+/', '', $conflict->organization) }}</span>
-                                        <span>#{{ preg_replace('/\s+/', '', $conflict->auditorium->name) }}</span>
-                                    </div>
+                    {{-- RIWAYAT KEPUTUSAN --}}
+                    @if($item->histories->isNotEmpty())
+                        <div class="bp-drawer-history">
+                            <strong>Riwayat Keputusan</strong>
+                            @foreach($item->histories->sortByDesc('created_at') as $history)
+                                <div class="bp-history-item">
+                                    <span>{{ $history->from_status ?: 'Pengajuan' }} → {{ $history->to_status }}</span>
+                                    <small>{{ $history->created_at->format('d/m/Y H:i') }}</small>
+                                    @if($history->note)
+                                        <p>{{ $history->note }}</p>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
-                    </div>
-                @endif
-
-                {{-- RIWAYAT KEPUTUSAN --}}
-                @if($item->histories->isNotEmpty())
-                    <div class="bp-drawer-history">
-                        <strong>Riwayat Keputusan</strong>
-                        @foreach($item->histories->sortByDesc('created_at') as $history)
-                            <div class="bp-history-item">
-                                <span>{{ $history->from_status ?: 'Pengajuan' }} → {{ $history->to_status }}</span>
-                                <small>{{ $history->created_at->format('d/m/Y H:i') }}</small>
-                                @if($history->note)
-                                    <p>{{ $history->note }}</p>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-
-            {{-- TOMBOL KEPUTUSAN BAWAH --}}
-            @if($item->status === 'Pending')
-                <div class="bp-drawer-actions">
-                    <button
-                        type="button"
-                        class="bp-btn bp-approve"
-                        data-decision-id="{{ $item->id }}"
-                        data-decision-status="Disetujui"
-                        data-approved-conflicts="{{ $approvedConflicts }}"
-                        data-pending-conflicts="{{ $pendingConflicts }}"
-                        @disabled($approvedConflicts > 0)
-                    >
-                        @if($approvedConflicts > 0)
-                            Jadwal Sudah Terkunci ({{ $approvedConflicts }} Disetujui)
-                        @elseif($pendingConflicts > 0)
-                            Setujui & Tolak Otomatis ({{ $pendingConflicts }} Pengajuan Lain)
-                        @else
-                            ✓ Setujui Pengajuan
-                        @endif
-                    </button>
-
-                    <div class="bp-drawer-actions-row">
-                        <button
-                            type="button"
-                            class="bp-btn bp-revision"
-                            data-decision-id="{{ $item->id }}"
-                            data-decision-status="Perlu Revisi"
-                            data-approved-conflicts="0"
-                            data-pending-conflicts="0"
-                        >
-                            Minta Revisi
-                        </button>
-                        <button
-                            type="button"
-                            class="bp-btn bp-reject"
-                            data-decision-id="{{ $item->id }}"
-                            data-decision-status="Ditolak"
-                            data-approved-conflicts="0"
-                            data-pending-conflicts="0"
-                        >
-                            Tolak Pengajuan
-                        </button>
-                    </div>
+                    @endif
                 </div>
-            @endif
-        </template>
-    @endforeach
+
+                {{-- TOMBOL KEPUTUSAN BAWAH --}}
+                @if($item->status === 'Pending')
+                    <div class="bp-drawer-actions">
+                        <button
+                            type="button"
+                            class="bp-btn bp-approve"
+                            data-decision-id="{{ $item->id }}"
+                            data-decision-status="Disetujui"
+                            data-approved-conflicts="{{ $approvedConflicts }}"
+                            data-pending-conflicts="{{ $pendingConflicts }}"
+                            @disabled($approvedConflicts > 0)
+                        >
+                            @if($approvedConflicts > 0)
+                                Jadwal Sudah Terkunci ({{ $approvedConflicts }} Disetujui)
+                            @elseif($pendingConflicts > 0)
+                                Setujui & Tolak Otomatis ({{ $pendingConflicts }} Pengajuan Lain)
+                            @else
+                                ✓ Setujui Pengajuan
+                            @endif
+                        </button>
+
+                        <div class="bp-drawer-actions-row">
+                            <button
+                                type="button"
+                                class="bp-btn bp-revision"
+                                data-decision-id="{{ $item->id }}"
+                                data-decision-status="Perlu Revisi"
+                                data-approved-conflicts="0"
+                                data-pending-conflicts="0"
+                            >
+                                Minta Revisi
+                            </button>
+                            <button
+                                type="button"
+                                class="bp-btn bp-reject"
+                                data-decision-id="{{ $item->id }}"
+                                data-decision-status="Ditolak"
+                                data-approved-conflicts="0"
+                                data-pending-conflicts="0"
+                            >
+                                Tolak Pengajuan
+                            </button>
+                        </div>
+                    </div>
+                @endif
+            </template>
+        @endforeach
+    </div>
 
     {{-- PANEL DETAIL DARI SISI KANAN --}}
     <div class="bp-drawer-backdrop" id="bookingDrawerBackdrop" aria-hidden="true">
@@ -1722,7 +1784,11 @@ body.bp-drawer-open {
                     <h2 id="bookingDrawerTitle">Tinjau Pengajuan & Prioritas</h2>
                     <p id="bookingDrawerSubtitle">Periksa detail pengajuan sebelum mengambil keputusan.</p>
                 </div>
-                <button type="button" class="bp-drawer-close" id="closeBookingDrawer" aria-label="Tutup">×</button>
+                <button type="button" class="bp-drawer-close" id="closeBookingDrawer" aria-label="Tutup">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
             </header>
             <div class="bp-drawer-body" id="bookingDrawerBody"></div>
         </aside>
@@ -1733,7 +1799,11 @@ body.bp-drawer-open {
         <div class="bp-pdf-window">
             <header class="bp-pdf-header">
                 <strong>Pratinjau Surat Permohonan</strong>
-                <button type="button" id="closePdfPreview" aria-label="Tutup">×</button>
+                <button type="button" id="closePdfPreview" aria-label="Tutup">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
             </header>
             <iframe id="pdfPreviewFrame" title="Pratinjau dokumen PDF"></iframe>
         </div>
@@ -1920,6 +1990,117 @@ body.bp-drawer-open {
     function closeDecisionModal() {
         document.getElementById('decisionModal').classList.remove('show');
     }
+
+    /* LIVE SEARCH & FILTER TANPA RELOAD HALAMAN */
+    (function () {
+        const form = document.getElementById('bookingFilterForm');
+        const searchInput = document.getElementById('bookingSearchInput');
+        const clearBtn = document.getElementById('clearBookingSearch');
+        const tableWrap = document.getElementById('bookingTableWrap');
+        const tabsWrap = document.getElementById('bookingStatusTabs');
+        const paginationWrap = document.getElementById('bookingPagination');
+        const templatesWrap = document.getElementById('bpDrawerTemplates');
+
+        if (!form || !searchInput || !tableWrap) return;
+
+        let debounceTimer = null;
+        let activeController = null;
+
+        function toggleClearButton() {
+            if (!clearBtn) return;
+            clearBtn.classList.toggle('show', searchInput.value.trim().length > 0);
+        }
+
+        function buildFilterUrl() {
+            const url = new URL(form.action, window.location.origin);
+            const formData = new FormData(form);
+
+            formData.forEach(function (value, key) {
+                if (String(value).trim() !== '') {
+                    url.searchParams.set(key, String(value).trim());
+                }
+            });
+
+            return url.toString();
+        }
+
+        async function fetchFilteredBookings(targetUrl) {
+            if (activeController) {
+                activeController.abort();
+            }
+
+            activeController = new AbortController();
+            tableWrap.classList.add('is-loading');
+
+            try {
+                const response = await fetch(targetUrl, {
+                    signal: activeController.signal,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html'
+                    }
+                });
+
+                if (!response.ok) return;
+
+                const html = await response.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                const nextTable = doc.getElementById('bookingTableWrap');
+                const nextTabs = doc.getElementById('bookingStatusTabs');
+                const nextPagination = doc.getElementById('bookingPagination');
+                const nextTemplates = doc.getElementById('bpDrawerTemplates');
+
+                if (nextTable) tableWrap.innerHTML = nextTable.innerHTML;
+                if (nextTabs && tabsWrap) tabsWrap.innerHTML = nextTabs.innerHTML;
+                if (nextPagination && paginationWrap) paginationWrap.innerHTML = nextPagination.innerHTML;
+                if (nextTemplates && templatesWrap) templatesWrap.innerHTML = nextTemplates.innerHTML;
+
+                window.history.replaceState({}, '', targetUrl);
+
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    window.location.href = targetUrl;
+                }
+            } finally {
+                tableWrap.classList.remove('is-loading');
+            }
+        }
+
+        searchInput.addEventListener('input', function () {
+            toggleClearButton();
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                fetchFilteredBookings(buildFilterUrl());
+            }, 250);
+        });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                toggleClearButton();
+                searchInput.focus();
+                fetchFilteredBookings(buildFilterUrl());
+            });
+        }
+
+        form.querySelectorAll('select, input[type="date"]').forEach(function (field) {
+            field.addEventListener('change', function () {
+                fetchFilteredBookings(buildFilterUrl());
+            });
+        });
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            clearTimeout(debounceTimer);
+            fetchFilteredBookings(buildFilterUrl());
+        });
+
+        toggleClearButton();
+    })();
 
     document.addEventListener('click', function(event) {
         const detailButton = event.target.closest('[data-open-drawer]');
