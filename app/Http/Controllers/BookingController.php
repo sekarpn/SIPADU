@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-
 class BookingController extends Controller
 {
     public function index(Request $r)
@@ -121,16 +120,60 @@ class BookingController extends Controller
 
         $bookings = $query->paginate(12)->withQueryString();
 
+        $pageItems = $bookings->getCollection();
+        $extraDrawerBookings = collect();
+
+        foreach ($pageItems as $item) {
+            if ($item->status === 'Pending') {
+                $conflicts = Booking::with(['user', 'auditorium', 'histories'])
+                    ->where('id', '!=', $item->id)
+                    ->where('auditorium_id', $item->auditorium_id)
+                    ->whereDate('booking_date', $item->booking_date)
+                    ->whereIn('status', ['Pending', 'Disetujui'])
+                    ->where('start_time', '<', $item->end_time)
+                    ->where('end_time', '>', $item->start_time)
+                    ->orderByRaw("CASE WHEN status = 'Disetujui' THEN 0 ELSE 1 END")
+                    ->orderBy('created_at')
+                    ->get();
+
+                $item->setRelation('conflicts', $conflicts);
+
+                foreach ($conflicts as $conflict) {
+                    if (
+                        !$pageItems->contains('id', $conflict->id) &&
+                        !$extraDrawerBookings->contains('id', $conflict->id)
+                    ) {
+                        $subConflicts = Booking::with(['user', 'auditorium', 'histories'])
+                            ->where('id', '!=', $conflict->id)
+                            ->where('auditorium_id', $conflict->auditorium_id)
+                            ->whereDate('booking_date', $conflict->booking_date)
+                            ->whereIn('status', ['Pending', 'Disetujui'])
+                            ->where('start_time', '<', $conflict->end_time)
+                            ->where('end_time', '>', $conflict->start_time)
+                            ->orderByRaw("CASE WHEN status = 'Disetujui' THEN 0 ELSE 1 END")
+                            ->orderBy('created_at')
+                            ->get();
+
+                        $conflict->setRelation('conflicts', $subConflicts);
+                        $extraDrawerBookings->push($conflict);
+                    }
+                }
+            } else {
+                $item->setRelation('conflicts', collect());
+            }
+        }
+
         $stats = [
             'pending' => Booking::where('status', 'Pending')->count(),
             'approved' => Booking::where('status', 'Disetujui')->count(),
             'rejected' => Booking::where('status', 'Ditolak')->count(),
+            'revision' => Booking::where('status', 'Perlu Revisi')->count(),
             'total' => Booking::count(),
         ];
 
         $auditoriums = Auditorium::orderBy('name')->get();
 
-        return view('admin.bookings', compact('bookings', 'stats', 'auditoriums'));
+        return view('admin.bookings', compact('bookings', 'stats', 'auditoriums', 'extraDrawerBookings'));
     }
 
     // Download surat peminjaman oleh admin
@@ -150,20 +193,29 @@ class BookingController extends Controller
 
         $filePath = Storage::disk('local')->path($booking->surat_path);
 
-        return Response::download(
+        return Response::file(
             $filePath,
-            'Surat-Peminjaman-' . $booking->id . '.pdf',
-            ['Content-Type' => 'application/pdf']
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="Surat-Peminjaman-' . $booking->id . '.pdf"',
+                'X-Content-Type-Options' => 'nosniff',
+            ]
         );
     }
 
     public function decide(Request $r, Booking $booking)
     {
         $data = $r->validate([
-            'status' => 'required|in:Disetujui,Ditolak',
+            'status' => 'required|in:Disetujui,Ditolak,Perlu Revisi',
             'admin_note' => 'nullable|string|max:2000',
             'conflict_rejection_reason' => 'nullable|string|max:2000',
         ]);
+
+        if ($data['status'] === 'Perlu Revisi' && blank($data['admin_note'] ?? null)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'admin_note' => 'Catatan revisi wajib diisi agar peminjam mengetahui bagian yang harus diperbaiki.'
+            ]);
+        }
 
         abort_unless($booking->status === 'Pending', 422, 'Pengajuan ini sudah diproses.');
 

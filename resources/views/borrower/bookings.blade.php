@@ -80,7 +80,7 @@
                     </td>
 
                     <td>
-                        <span class="status {{ strtolower($b->status) }}">
+                        <span class="status {{ strtolower(str_replace(' ', '-', $b->status)) }}">
                             {{ $b->status }}
                         </span>
                     </td>
