@@ -49,175 +49,289 @@
 
 <style>
 .booking-page {
-    --bp-ink: #172b20;
-    --bp-muted: #718078;
-    --bp-line: #e4ebe6;
-    --bp-green: #266b47;
+    --bp-ink: #163626;
+    --bp-muted: #4c6456;
+    --bp-subtle: #64786c;
+    --bp-line: rgba(22, 54, 38, .09);
+    --bp-green: #1f7a49;
+    --bp-green-mid: #237c4d;
+    --bp-glass-bg: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, .68) 0%,
+        rgba(255, 255, 255, .42) 100%
+    );
+    --bp-glass-border: 1px solid rgba(255, 255, 255, .55);
+    --bp-glass-shadow: 0 8px 28px rgba(22, 54, 38, .06);
     color: var(--bp-ink);
 }
 
+.booking-page,
+.booking-page button,
+.booking-page input,
+.booking-page select,
+.booking-page textarea {
+    font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* PAGE HEADER */
 .booking-page .bp-heading {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: flex-end;
     gap: 18px;
-    margin: 2px 0 22px;
+    margin: 4px 0 22px;
 }
 
 .booking-page .bp-heading h1 {
-    font-size: 27px;
-    letter-spacing: -.04em;
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -.03em;
     margin: 0;
-    color: #1c3527;
+    color: var(--bp-ink);
 }
 
 .booking-page .bp-heading p {
-    margin: 7px 0 0;
+    margin: 6px 0 0;
     color: var(--bp-muted);
-    font-size: 12px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.55;
 }
 
+/* SCORECARDS (GLASSMORPHISM MATCHING DASHBOARD) */
 .booking-page .bp-stats {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 13px;
+    gap: 14px;
     margin-bottom: 18px;
 }
 
 .booking-page .bp-stat {
-    background: #fff;
-    border: 1px solid var(--bp-line);
-    border-radius: 15px;
-    padding: 17px 18px;
+    background: var(--bp-glass-bg);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: var(--bp-glass-border);
+    box-shadow: var(--bp-glass-shadow);
+    border-radius: 16px;
+    padding: 18px;
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 14px;
     min-width: 0;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.booking-page .bp-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(22, 54, 38, .09);
 }
 
 .booking-page .bp-stat-icon {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     border-radius: 12px;
     display: grid;
     place-items: center;
-    font-size: 17px;
-    background: #edf6f0;
-    color: #237c4d;
+    background: rgba(33, 128, 77, .14);
+    color: var(--bp-green);
+    border: 1px solid rgba(255, 255, 255, .45);
     flex-shrink: 0;
+}
+
+.booking-page .bp-stat-icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+.booking-page .bp-stat-icon.is-warning {
+    background: rgba(217, 119, 6, .13);
+    color: #b45309;
+}
+
+.booking-page .bp-stat-icon.is-danger {
+    background: rgba(220, 38, 38, .12);
+    color: #b91c1c;
 }
 
 .booking-page .bp-stat small {
     display: block;
     color: var(--bp-muted);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .booking-page .bp-stat strong {
     display: block;
-    font-size: 24px;
-    line-height: 1.25;
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    color: var(--bp-ink);
+    line-height: 1.2;
     margin-top: 3px;
 }
 
+/* ALERT BANNERS */
+.booking-page .bp-alert {
+    border-radius: 14px;
+    padding: 13px 16px;
+    margin-bottom: 16px;
+    font-size: 12.5px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.booking-page .bp-alert.is-error {
+    background: rgba(254, 226, 226, .85);
+    color: #991b1b;
+    border: 1px solid rgba(248, 113, 113, .35);
+}
+
+.booking-page .bp-alert.is-success {
+    background: rgba(220, 252, 231, .85);
+    color: #166534;
+    border: 1px solid rgba(74, 222, 128, .35);
+    font-weight: 600;
+}
+
+/* MAIN TABLE CARD (GLASSMORPHISM) */
 .booking-page .bp-card {
-    background: #fff;
-    border: 1px solid var(--bp-line);
-    border-radius: 15px;
+    background: var(--bp-glass-bg);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: var(--bp-glass-border);
+    box-shadow: var(--bp-glass-shadow);
+    border-radius: 16px;
     overflow: hidden;
 }
 
 .booking-page .bp-toolbar {
-    padding: 17px;
+    padding: 16px 18px;
     display: flex;
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
     border-bottom: 1px solid var(--bp-line);
+    background: rgba(255, 255, 255, .25);
 }
 
 .booking-page .bp-search {
     position: relative;
-    flex: 1 1 230px;
+    flex: 1 1 240px;
 }
 
 .booking-page .bp-search input {
     width: 100%;
-    height: 39px;
-    padding: 0 12px 0 36px;
-    border: 1px solid #dfe8e2;
-    border-radius: 10px;
-    background: #fbfdfb;
-    font-size: 11px;
+    height: 40px;
+    padding: 0 14px 0 38px;
+    border: 1px solid rgba(22, 54, 38, .12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .78);
+    color: var(--bp-ink);
+    font-size: 12.5px;
+    font-weight: 500;
     outline: none;
+    box-sizing: border-box;
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
 }
 
-.booking-page .bp-search span {
+.booking-page .bp-search-icon {
     position: absolute;
     left: 12px;
-    top: 10px;
-    color: #809087;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--bp-subtle);
+    display: inline-flex;
+    pointer-events: none;
+}
+
+.booking-page .bp-search-icon svg {
+    width: 16px;
+    height: 16px;
 }
 
 .booking-page .bp-filter {
-    height: 39px;
-    padding: 0 11px;
-    border: 1px solid #dfe8e2;
-    border-radius: 10px;
-    background: #fff;
-    color: #42554a;
-    font-size: 11px;
-    min-width: 130px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid rgba(22, 54, 38, .12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .78);
+    color: var(--bp-ink);
+    font-size: 12.5px;
+    font-weight: 600;
+    min-width: 140px;
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
 }
 
 .booking-page .bp-filter:focus,
 .booking-page .bp-search input:focus {
-    border-color: #318456;
-    box-shadow: 0 0 0 3px #31845618;
+    background: #fff;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 3px rgba(31, 122, 73, .14);
     outline: none;
 }
 
 .booking-page .bp-reset {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: #277b4b;
-    padding: 10px 8px;
+    color: var(--bp-green);
+    padding: 10px 10px;
+    border-radius: 10px;
     text-decoration: none;
+    transition: background .2s ease;
 }
 
+.booking-page .bp-reset:hover {
+    background: rgba(33, 128, 77, .12);
+}
+
+/* STATUS FILTER TABS */
 .booking-page .bp-tabs {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     overflow-x: auto;
-    padding: 12px 17px 0;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--bp-line);
 }
 
 .booking-page .bp-tab {
     display: inline-flex;
     align-items: center;
+    gap: 6px;
     border: 1px solid transparent;
-    border-radius: 9px;
-    padding: 8px 11px;
-    font-size: 10px;
-    font-weight: 800;
-    color: #718078;
+    border-radius: 11px;
+    padding: 8px 13px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bp-muted);
     white-space: nowrap;
     text-decoration: none;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.booking-page .bp-tab:hover:not(.active) {
+    background: rgba(255, 255, 255, .55);
+    color: var(--bp-ink);
 }
 
 .booking-page .bp-tab.active {
-    background: #eaf5ee;
-    color: #237c4d;
-    border-color: #d7ebde;
+    background: rgba(33, 128, 77, .16);
+    color: var(--bp-green);
+    border-color: rgba(33, 128, 77, .24);
 }
 
 .booking-page .bp-tab span {
-    margin-left: 4px;
-    opacity: .7;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: rgba(22, 54, 38, .07);
+    font-size: 11px;
+    font-weight: 800;
 }
 
+.booking-page .bp-tab.active span {
+    background: rgba(31, 122, 73, .16);
+    color: var(--bp-green);
+}
+
+/* TABLE STYLING */
 .booking-page .bp-table-wrap {
     overflow-x: auto;
 }
@@ -225,30 +339,35 @@
 .booking-page table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 760px;
-    font-size: 12px;
+    min-width: 780px;
+    font-size: 13px;
 }
 
 .booking-page th {
-    padding: 12px 14px;
+    padding: 13px 18px;
     text-align: left;
-    background: #fafcfb;
+    background: rgba(255, 255, 255, .36);
     border-bottom: 1px solid var(--bp-line);
-    font-size: 9px;
+    font-size: 10.5px;
     font-weight: 800;
-    letter-spacing: .08em;
+    letter-spacing: .07em;
     text-transform: uppercase;
-    color: #829087;
+    color: var(--bp-muted);
     white-space: nowrap;
 }
 
 .booking-page td {
-    padding: 14px;
-    border-bottom: 1px solid #edf1ee;
+    padding: 15px 18px;
+    border-bottom: 1px solid rgba(22, 54, 38, .06);
     vertical-align: middle;
-    font-size: 11px;
+    font-size: 12.5px;
     line-height: 1.5;
-    color: #33463a;
+    color: var(--bp-ink);
+    transition: background .18s ease;
+}
+
+.booking-page tbody tr:hover td {
+    background: rgba(255, 255, 255, .42);
 }
 
 .booking-page tbody tr:last-child td {
@@ -256,36 +375,39 @@
 }
 
 .booking-page .bp-code {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
-    color: #266b47;
+    color: var(--bp-green);
     letter-spacing: .02em;
 }
 
 .booking-page .bp-primary {
-    font-weight: 800;
-    color: #23382b;
+    font-weight: 700;
+    color: var(--bp-ink);
     display: block;
-    max-width: 220px;
+    max-width: 240px;
     white-space: normal;
     line-height: 1.45;
+    margin-top: 2px;
 }
 
 .booking-page .bp-sub {
     display: block;
-    color: #87938b;
-    font-size: 9px;
-    margin-top: 4px;
-    line-height: 1.45;
+    color: var(--bp-subtle);
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 2px;
+    line-height: 1.4;
 }
 
+/* PASTEL STATUS PILLS */
 .booking-page .bp-status {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 10px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 11px;
     font-weight: 800;
     white-space: nowrap;
 }
@@ -299,103 +421,134 @@
 }
 
 .booking-page .st-pending {
-    background: #fff4dc;
-    color: #98650b;
+    background: #fef3c7;
+    color: #92400e;
 }
 
 .booking-page .st-approved {
-    background: #e6f5eb;
-    color: #167341;
+    background: #dcfce7;
+    color: #166534;
 }
 
 .booking-page .st-rejected {
-    background: #ffebeb;
-    color: #b32e2e;
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 .booking-page .st-revision {
-    background: #fff4d6;
-    color: #95620a;
+    background: #ffedd5;
+    color: #9a3412;
 }
 
 .booking-page .st-cancelled {
-    background: #eff1f0;
-    color: #647168;
+    background: #f1f5f9;
+    color: #475569;
 }
 
+/* BUTTONS */
 .booking-page .bp-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 11px;
-    font-weight: 800;
+    border-radius: 11px;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
     text-decoration: none;
-    transition: .2s ease;
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.booking-page .bp-btn svg {
+    width: 15px;
+    height: 15px;
 }
 
 .booking-page .bp-btn:hover {
-    filter: brightness(.97);
     transform: translateY(-1px);
 }
 
 .booking-page .bp-btn:disabled {
     cursor: not-allowed;
     transform: none;
-    filter: none;
+    opacity: .55;
 }
 
 .booking-page .bp-view {
+    background: rgba(255, 255, 255, .75);
+    border-color: rgba(22, 54, 38, .12);
+    color: var(--bp-ink);
+}
+
+.booking-page .bp-view:hover {
     background: #fff;
-    border-color: #dce7e0;
-    color: #356448;
+    border-color: rgba(31, 122, 73, .35);
+    color: var(--bp-green);
 }
 
 .booking-page .bp-approve {
-    background: #266b47;
+    background: var(--bp-green-mid);
     color: #fff;
+    box-shadow: 0 4px 12px rgba(35, 124, 77, .22);
+}
+
+.booking-page .bp-approve:hover {
+    background: var(--bp-green);
 }
 
 .booking-page .bp-reject {
-    background: #ffeded;
-    border-color: #e49494;
-    color: #b32e2e;
+    background: #fee2e2;
+    border-color: rgba(220, 38, 38, .25);
+    color: #991b1b;
+}
+
+.booking-page .bp-reject:hover {
+    background: #fecaca;
 }
 
 .booking-page .bp-revision {
-    background: #fff6db;
-    border-color: #dfa634;
-    color: #92580c;
+    background: #fef3c7;
+    border-color: rgba(217, 119, 6, .28);
+    color: #92400e;
 }
 
-.booking-page,
-.booking-page button,
-.booking-page input,
-.booking-page select,
-.booking-page textarea {
-    font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+.booking-page .bp-revision:hover {
+    background: #fde68a;
 }
 
 .booking-page .bp-empty {
-    padding: 40px 20px;
+    padding: 46px 20px;
     text-align: center;
-    color: #7b8980;
-    font-size: 12px;
+    color: var(--bp-muted);
+    font-size: 13px;
+}
+
+.booking-page .bp-empty-icon {
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 10px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(33, 128, 77, .12);
+    color: var(--bp-green);
 }
 
 .booking-page .bp-pagination {
-    padding: 14px 17px;
+    padding: 14px 18px;
     border-top: 1px solid var(--bp-line);
+    background: rgba(255, 255, 255, .25);
 }
 
-/* Modal Keputusan */
+/* MODAL KEPUTUSAN */
 .booking-page .bp-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: #10221977;
+    background: rgba(16, 34, 25, .48);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     z-index: 10005;
     display: none;
     align-items: center;
@@ -411,75 +564,74 @@
     width: min(520px, 100%);
     max-height: 90vh;
     overflow-y: auto;
-    background: #fff;
-    border-radius: 17px;
-    padding: 22px;
-    box-shadow: 0 25px 70px #071b1040;
+    background: rgba(255, 255, 255, .96);
+    border: 1px solid rgba(255, 255, 255, .75);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 25px 70px rgba(7, 27, 16, .22);
 }
 
 .booking-page .bp-modal h3 {
-    font-size: 16px;
-    margin: 0 0 7px;
-    color: #1c3527;
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    color: var(--bp-ink);
 }
 
 .booking-page .bp-modal p {
-    font-size: 11px;
-    color: #6f7e74;
+    font-size: 12.5px;
+    color: var(--bp-muted);
     line-height: 1.6;
 }
 
 .booking-page .bp-modal label {
     display: block;
-    font-size: 10px;
-    font-weight: 800;
-    margin: 13px 0 6px;
-    color: #33463a;
+    font-size: 11.5px;
+    font-weight: 700;
+    margin: 14px 0 6px;
+    color: var(--bp-ink);
 }
 
 .booking-page .bp-modal textarea {
     width: 100%;
-    border: 1px solid #dfe8e2;
-    border-radius: 9px;
-    padding: 10px;
-    font-size: 11px;
-    min-height: 82px;
+    border: 1px solid rgba(22, 54, 38, .15);
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 12.5px;
+    min-height: 86px;
     resize: vertical;
     outline: none;
     box-sizing: border-box;
 }
 
 .booking-page .bp-modal textarea:focus {
-    border-color: #318456;
-    box-shadow: 0 0 0 3px #31845618;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 3px rgba(31, 122, 73, .14);
 }
 
 .booking-page .bp-modal-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 16px;
+    gap: 10px;
+    margin-top: 18px;
 }
 
 .booking-page .bp-modal .bp-confirm {
-    background: #266b47;
+    background: var(--bp-green-mid);
     color: #fff;
 }
 
 .booking-page .bp-modal .bp-cancel {
     background: #eef2ef;
-    color: #45564b;
+    color: #3c5446;
 }
 
-/* Drawer Tinjau Pengajuan & Prioritas */
+/* DRAWER TINJAU PENGAJUAN & PRIORITAS */
 .booking-page .bp-detail-open {
-    min-width: 76px;
-    min-height: 34px;
-    border: 1px solid #dce7e0;
-    border-radius: 10px;
-    background: #fff;
-    color: #356448;
-    font-size: 11px;
+    min-width: 82px;
+    min-height: 36px;
+    border-radius: 11px;
+    font-size: 12px;
 }
 
 .booking-page .bp-conflict-chip {
@@ -487,12 +639,17 @@
     align-items: center;
     gap: 4px;
     margin-left: 6px;
-    padding: 2px 7px;
+    padding: 2px 8px;
     border-radius: 999px;
-    background: #fff3d6;
-    color: #9a5818;
-    font-size: 9px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 10px;
     font-weight: 800;
+}
+
+.booking-page .bp-conflict-chip svg {
+    width: 11px;
+    height: 11px;
 }
 
 .booking-page .bp-drawer-backdrop {
@@ -501,7 +658,7 @@
     z-index: 10000;
     display: flex;
     justify-content: flex-end;
-    background: rgba(15, 32, 23, .42);
+    background: rgba(15, 32, 23, .40);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     opacity: 0;
@@ -517,9 +674,9 @@
 .booking-page .bp-drawer {
     display: flex;
     flex-direction: column;
-    width: min(500px, 100%);
+    width: min(510px, 100%);
     height: 100%;
-    background: #fff;
+    background: #f8fbf9;
     box-shadow: -18px 0 55px rgba(12, 32, 21, .16);
     transform: translateX(100%);
     transition: transform .28s ease;
@@ -535,21 +692,22 @@
     justify-content: space-between;
     gap: 16px;
     padding: 18px 24px 16px;
-    border-bottom: 1px solid #e5ece7;
+    background: #fff;
+    border-bottom: 1px solid rgba(22, 54, 38, .08);
     flex-shrink: 0;
 }
 
 .booking-page .bp-drawer-header h2 {
     margin: 0;
-    color: #172b20;
+    color: var(--bp-ink);
     font-size: 18px;
     font-weight: 800;
-    letter-spacing: -.4px;
+    letter-spacing: -.02em;
 }
 
 .booking-page .bp-drawer-header p {
     margin: 4px 0 0;
-    color: #718078;
+    color: var(--bp-subtle);
     font-size: 12px;
 }
 
@@ -557,16 +715,23 @@
 .booking-page .bp-pdf-header button {
     display: grid;
     place-items: center;
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
-    border: 1px solid #dce7e0;
+    border: 1px solid rgba(22, 54, 38, .12);
     border-radius: 50%;
     background: #fff;
-    color: #63736a;
-    font-size: 24px;
+    color: var(--bp-muted);
+    font-size: 22px;
     line-height: 1;
     cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+.booking-page .bp-drawer-close:hover,
+.booking-page .bp-pdf-header button:hover {
+    background: #f1f6f2;
+    color: var(--bp-ink);
 }
 
 .booking-page .bp-drawer-body {
@@ -582,17 +747,18 @@
     padding-bottom: 20px;
 }
 
-/* Kartu Utama Pengajuan (Bingkai Hijau Tegas sesuai Referensi) */
+/* KARTU UTAMA PENGAJUAN */
 .booking-page .bp-drawer-summary {
     padding: 20px;
-    border: 1px solid #dce7e0;
-    border-radius: 18px;
+    border: 1px solid rgba(22, 54, 38, .10);
+    border-radius: 16px;
     background: #fff;
+    box-shadow: 0 4px 18px rgba(22, 54, 38, .04);
 }
 
 .booking-page .bp-drawer-summary.is-pending {
-    border: 2px solid #266b47;
-    box-shadow: 0 3px 10px rgba(38, 107, 71, .07);
+    border: 2px solid var(--bp-green-mid);
+    box-shadow: 0 6px 20px rgba(35, 124, 77, .09);
 }
 
 .booking-page .bp-drawer-summary-top {
@@ -605,12 +771,12 @@
 
 .booking-page .bp-drawer-summary-top .bp-code {
     font-size: 11px;
-    color: #266b47;
+    color: var(--bp-green);
 }
 
 .booking-page .bp-drawer-summary h3 {
     margin: 13px 0 5px;
-    color: #172b20;
+    color: var(--bp-ink);
     font-size: 17px;
     line-height: 1.38;
     font-weight: 800;
@@ -619,8 +785,8 @@
 
 .booking-page .bp-drawer-date {
     margin: 0;
-    color: #718078;
-    font-size: 12px;
+    color: var(--bp-subtle);
+    font-size: 12.5px;
     font-weight: 500;
 }
 
@@ -633,9 +799,9 @@
 
 .booking-page .bp-drawer-tags span {
     padding: 5px 10px;
-    border-radius: 7px;
-    background: #e8f4ec;
-    color: #2c734c;
+    border-radius: 8px;
+    background: rgba(33, 128, 77, .12);
+    color: var(--bp-green);
     font-size: 11px;
     font-weight: 700;
 }
@@ -651,46 +817,46 @@
 .booking-page .bp-drawer-description small {
     display: block;
     margin-bottom: 3px;
-    color: #718078;
+    color: var(--bp-subtle);
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .booking-page .bp-drawer-info-grid strong {
     display: block;
-    color: #1c2f24;
-    font-size: 12px;
+    color: var(--bp-ink);
+    font-size: 12.5px;
     font-weight: 800;
     line-height: 1.45;
 }
 
 .booking-page .bp-drawer-info-grid span {
     display: block;
-    color: #718078;
-    font-size: 10px;
+    color: var(--bp-subtle);
+    font-size: 11px;
     margin-top: 2px;
 }
 
-/* Kotak Kelengkapan Perizinan di dalam Kartu Utama */
+/* KELENGKAPAN PERIZINAN */
 .booking-page .bp-drawer-check {
     display: flex;
     align-items: flex-start;
     gap: 11px;
-    padding: 13px 14px;
-    border: 1px solid #dce7e0;
+    padding: 14px;
+    border: 1px solid rgba(22, 54, 38, .10);
     border-radius: 12px;
-    background: #fafcfb;
+    background: #f6faf7;
 }
 
 .booking-page .bp-check-icon {
     display: grid;
     place-items: center;
-    width: 19px;
-    height: 19px;
+    width: 22px;
+    height: 22px;
     margin-top: 1px;
     flex-shrink: 0;
-    border-radius: 4px;
-    background: #266b47;
+    border-radius: 6px;
+    background: var(--bp-green-mid);
     color: #fff;
     font-size: 12px;
     font-weight: 800;
@@ -702,50 +868,51 @@
 
 .booking-page .bp-drawer-check p {
     margin: 0;
-    color: #3e5045;
-    font-size: 11.5px;
+    color: #3c5446;
+    font-size: 12px;
     line-height: 1.55;
 }
 
 .booking-page .bp-drawer-check p strong {
-    color: #172b20;
+    color: var(--bp-ink);
     font-weight: 800;
 }
 
 .booking-page .bp-inline-pdf-link {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    margin-top: 8px;
-    padding: 5px 10px;
-    border: 1px solid #cfe0d6;
-    border-radius: 7px;
+    gap: 6px;
+    margin-top: 9px;
+    padding: 6px 11px;
+    border: 1px solid rgba(31, 122, 73, .28);
+    border-radius: 8px;
     background: #fff;
-    color: #266b47;
-    font-size: 10.5px;
-    font-weight: 800;
+    color: var(--bp-green);
+    font-size: 11.5px;
+    font-weight: 700;
     cursor: pointer;
+    transition: background .2s ease;
 }
 
 .booking-page .bp-inline-pdf-link:hover {
-    background: #eef7f1;
+    background: rgba(33, 128, 77, .10);
 }
 
 .booking-page .bp-drawer-description {
     margin-top: 13px;
-    padding: 11px 13px;
-    border-radius: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
     background: #f6faf7;
 }
 
 .booking-page .bp-drawer-description p {
-    margin: 2px 0 0;
-    color: #46584d;
-    font-size: 11px;
+    margin: 3px 0 0;
+    color: #3c5446;
+    font-size: 12px;
     line-height: 1.55;
 }
 
-/* Bagian Pengajuan Bentrok (Di luar Kartu Utama) */
+/* PENGAJUAN BENTROK */
 .booking-page .bp-conflict-section {
     margin-top: 20px;
 }
@@ -768,9 +935,9 @@
 }
 
 .booking-page .bp-conflict-hint {
-    color: #718078;
+    color: var(--bp-subtle);
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .booking-page .bp-conflict-list {
@@ -781,15 +948,15 @@
 
 .booking-page .bp-conflict-card {
     padding: 15px 16px;
-    border: 1px solid #e1e8e4;
+    border: 1px solid rgba(22, 54, 38, .10);
     border-radius: 14px;
     background: #fff;
     transition: border-color .2s ease, box-shadow .2s ease;
 }
 
 .booking-page .bp-conflict-card:hover {
-    border-color: #b7d2c2;
-    box-shadow: 0 4px 12px rgba(23, 43, 32, .05);
+    border-color: rgba(31, 122, 73, .38);
+    box-shadow: 0 4px 14px rgba(22, 54, 38, .06);
 }
 
 .booking-page .bp-conflict-card-top {
@@ -800,40 +967,39 @@
 }
 
 .booking-page .bp-conflict-code {
-    color: #4b5d53;
+    color: var(--bp-muted);
     font-size: 11.5px;
     font-weight: 800;
-    letter-spacing: .01em;
 }
 
 .booking-page .bp-prioritize-btn {
     border: 0;
-    border-radius: 8px;
-    background: #266b47;
+    border-radius: 9px;
+    background: var(--bp-green-mid);
     color: #fff;
     padding: 6px 12px;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
     cursor: pointer;
-    transition: .2s ease;
+    transition: background .2s ease;
 }
 
 .booking-page .bp-prioritize-btn:hover {
-    background: #1e5739;
+    background: var(--bp-green);
 }
 
 .booking-page .bp-conflict-card h4 {
     margin: 10px 0 4px;
-    color: #172b20;
-    font-size: 13.5px;
+    color: var(--bp-ink);
+    font-size: 14px;
     font-weight: 800;
     line-height: 1.4;
 }
 
 .booking-page .bp-conflict-meta {
     margin: 0;
-    color: #718078;
-    font-size: 11.5px;
+    color: var(--bp-subtle);
+    font-size: 12px;
 }
 
 .booking-page .bp-conflict-tags {
@@ -845,73 +1011,75 @@
 
 .booking-page .bp-conflict-tags span {
     padding: 4px 9px;
-    border: 1px solid #dce5df;
+    border: 1px solid rgba(22, 54, 38, .10);
     border-radius: 7px;
-    background: #fff;
-    color: #4b5d53;
+    background: #f8fbf9;
+    color: var(--bp-muted);
     font-size: 10.5px;
     font-weight: 700;
 }
 
-/* Riwayat Keputusan */
+/* RIWAYAT KEPUTUSAN */
 .booking-page .bp-drawer-history {
     margin-top: 18px;
     padding-top: 14px;
-    border-top: 1px solid #e5ece7;
+    border-top: 1px solid rgba(22, 54, 38, .08);
 }
 
 .booking-page .bp-drawer-history > strong {
     display: block;
     margin-bottom: 8px;
-    color: #26382d;
-    font-size: 12px;
+    color: var(--bp-ink);
+    font-size: 12.5px;
 }
 
 .booking-page .bp-history-item {
     margin-top: 8px;
-    padding: 10px 12px;
-    border: 1px solid #e5ece7;
-    border-radius: 10px;
-    background: #fafcfb;
+    padding: 11px 13px;
+    border: 1px solid rgba(22, 54, 38, .09);
+    border-radius: 12px;
+    background: #fff;
 }
 
 .booking-page .bp-history-item span {
     display: block;
-    color: #33463a;
-    font-size: 10.5px;
+    color: var(--bp-ink);
+    font-size: 11.5px;
     font-weight: 800;
 }
 
 .booking-page .bp-history-item small {
     display: block;
     margin-top: 3px;
-    color: #829087;
-    font-size: 9.5px;
+    color: var(--bp-subtle);
+    font-size: 10.5px;
 }
 
 .booking-page .bp-history-item p {
     margin: 5px 0 0;
-    color: #596a5f;
-    font-size: 10.5px;
+    color: var(--bp-muted);
+    font-size: 11.5px;
     line-height: 1.5;
 }
 
-/* Footer Tombol Keputusan di Bawah Drawer */
+/* FOOTER TOMBOL KEPUTUSAN DRAWER */
 .booking-page .bp-drawer-actions {
     position: sticky;
     bottom: 0;
     margin: 0 -24px;
     padding: 16px 24px 20px;
-    border-top: 1px solid #e5ece7;
-    background: rgba(255, 255, 255, .98);
+    border-top: 1px solid rgba(22, 54, 38, .08);
+    background: rgba(255, 255, 255, .96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     flex-shrink: 0;
 }
 
 .booking-page .bp-drawer-actions > .bp-btn {
     width: 100%;
     min-height: 44px;
-    border-radius: 10px;
-    font-size: 12.5px;
+    border-radius: 12px;
+    font-size: 13px;
     font-weight: 700;
 }
 
@@ -924,12 +1092,12 @@
 
 .booking-page .bp-drawer-actions-row .bp-btn {
     min-height: 42px;
-    border-radius: 10px;
-    font-size: 12px;
+    border-radius: 12px;
+    font-size: 12.5px;
     font-weight: 700;
 }
 
-/* Penampil PDF */
+/* PENAMPIL PDF */
 .booking-page .bp-pdf-backdrop {
     position: fixed;
     inset: 0;
@@ -938,7 +1106,9 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(10, 25, 16, .68);
+    background: rgba(10, 25, 16, .62);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .booking-page .bp-pdf-backdrop.show {
@@ -951,7 +1121,7 @@
     width: min(1000px, 100%);
     height: min(92vh, 900px);
     overflow: hidden;
-    border-radius: 14px;
+    border-radius: 16px;
     background: #fff;
     box-shadow: 0 25px 70px rgba(0, 0, 0, .28);
 }
@@ -960,16 +1130,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 17px;
-    border-bottom: 1px solid #e5ece7;
-    color: #26382d;
-    font-size: 13px;
-}
-
-.booking-page .bp-pdf-header button {
-    width: 32px;
-    height: 32px;
-    font-size: 22px;
+    padding: 13px 18px;
+    border-bottom: 1px solid rgba(22, 54, 38, .09);
+    color: var(--bp-ink);
+    font-size: 13.5px;
 }
 
 .booking-page .bp-pdf-window iframe {
@@ -984,7 +1148,25 @@ body.bp-drawer-open {
     overflow: hidden;
 }
 
-@media(max-width: 600px) {
+/* RESPONSIVE */
+@media (max-width: 1120px) {
+    .booking-page .bp-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .booking-page .bp-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .booking-page .bp-heading {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
     .booking-page .bp-drawer {
         width: 100%;
     }
@@ -1008,40 +1190,30 @@ body.bp-drawer-open {
 
     .booking-page .bp-pdf-window {
         height: 96vh;
-        border-radius: 9px;
+        border-radius: 12px;
     }
 }
 
-@media(max-width: 900px) {
+@media (max-width: 520px) {
     .booking-page .bp-stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .booking-page .bp-heading {
-        flex-direction: column;
-    }
-}
-
-@media(max-width: 560px) {
-    .booking-page .bp-stats {
-        gap: 8px;
+        gap: 10px;
     }
 
     .booking-page .bp-stat {
-        padding: 12px;
+        padding: 14px;
     }
 
     .booking-page .bp-stat strong {
-        font-size: 20px;
+        font-size: 21px;
     }
 
     .booking-page .bp-stat-icon {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
     }
 
     .booking-page .bp-heading h1 {
-        font-size: 23px;
+        font-size: 21px;
     }
 
     .booking-page .bp-toolbar {
@@ -1068,7 +1240,9 @@ body.bp-drawer-open {
     {{-- STATISTIK --}}
     <div class="bp-stats">
         <div class="bp-stat">
-            <div class="bp-stat-icon">◷</div>
+            <div class="bp-stat-icon is-warning">
+                <i data-lucide="clock"></i>
+            </div>
             <div>
                 <small>Menunggu Verifikasi</small>
                 <strong>{{ $stats['pending'] }}</strong>
@@ -1076,7 +1250,9 @@ body.bp-drawer-open {
         </div>
 
         <div class="bp-stat">
-            <div class="bp-stat-icon">✓</div>
+            <div class="bp-stat-icon">
+                <i data-lucide="check-circle-2"></i>
+            </div>
             <div>
                 <small>Disetujui</small>
                 <strong>{{ $stats['approved'] }}</strong>
@@ -1084,7 +1260,9 @@ body.bp-drawer-open {
         </div>
 
         <div class="bp-stat">
-            <div class="bp-stat-icon">×</div>
+            <div class="bp-stat-icon is-danger">
+                <i data-lucide="x-circle"></i>
+            </div>
             <div>
                 <small>Ditolak</small>
                 <strong>{{ $stats['rejected'] }}</strong>
@@ -1092,7 +1270,9 @@ body.bp-drawer-open {
         </div>
 
         <div class="bp-stat">
-            <div class="bp-stat-icon">▤</div>
+            <div class="bp-stat-icon">
+                <i data-lucide="clipboard-list"></i>
+            </div>
             <div>
                 <small>Total Pengajuan</small>
                 <strong>{{ $stats['total'] }}</strong>
@@ -1100,7 +1280,9 @@ body.bp-drawer-open {
         </div>
 
         <div class="bp-stat">
-            <div class="bp-stat-icon">↻</div>
+            <div class="bp-stat-icon is-warning">
+                <i data-lucide="rotate-ccw"></i>
+            </div>
             <div>
                 <small>Perlu Revisi</small>
                 <strong>{{ $stats['revision'] }}</strong>
@@ -1110,9 +1292,9 @@ body.bp-drawer-open {
 
     {{-- PESAN VALIDASI --}}
     @if($errors->any())
-        <div style="background:#fff0f0;color:#a22;border:1px solid #f5cccc;border-radius:10px;padding:12px 15px;margin-bottom:14px;font-size:11px">
+        <div class="bp-alert is-error">
             <strong>Pengajuan belum dapat diproses.</strong>
-            <ul style="margin:5px 0 0 17px">
+            <ul style="margin:6px 0 0 18px">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -1121,7 +1303,7 @@ body.bp-drawer-open {
     @endif
 
     @if(session('success'))
-        <div style="background:#eaf7ee;color:#176b3b;border:1px solid #d2ebda;border-radius:10px;padding:12px 15px;margin-bottom:14px;font-size:11px">
+        <div class="bp-alert is-success">
             {{ session('success') }}
         </div>
     @endif
@@ -1132,7 +1314,9 @@ body.bp-drawer-open {
         {{-- FILTER DAN PENCARIAN --}}
         <form method="GET" action="{{ route('admin.bookings') }}" class="bp-toolbar">
             <div class="bp-search">
-                <span>⌕</span>
+                <span class="bp-search-icon">
+                    <i data-lucide="search"></i>
+                </span>
                 <input
                     type="text"
                     name="q"
@@ -1171,6 +1355,7 @@ body.bp-drawer-open {
             >
 
             <button class="bp-btn bp-approve" type="submit">
+                <i data-lucide="sliders-horizontal"></i>
                 Terapkan Filter
             </button>
 
@@ -1243,7 +1428,10 @@ body.bp-drawer-open {
                         <td>
                             <span class="bp-code">{{ $bookingCode }}</span>
                             @if($conflictCount > 0)
-                                <span class="bp-conflict-chip">⚡ {{ $conflictCount }} Bentrok</span>
+                                <span class="bp-conflict-chip">
+                                    <i data-lucide="alert-triangle"></i>
+                                    {{ $conflictCount + 1 }} Bentrok
+                                </span>
                             @endif
                             <span class="bp-sub">
                                 {{ $b->created_at->format('d M Y, H:i') }}
@@ -1278,6 +1466,7 @@ body.bp-drawer-open {
                                 data-open-drawer="{{ $b->id }}"
                                 data-booking-subtitle="{{ $bookingCode }} • {{ $b->auditorium->name }}"
                             >
+                                <i data-lucide="eye"></i>
                                 Detail
                             </button>
                         </td>
@@ -1286,7 +1475,9 @@ body.bp-drawer-open {
                     <tr>
                         <td colspan="5">
                             <div class="bp-empty">
-                                <div style="font-size:28px;margin-bottom:8px">▤</div>
+                                <div class="bp-empty-icon">
+                                    <i data-lucide="inbox"></i>
+                                </div>
                                 <strong>Tidak ada pengajuan ditemukan</strong>
                                 <div style="margin-top:5px">
                                     Coba ubah kata kunci atau filter pencarian.
@@ -1411,7 +1602,7 @@ body.bp-drawer-open {
                     <div class="bp-conflict-section">
                         <div class="bp-conflict-header">
                             <span class="bp-conflict-title">
-                                ⚡ Pengajuan Bentrok pada Slot Ini ({{ $totalConflicts }})
+                                ⚡ Total Pengajuan Bentrok di Slot Ini ({{ $totalConflicts + 1 }})
                             </span>
                             <span class="bp-conflict-hint">Pilih yang diprioritaskan</span>
                         </div>
@@ -1490,7 +1681,7 @@ body.bp-drawer-open {
                         @if($approvedConflicts > 0)
                             Jadwal Sudah Terkunci ({{ $approvedConflicts }} Disetujui)
                         @elseif($pendingConflicts > 0)
-                            Setujui & Tolak Otomatis ({{ $pendingConflicts }} Bentrok)
+                            Setujui & Tolak Otomatis ({{ $pendingConflicts }} Pengajuan Lain)
                         @else
                             ✓ Setujui Pengajuan
                         @endif
@@ -1632,6 +1823,10 @@ body.bp-drawer-open {
             ? button.dataset.bookingSubtitle
             : 'Periksa detail pengajuan sebelum mengambil keputusan.';
 
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
         backdrop.classList.add('show');
         backdrop.setAttribute('aria-hidden', 'false');
         document.body.classList.add('bp-drawer-open');
@@ -1677,7 +1872,7 @@ body.bp-drawer-open {
         document.getElementById('decisionStatus').value = status;
 
         document.getElementById('decisionTitle').textContent = isApprove
-            ? (pendingConflicts > 0 ? 'Setujui & Tolak Otomatis (' + pendingConflicts + ' Bentrok)' : 'Setujui Pengajuan')
+            ? (pendingConflicts > 0 ? 'Setujui & Tolak Otomatis (' + pendingConflicts + ' Pengajuan Lain)' : 'Setujui Pengajuan')
             : (isRevision ? 'Minta Revisi Pengajuan' : 'Tolak Pengajuan');
 
         document.getElementById('decisionDescription').textContent = isRevision
@@ -1780,5 +1975,9 @@ body.bp-drawer-open {
             closeBookingDrawer();
         }
     });
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 </script>
 @endsection

@@ -682,3 +682,26 @@ td {
         grid-template-columns: 1fr;
     }
 }
+
+/* Pastikan container link sidebar menggunakan flex */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-notif-badge {
+    margin-left: auto;
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}

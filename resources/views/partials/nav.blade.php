@@ -1,6 +1,8 @@
-
 @php
     $isAdmin = auth()->user()->role === 'admin';
+    $pendingBookingsCount = $isAdmin
+        ? ($pendingBookingsCount ?? \App\Models\Booking::where('status', 'Pending')->count())
+        : 0;
 @endphp
 
 <style>
@@ -143,6 +145,25 @@
         color: #163626 !important;
     }
 
+    /* BADGE NOTIFIKASI PENGAJUAN */
+    .sidebar .nav-badge {
+        margin-left: auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 21px !important;
+        height: 21px !important;
+        padding: 0 6px !important;
+        border-radius: 999px !important;
+        background: #ef4444 !important;
+        color: #ffffff !important;
+        font-size: 10.5px !important;
+        font-weight: 800 !important;
+        line-height: 1 !important;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.32) !important;
+        flex-shrink: 0 !important;
+    }
+
     /* LOGOUT */
     .sidebar .logout {
         margin-top: auto !important;
@@ -203,9 +224,22 @@
 
     .app-layout.sidebar-closed .sidebar .nav-link,
     html.sipadu-sidebar-closed .app-layout .sidebar .nav-link {
+        position: relative !important;
         justify-content: center !important;
         gap: 0 !important;
         padding: 10px 0 !important;
+    }
+
+    .app-layout.sidebar-closed .sidebar .nav-badge,
+    html.sipadu-sidebar-closed .app-layout .sidebar .nav-badge {
+        position: absolute !important;
+        top: 5px !important;
+        right: 11px !important;
+        margin-left: 0 !important;
+        min-width: 16px !important;
+        height: 16px !important;
+        padding: 0 4px !important;
+        font-size: 9px !important;
     }
 
     .app-layout.sidebar-closed .sidebar .logout button,
@@ -265,6 +299,16 @@
             padding: 10px 12px !important;
         }
 
+        .app-layout.sidebar-closed .sidebar .nav-badge,
+        html.sipadu-sidebar-closed .app-layout .sidebar .nav-badge {
+            position: static !important;
+            margin-left: auto !important;
+            min-width: 21px !important;
+            height: 21px !important;
+            padding: 0 6px !important;
+            font-size: 10.5px !important;
+        }
+
         .app-layout.sidebar-closed .sidebar .logout button,
         html.sipadu-sidebar-closed .app-layout .sidebar .logout button {
             justify-content: flex-start !important;
@@ -319,6 +363,12 @@
         >
             <i data-lucide="clipboard-list"></i>
             <span>Pengajuan</span>
+
+            @if ($pendingBookingsCount > 0)
+                <small class="nav-badge">
+                    {{ $pendingBookingsCount > 99 ? '99+' : $pendingBookingsCount }}
+                </small>
+            @endif
         </a>
 
         <a
