@@ -1,115 +1,164 @@
-
 @extends('layouts.panel')
 
 @section('panel')
 
 @php
+    use Illuminate\Support\Facades\Route;
+
     $user = auth()->user();
-    $isAdmin = $user->role === 'admin';
-    $isEmployee = $user->role === 'pegawai';
-    $profileUpdateRoute = $isAdmin ? route('admin.profile.update') : ($isEmployee ? route('pegawai.profile.update') : route('borrower.profile.update'));
-    $profilePasswordRoute = $isAdmin ? route('admin.profile.password') : ($isEmployee ? route('pegawai.profile.password') : route('borrower.profile.password'));
+    $role = strtolower((string) data_get($user, 'role', 'mahasiswa'));
+    $isAdmin = $role === 'admin';
+    $isEmployee = $role === 'pegawai';
+
+    if ($isAdmin && Route::has('admin.profile.update')) {
+        $profileUpdateRoute = route('admin.profile.update');
+    } elseif ($isEmployee && Route::has('pegawai.profile.update')) {
+        $profileUpdateRoute = route('pegawai.profile.update');
+    } elseif (Route::has('borrower.profile.update')) {
+        $profileUpdateRoute = route('borrower.profile.update');
+    } elseif (Route::has('profile.update')) {
+        $profileUpdateRoute = route('profile.update');
+    } else {
+        $profileUpdateRoute = url()->current();
+    }
+
+    if ($isAdmin && Route::has('admin.profile.password')) {
+        $profilePasswordRoute = route('admin.profile.password');
+    } elseif ($isEmployee && Route::has('pegawai.profile.password')) {
+        $profilePasswordRoute = route('pegawai.profile.password');
+    } elseif (Route::has('borrower.profile.password')) {
+        $profilePasswordRoute = route('borrower.profile.password');
+    } elseif (Route::has('profile.password')) {
+        $profilePasswordRoute = route('profile.password');
+    } else {
+        $profilePasswordRoute = url()->current();
+    }
+
+    $userName = (string) data_get($user, 'name', 'Pengguna');
+    $userEmail = (string) data_get($user, 'email', '');
+    $initial = mb_strtoupper(mb_substr(trim($userName) !== '' ? trim($userName) : 'U', 0, 1));
 @endphp
 
 <style>
-    /* HALAMAN PROFIL */
     .profile-page {
+        --pf-ink: #163626;
+        --pf-muted: #4c6456;
+        --pf-subtle: #64786c;
+        --pf-line: rgba(22, 54, 38, .09);
+        --pf-green: #1f7a49;
+        --pf-green-mid: #237c4d;
+        --pf-glass-bg: linear-gradient(
+            145deg,
+            rgba(255, 255, 255, .68) 0%,
+            rgba(255, 255, 255, .42) 100%
+        );
+        --pf-glass-border: 1px solid rgba(255, 255, 255, .55);
+        --pf-glass-shadow: 0 8px 28px rgba(22, 54, 38, .06);
         width: 100%;
         max-width: none;
         margin: 0;
         padding: 0 0 35px;
         box-sizing: border-box;
+        color: var(--pf-ink);
+        font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
     }
 
     .profile-heading {
-        margin-bottom: 25px;
+        margin-bottom: 22px;
     }
 
     .profile-heading h1 {
-        font-size: 27px;
-        font-weight: 750;
-        color: #183b2b;
-        margin: 0 0 7px;
+        font-size: 25px;
+        font-weight: 800;
+        letter-spacing: -.03em;
+        color: var(--pf-ink);
+        margin: 0;
     }
 
     .profile-heading p {
-        color: #718078;
-        margin: 0;
-        font-size: 14px;
+        color: var(--pf-muted);
+        margin: 6px 0 0;
+        font-size: 13px;
+        line-height: 1.55;
     }
 
     /* BANNER PROFIL */
     .profile-banner {
         width: 100%;
         box-sizing: border-box;
-        background: linear-gradient(120deg, #145c3b, #238653);
+        background: linear-gradient(125deg, #164e34 0%, #237c4d 100%);
+        border: 1px solid rgba(255, 255, 255, .28);
         border-radius: 18px;
-        padding: 28px;
-        color: white;
+        padding: 26px 28px;
+        color: #fff;
         display: flex;
         align-items: center;
         gap: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 8px 22px rgba(20, 92, 59, .12);
+        margin-bottom: 22px;
+        box-shadow: 0 10px 26px rgba(20, 92, 59, .14);
     }
 
     .profile-avatar {
-        width: 75px;
-        height: 75px;
+        width: 72px;
+        height: 72px;
         border-radius: 50%;
-        background: rgba(255,255,255,.18);
-        border: 2px solid rgba(255,255,255,.5);
+        background: rgba(255, 255, 255, .18);
+        border: 2px solid rgba(255, 255, 255, .52);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 30px;
-        font-weight: 700;
+        font-size: 28px;
+        font-weight: 800;
         flex-shrink: 0;
     }
 
     .profile-banner h2 {
-        margin: 0 0 6px;
-        font-size: 21px;
-        font-weight: 700;
+        margin: 0 0 4px;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -.02em;
     }
 
     .profile-banner p {
         margin: 0;
-        color: rgba(255,255,255,.85);
-        font-size: 14px;
+        color: rgba(255, 255, 255, .86);
+        font-size: 13.5px;
     }
 
     .profile-role {
         display: inline-block;
         margin-top: 10px;
         padding: 5px 12px;
-        border-radius: 20px;
-        background: rgba(255,255,255,.17);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .18);
+        border: 1px solid rgba(255, 255, 255, .25);
         font-size: 11px;
-        font-weight: 700;
-        letter-spacing: .5px;
+        font-weight: 800;
+        letter-spacing: .05em;
     }
 
     /* GRID KARTU PROFIL */
     .profile-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 22px;
+        gap: 20px;
         align-items: stretch;
         width: 100%;
     }
 
-    /* KEDUA KARTU DIBUAT SEIMBANG */
+    /* KARTU GLASSMORPHISM */
     .profile-card {
         width: 100%;
         min-width: 0;
         height: 100%;
         box-sizing: border-box;
-        background: white;
-        border: 1px solid #e8eee9;
+        background: var(--pf-glass-bg);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+        border: var(--pf-glass-border);
         border-radius: 16px;
-        padding: 25px;
-        box-shadow: 0 4px 15px rgba(0,0,0,.035);
+        padding: 24px 26px;
+        box-shadow: var(--pf-glass-shadow);
         display: flex;
         flex-direction: column;
     }
@@ -118,35 +167,40 @@
         display: flex;
         align-items: center;
         gap: 13px;
-        margin-bottom: 23px;
+        margin-bottom: 22px;
         padding-bottom: 18px;
-        border-bottom: 1px solid #edf1ee;
+        border-bottom: 1px solid var(--pf-line);
         flex-shrink: 0;
     }
 
     .profile-icon {
-        width: 43px;
-        height: 43px;
+        width: 42px;
+        height: 42px;
         border-radius: 12px;
-        background: #e9f5ed;
-        color: #21804d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 19px;
+        background: rgba(33, 128, 77, .14);
+        border: 1px solid rgba(255, 255, 255, .45);
+        color: var(--pf-green);
+        display: grid;
+        place-items: center;
         flex-shrink: 0;
     }
 
+    .profile-icon svg {
+        width: 19px;
+        height: 19px;
+    }
+
     .profile-card-header h3 {
-        font-size: 17px;
-        color: #244332;
-        font-weight: 700;
-        margin: 0 0 4px;
+        font-size: 16px;
+        color: var(--pf-ink);
+        font-weight: 800;
+        letter-spacing: -.01em;
+        margin: 0 0 3px;
     }
 
     .profile-card-header p {
         font-size: 12px;
-        color: #849188;
+        color: var(--pf-subtle);
         margin: 0;
     }
 
@@ -159,16 +213,20 @@
     }
 
     .profile-field {
-        margin-bottom: 17px;
+        margin-bottom: 16px;
         min-width: 0;
     }
 
     .profile-field label {
         display: block;
-        color: #405449;
-        font-size: 13px;
-        font-weight: 650;
-        margin-bottom: 8px;
+        color: #294735;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 7px;
+    }
+
+    .profile-input-wrap {
+        position: relative;
     }
 
     .profile-field input {
@@ -176,31 +234,68 @@
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
-        padding: 12px 14px;
-        border: 1px solid #dce5de;
-        border-radius: 9px;
-        background: #fff;
-        color: #304638;
+        padding: 11px 13px;
+        border: 1px solid rgba(22, 54, 38, .13);
+        border-radius: 11px;
+        background: rgba(255, 255, 255, .82);
+        color: var(--pf-ink);
+        font-family: inherit;
         font-size: 13px;
+        font-weight: 500;
         outline: none;
-        transition: .2s;
+        transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .profile-input-wrap input {
+        padding-right: 40px;
     }
 
     .profile-field input:focus {
-        border-color: #278653;
-        box-shadow: 0 0 0 3px rgba(39,134,83,.1);
+        background: #fff;
+        border-color: var(--pf-green-mid);
+        box-shadow: 0 0 0 3px rgba(35, 124, 77, .14);
     }
 
     .profile-field input:disabled {
-        background: #f2f5f3;
-        color: #89958d;
+        background: rgba(22, 54, 38, .05);
+        color: var(--pf-subtle);
         cursor: not-allowed;
     }
 
+    .profile-eye-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--pf-subtle);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: color .18s ease, background .18s ease;
+    }
+
+    .profile-eye-btn:hover {
+        background: rgba(22, 54, 38, .06);
+        color: var(--pf-ink);
+    }
+
+    .profile-eye-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
     .profile-hint {
-        font-size: 11px;
-        color: #8b978f;
-        margin-top: 6px;
+        font-size: 11.5px;
+        color: var(--pf-subtle);
+        line-height: 1.5;
+        margin-top: 4px;
     }
 
     /* TOMBOL SEJAJAR DI BAGIAN BAWAH */
@@ -208,44 +303,49 @@
         width: 100%;
         box-sizing: border-box;
         border: none;
-        border-radius: 9px;
-        background: #21804d;
-        color: white;
-        padding: 13px 18px;
+        border-radius: 11px;
+        background: var(--pf-green-mid);
+        color: #fff;
+        padding: 12px 18px;
+        font-family: inherit;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: .2s;
+        box-shadow: 0 4px 12px rgba(35, 124, 77, .22);
+        transition: background .2s ease, transform .18s ease;
         margin-top: auto;
     }
 
     .profile-button:hover {
-        background: #17683d;
+        background: #1b663f;
+        transform: translateY(-1px);
     }
 
     /* NOTIFIKASI */
     .profile-alert {
         padding: 13px 16px;
-        border-radius: 9px;
+        border-radius: 14px;
         margin-bottom: 18px;
-        font-size: 13px;
+        font-size: 12.5px;
+        font-weight: 600;
     }
 
     .profile-alert.success {
-        color: #17683d;
-        background: #e9f7ee;
-        border: 1px solid #c9ead5;
+        color: #166534;
+        background: rgba(220, 252, 231, .88);
+        border: 1px solid rgba(74, 222, 128, .35);
     }
 
     .profile-alert.error {
-        color: #a52e2e;
-        background: #fff0f0;
-        border: 1px solid #f4cccc;
+        color: #991b1b;
+        background: rgba(254, 226, 226, .88);
+        border: 1px solid rgba(248, 113, 113, .35);
     }
 
     .profile-error {
-        color: #c0392b;
-        font-size: 11px;
+        color: #b91c1c;
+        font-size: 11.5px;
+        font-weight: 600;
         margin-top: 5px;
     }
 
@@ -260,20 +360,24 @@
         }
 
         .profile-button {
-            margin-top: 5px;
+            margin-top: 8px;
         }
     }
 
     /* HP */
     @media (max-width: 500px) {
+        .profile-heading h1 {
+            font-size: 21px;
+        }
+
         .profile-banner {
             padding: 20px;
         }
 
         .profile-avatar {
-            width: 58px;
-            height: 58px;
-            font-size: 23px;
+            width: 56px;
+            height: 56px;
+            font-size: 22px;
         }
 
         .profile-banner h2 {
@@ -302,12 +406,12 @@
     {{-- BANNER PROFIL --}}
     <div class="profile-banner">
         <div class="profile-avatar">
-            {{ strtoupper(substr($user->name, 0, 1)) }}
+            {{ $initial }}
         </div>
 
         <div>
-            <h2>{{ $user->name }}</h2>
-            <p>{{ $user->email }}</p>
+            <h2>{{ $userName }}</h2>
+            <p>{{ $userEmail }}</p>
 
             <span class="profile-role">
                 {{ $isAdmin ? 'ADMINISTRATOR' : ($isEmployee ? 'PEGAWAI' : 'MAHASISWA') }}
@@ -331,7 +435,7 @@
     @if($errors->any())
         <div class="profile-alert error">
             <strong>Periksa kembali data yang kamu masukkan.</strong>
-            <ul style="margin:8px 0 0 18px;padding:0;">
+            <ul style="margin:6px 0 0 18px;padding:0;font-weight:500;">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -345,40 +449,40 @@
         <div class="profile-card">
 
             <div class="profile-card-header">
-                <div class="profile-icon">👤</div>
+                <div class="profile-icon">
+                    <i data-lucide="user"></i>
+                </div>
                 <div>
                     <h3>Informasi {{ $isAdmin ? 'Administrator' : ($isEmployee ? 'Pegawai' : 'Mahasiswa') }}</h3>
                     <p>Perbarui informasi profil sesuai identitas akun.</p>
                 </div>
             </div>
 
-            <form method="POST"
-                  action="{{ $profileUpdateRoute }}">
-
+            <form method="POST" action="{{ $profileUpdateRoute }}">
                 @csrf
                 @method('PUT')
 
                 <div class="profile-field">
-                    <label>Nama Lengkap</label>
-                    <input type="text"
+                    <label for="profileName">Nama Lengkap</label>
+                    <input id="profileName"
+                           type="text"
                            name="name"
-                           value="{{ old('name', $user->name) }}"
+                           value="{{ old('name', $userName) }}"
                            placeholder="Masukkan nama lengkap"
                            required>
-
                     @error('name')
                         <div class="profile-error">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="profile-field">
-                    <label>Email</label>
-                    <input type="email"
+                    <label for="profileEmail">Email</label>
+                    <input id="profileEmail"
+                           type="email"
                            name="email"
-                           value="{{ old('email', $user->email) }}"
+                           value="{{ old('email', $userEmail) }}"
                            placeholder="Masukkan email"
                            required>
-
                     @error('email')
                         <div class="profile-error">{{ $message }}</div>
                     @enderror
@@ -386,15 +490,16 @@
 
                 @if($isAdmin)
                     <div class="profile-field">
-                        <label>ID Admin</label>
-                        <input type="text" value="Admin" disabled>
+                        <label>Peran Akun</label>
+                        <input type="text" value="Administrator" disabled>
                     </div>
                 @else
                     <div class="profile-field">
-                        <label>{{ $isEmployee ? 'NIP' : 'NIM' }}</label>
-                        <input type="text"
+                        <label for="profileNimNip">{{ $isEmployee ? 'NIP' : 'NIM' }}</label>
+                        <input id="profileNimNip"
+                               type="text"
                                name="nim_nip"
-                               value="{{ old('nim_nip', $user->nim_nip ?? $user->nim_np) }}"
+                               value="{{ old('nim_nip', data_get($user, 'nim_nip')) }}"
                                placeholder="Masukkan {{ $isEmployee ? 'NIP' : 'NIM' }}"
                                required>
                         @error('nim_nip')
@@ -404,36 +509,60 @@
 
                     @if($isEmployee)
                         <div class="profile-field">
-                            <label>Unit / Biro Kerja</label>
-                            <input name="employee_unit" value="{{ old('employee_unit', $user->employee_unit) }}" placeholder="Masukkan unit atau biro" required>
-                            @error('employee_unit') <div class="profile-error">{{ $message }}</div> @enderror
+                            <label for="profileEmployeeUnit">Unit / Biro Kerja</label>
+                            <input id="profileEmployeeUnit"
+                                   name="employee_unit"
+                                   value="{{ old('employee_unit', data_get($user, 'employee_unit')) }}"
+                                   placeholder="Masukkan unit atau biro"
+                                   required>
+                            @error('employee_unit')
+                                <div class="profile-error">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="profile-field">
-                            <label>Jabatan</label>
-                            <input name="position" value="{{ old('position', $user->position) }}" placeholder="Masukkan jabatan" required>
-                            @error('position') <div class="profile-error">{{ $message }}</div> @enderror
+                            <label for="profilePosition">Jabatan</label>
+                            <input id="profilePosition"
+                                   name="position"
+                                   value="{{ old('position', data_get($user, 'position')) }}"
+                                   placeholder="Masukkan jabatan"
+                                   required>
+                            @error('position')
+                                <div class="profile-error">{{ $message }}</div>
+                            @enderror
                         </div>
                     @else
                         <div class="profile-field">
-                            <label>Fakultas</label>
-                            <input name="faculty" value="{{ old('faculty', $user->faculty) }}" placeholder="Masukkan fakultas" required>
-                            @error('faculty') <div class="profile-error">{{ $message }}</div> @enderror
+                            <label for="profileFaculty">Fakultas</label>
+                            <input id="profileFaculty"
+                                   name="faculty"
+                                   value="{{ old('faculty', data_get($user, 'faculty')) }}"
+                                   placeholder="Masukkan fakultas"
+                                   required>
+                            @error('faculty')
+                                <div class="profile-error">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="profile-field">
-                            <label>Program Studi</label>
-                            <input name="study_program" value="{{ old('study_program', $user->study_program) }}" placeholder="Masukkan program studi" required>
-                            @error('study_program') <div class="profile-error">{{ $message }}</div> @enderror
+                            <label for="profileStudyProgram">Program Studi</label>
+                            <input id="profileStudyProgram"
+                                   name="study_program"
+                                   value="{{ old('study_program', data_get($user, 'study_program')) }}"
+                                   placeholder="Masukkan program studi"
+                                   required>
+                            @error('study_program')
+                                <div class="profile-error">{{ $message }}</div>
+                            @enderror
                         </div>
                     @endif
                 @endif
 
                 <div class="profile-field">
-                    <label>Nomor Telepon</label>
-                    <input type="tel"
+                    <label for="profilePhone">Nomor Telepon</label>
+                    <input id="profilePhone"
+                           type="tel"
                            name="phone"
-                           value="{{ old('phone', $user->phone) }}"
+                           value="{{ old('phone', data_get($user, 'phone')) }}"
                            placeholder="Contoh: 081234567890">
-
                     @error('phone')
                         <div class="profile-error">{{ $message }}</div>
                     @enderror
@@ -442,7 +571,6 @@
                 <button type="submit" class="profile-button">
                     Simpan Perubahan Profil
                 </button>
-
             </form>
         </div>
 
@@ -450,52 +578,73 @@
         <div class="profile-card">
 
             <div class="profile-card-header">
-                <div class="profile-icon">🔒</div>
+                <div class="profile-icon">
+                    <i data-lucide="lock"></i>
+                </div>
                 <div>
                     <h3>Keamanan Akun</h3>
                     <p>Ubah password untuk menjaga keamanan akun.</p>
                 </div>
             </div>
 
-            <form method="POST"
-                  action="{{ $profilePasswordRoute }}">
-
+            <form method="POST" action="{{ $profilePasswordRoute }}">
                 @csrf
                 @method('PUT')
 
                 <div class="profile-field">
-                    <label>Password Lama</label>
-                    <input type="password"
-                           name="current_password"
-                           placeholder="Masukkan password lama"
-                           required
-                           autocomplete="current-password">
-
+                    <label for="currentPasswordInput">Password Lama</label>
+                    <div class="profile-input-wrap">
+                        <input id="currentPasswordInput"
+                               type="password"
+                               name="current_password"
+                               placeholder="Masukkan password lama"
+                               required
+                               autocomplete="current-password">
+                        <button type="button" class="profile-eye-btn" data-toggle-password="currentPasswordInput" aria-label="Tampilkan password">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
                     @error('current_password')
                         <div class="profile-error">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="profile-field">
-                    <label>Password Baru</label>
-                    <input type="password"
-                           name="password"
-                           placeholder="Minimal 8 karakter"
-                           required
-                           autocomplete="new-password">
-
+                    <label for="newPasswordInput">Password Baru</label>
+                    <div class="profile-input-wrap">
+                        <input id="newPasswordInput"
+                               type="password"
+                               name="password"
+                               placeholder="Minimal 8 karakter"
+                               minlength="8"
+                               required
+                               autocomplete="new-password">
+                        <button type="button" class="profile-eye-btn" data-toggle-password="newPasswordInput" aria-label="Tampilkan password">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
                     @error('password')
                         <div class="profile-error">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="profile-field">
-                    <label>Konfirmasi Password Baru</label>
-                    <input type="password"
-                           name="password_confirmation"
-                           placeholder="Ulangi password baru"
-                           required
-                           autocomplete="new-password">
+                    <label for="confirmPasswordInput">Konfirmasi Password Baru</label>
+                    <div class="profile-input-wrap">
+                        <input id="confirmPasswordInput"
+                               type="password"
+                               name="password_confirmation"
+                               placeholder="Ulangi password baru"
+                               minlength="8"
+                               required
+                               autocomplete="new-password">
+                        <button type="button" class="profile-eye-btn" data-toggle-password="confirmPasswordInput" aria-label="Tampilkan password">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                    @error('password_confirmation')
+                        <div class="profile-error">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="profile-hint" style="margin-bottom:18px;">
@@ -505,11 +654,31 @@
                 <button type="submit" class="profile-button">
                     Ubah Password
                 </button>
-
             </form>
         </div>
 
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const target = document.getElementById(btn.dataset.togglePassword);
+            if (!target) return;
+            const isHidden = target.type === 'password';
+            target.type = isHidden ? 'text' : 'password';
+            btn.innerHTML = isHidden ? '<i data-lucide="eye-off"></i>' : '<i data-lucide="eye"></i>';
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
+    });
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+});
+</script>
 
 @endsection
