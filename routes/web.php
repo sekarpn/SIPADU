@@ -91,6 +91,11 @@ Route::middleware(['auth', 'role:admin'])
 
         // DATA PENGGUNA
         Route::get('/pengguna', [AdminController::class, 'users'])->name('users');
+        Route::post('/pengguna', [AdminController::class, 'storeUser'])->name('users.store');
+        Route::get('/pengguna/{user}', [AdminController::class, 'showUser'])->name('users.show');
+        Route::get('/pengguna/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+        Route::put('/pengguna/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+        Route::delete('/pengguna/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
 
         // PROFIL ADMIN
         Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
