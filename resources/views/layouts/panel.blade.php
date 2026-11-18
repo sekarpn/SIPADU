@@ -305,6 +305,129 @@ html.page-ready .app-layout > main > .main-content {
     margin-top: 10px !important;
 }
 
+/* SCROLL HORIZONTAL TABEL AGAR BISA DIGESER */
+.sipadu-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* PAGINATION GLASSMORPHISM UNTUK SEMUA HALAMAN YANG PAKAI TABEL */
+.sipadu-pager-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 13px 18px;
+    border-top: 1px solid rgba(22, 54, 38, .09);
+    background: rgba(255, 255, 255, .32);
+    font-size: 12.5px;
+    color: #4c6456;
+    box-sizing: border-box;
+}
+
+.sipadu-pager-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sipadu-pager-size {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 600;
+    color: #294735;
+}
+
+.sipadu-pager-select {
+    appearance: auto;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid rgba(22, 54, 38, .15);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .86);
+    color: #163626;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.sipadu-pager-select:focus {
+    border-color: #237c4d;
+    box-shadow: 0 0 0 3px rgba(35, 124, 77, .14);
+}
+
+.sipadu-pager-dot {
+    color: rgba(22, 54, 38, .28);
+    user-select: none;
+}
+
+.sipadu-pager-info {
+    font-weight: 600;
+    color: #243b2e;
+}
+
+.sipadu-pager-info strong {
+    font-weight: 800;
+    color: #163626;
+}
+
+.sipadu-pager-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.sipadu-pager-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid rgba(22, 54, 38, .13);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .80) !important;
+    color: #163626 !important;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: none !important;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .15s ease;
+}
+
+.sipadu-pager-btn:hover:not(:disabled):not(.active) {
+    background: #ffffff !important;
+    border-color: #237c4d !important;
+    color: #237c4d !important;
+    transform: translateY(-1px);
+}
+
+.sipadu-pager-btn.active {
+    background: #237c4d !important;
+    border-color: #237c4d !important;
+    color: #ffffff !important;
+}
+
+.sipadu-pager-btn:disabled {
+    opacity: .42 !important;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sipadu-pager-ellipsis {
+    padding: 0 4px;
+    color: #64786c;
+    font-weight: 700;
+    user-select: none;
+}
+
 /* MOBILE */
 @media (max-width: 900px) {
     html,
@@ -384,6 +507,19 @@ html.page-ready .app-layout > main > .main-content {
 
     .topbar-right {
         gap: 10px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .sipadu-pager-bar {
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sipadu-pager-nav {
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 
@@ -577,6 +713,185 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     window.addEventListener('resize', sync);
+
+    /* PAGINASI & SCROLL HORIZONTAL OTOMATIS UNTUK SEMUA TABEL */
+    function initTablePagination(table) {
+        if (!table || table.dataset.sipaduPaginated === '1') return;
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        table.dataset.sipaduPaginated = '1';
+
+        let scrollWrap = table.parentElement;
+        if (!scrollWrap || getComputedStyle(scrollWrap).overflowX === 'visible') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'sipadu-table-scroll';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+            scrollWrap = wrapper;
+        } else {
+            scrollWrap.style.webkitOverflowScrolling = 'touch';
+        }
+
+        const pagerBar = document.createElement('div');
+        pagerBar.className = 'sipadu-pager-bar';
+        pagerBar.innerHTML =
+            '<div class="sipadu-pager-left">' +
+                '<label class="sipadu-pager-size">' +
+                    '<span>Tampilkan</span>' +
+                    '<select class="sipadu-pager-select" aria-label="Jumlah data per halaman">' +
+                        '<option value="10" selected>10</option>' +
+                        '<option value="25">25</option>' +
+                        '<option value="50">50</option>' +
+                        '<option value="100">100</option>' +
+                    '</select>' +
+                    '<span>data</span>' +
+                '</label>' +
+                '<span class="sipadu-pager-dot">•</span>' +
+                '<span class="sipadu-pager-info"></span>' +
+            '</div>' +
+            '<div class="sipadu-pager-nav" role="navigation" aria-label="Navigasi halaman tabel"></div>';
+
+        const container = scrollWrap.parentElement;
+        const existingPagination = container ? container.querySelector('.up-pagination, .bp-pagination') : null;
+        if (existingPagination) {
+            existingPagination.innerHTML = '';
+            existingPagination.style.padding = '0';
+            existingPagination.appendChild(pagerBar);
+        } else {
+            scrollWrap.insertAdjacentElement('afterend', pagerBar);
+            const nextEl = pagerBar.nextElementSibling;
+            if (nextEl && (nextEl.matches('nav[role="navigation"]') || nextEl.classList.contains('pagination'))) {
+                nextEl.style.display = 'none';
+            }
+        }
+
+        const perPageSelect = pagerBar.querySelector('.sipadu-pager-select');
+        const infoEl = pagerBar.querySelector('.sipadu-pager-info');
+        const navEl = pagerBar.querySelector('.sipadu-pager-nav');
+
+        let currentPage = 1;
+        let perPage = parseInt(perPageSelect.value, 10) || 10;
+
+        function getDataRows() {
+            return Array.from(tbody.querySelectorAll('tr')).filter(function (tr) {
+                if (tr.dataset.emptyRow === '1') return false;
+                if (tr.id === 'userFilterEmptyRow') return false;
+                if (tr.querySelector('td[colspan]')) return false;
+                return true;
+            });
+        }
+
+        function buildPageNumbers(totalPages, current) {
+            if (totalPages <= 7) {
+                return Array.from({ length: totalPages }, function (_, i) {
+                    return i + 1;
+                });
+            }
+            const pages = [1];
+            if (current > 3) pages.push('...');
+            const start = Math.max(2, current - 1);
+            const end = Math.min(totalPages - 1, current + 1);
+            for (let p = start; p <= end; p++) pages.push(p);
+            if (current < totalPages - 2) pages.push('...');
+            pages.push(totalPages);
+            return pages;
+        }
+
+        function render() {
+            const allRows = getDataRows();
+            const activeRows = allRows.filter(function (tr) {
+                return tr.dataset.filterHidden !== '1';
+            });
+
+            const totalItems = activeRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIdx = (currentPage - 1) * perPage;
+            const endIdx = Math.min(startIdx + perPage, totalItems);
+
+            allRows.forEach(function (tr) {
+                if (tr.dataset.filterHidden === '1') {
+                    tr.style.display = 'none';
+                }
+            });
+
+            activeRows.forEach(function (tr, idx) {
+                tr.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+            });
+
+            const fromNum = totalItems === 0 ? 0 : startIdx + 1;
+            const toNum = totalItems === 0 ? 0 : endIdx;
+            infoEl.innerHTML = 'Menampilkan <strong>' + fromNum + ' - ' + toNum + '</strong> dari <strong>' + totalItems + '</strong> data';
+
+            navEl.innerHTML = '';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.type = 'button';
+            prevBtn.className = 'sipadu-pager-btn';
+            prevBtn.innerHTML = '‹';
+            prevBtn.title = 'Halaman sebelumnya';
+            prevBtn.disabled = currentPage <= 1 || totalItems === 0;
+            prevBtn.addEventListener('click', function () {
+                if (currentPage > 1) {
+                    currentPage--;
+                    render();
+                }
+            });
+            navEl.appendChild(prevBtn);
+
+            const pageList = buildPageNumbers(totalPages, currentPage);
+            pageList.forEach(function (item) {
+                if (item === '...') {
+                    const dots = document.createElement('span');
+                    dots.className = 'sipadu-pager-ellipsis';
+                    dots.textContent = '…';
+                    navEl.appendChild(dots);
+                    return;
+                }
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'sipadu-pager-btn' + (item === currentPage ? ' active' : '');
+                btn.textContent = String(item);
+                btn.addEventListener('click', function () {
+                    currentPage = item;
+                    render();
+                });
+                navEl.appendChild(btn);
+            });
+
+            const nextBtn = document.createElement('button');
+            nextBtn.type = 'button';
+            nextBtn.className = 'sipadu-pager-btn';
+            nextBtn.innerHTML = '›';
+            nextBtn.title = 'Halaman berikutnya';
+            nextBtn.disabled = currentPage >= totalPages || totalItems === 0;
+            nextBtn.addEventListener('click', function () {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    render();
+                }
+            });
+            navEl.appendChild(nextBtn);
+        }
+
+        perPageSelect.addEventListener('change', function () {
+            perPage = parseInt(this.value, 10) || 10;
+            currentPage = 1;
+            render();
+        });
+
+        table.sipaduRefreshPagination = function (resetPage) {
+            if (resetPage) currentPage = 1;
+            render();
+        };
+
+        render();
+    }
+
+    document.querySelectorAll('.main-content table').forEach(initTablePagination);
 
     if (window.lucide) {
         window.lucide.createIcons();
