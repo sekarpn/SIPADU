@@ -516,16 +516,17 @@
     opacity: .55;
 }
 
+/* TOMBOL DETAIL (HIJAU) */
 .booking-page .bp-view {
-    background: rgba(255, 255, 255, .75);
-    border-color: rgba(22, 54, 38, .12);
-    color: var(--bp-ink);
+    background: #dcfce7;
+    border-color: rgba(22, 163, 74, .28);
+    color: #15803d;
 }
 
 .booking-page .bp-view:hover {
-    background: #fff;
-    border-color: rgba(31, 122, 73, .35);
-    color: var(--bp-green);
+    background: #bbf7d0;
+    border-color: rgba(21, 128, 61, .38);
+    color: #166534;
 }
 
 .booking-page .bp-approve {
