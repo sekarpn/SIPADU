@@ -69,7 +69,12 @@
 .booking-page button,
 .booking-page input,
 .booking-page select,
-.booking-page textarea {
+.booking-page textarea,
+.sipadu-booking-panel,
+.sipadu-booking-panel button,
+.sipadu-booking-modal,
+.sipadu-booking-modal button,
+.sipadu-booking-modal textarea {
     font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -97,7 +102,7 @@
     line-height: 1.55;
 }
 
-/* SCORECARDS (GLASSMORPHISM MATCHING DASHBOARD) */
+/* SCORECARDS */
 .booking-page .bp-stats {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -175,8 +180,6 @@
     padding: 13px 16px;
     margin-bottom: 16px;
     font-size: 12.5px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
 }
 
 .booking-page .bp-alert.is-error {
@@ -192,7 +195,7 @@
     font-weight: 600;
 }
 
-/* MAIN TABLE CARD (GLASSMORPHISM) */
+/* MAIN TABLE CARD */
 .booking-page .bp-card {
     background: var(--bp-glass-bg);
     backdrop-filter: blur(18px) saturate(150%);
@@ -414,10 +417,11 @@
     border-bottom: 0;
 }
 
-.booking-page .bp-code {
+.booking-page .bp-code,
+.sipadu-booking-panel .bp-code {
     font-size: 11px;
     font-weight: 800;
-    color: var(--bp-green);
+    color: #1f7a49;
     letter-spacing: .02em;
 }
 
@@ -441,7 +445,7 @@
 }
 
 /* PASTEL STATUS PILLS */
-.booking-page .bp-status {
+.bp-status {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -452,7 +456,7 @@
     white-space: nowrap;
 }
 
-.booking-page .bp-status-dot {
+.bp-status-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -460,33 +464,33 @@
     flex-shrink: 0;
 }
 
-.booking-page .st-pending {
+.st-pending {
     background: #fef3c7;
     color: #92400e;
 }
 
-.booking-page .st-approved {
+.st-approved {
     background: #dcfce7;
     color: #166534;
 }
 
-.booking-page .st-rejected {
+.st-rejected {
     background: #fee2e2;
     color: #991b1b;
 }
 
-.booking-page .st-revision {
+.st-revision {
     background: #ffedd5;
     color: #9a3412;
 }
 
-.booking-page .st-cancelled {
+.st-cancelled {
     background: #f1f5f9;
     color: #475569;
 }
 
 /* BUTTONS */
-.booking-page .bp-btn {
+.bp-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -501,61 +505,60 @@
     transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
 }
 
-.booking-page .bp-btn svg {
+.bp-btn svg {
     width: 15px;
     height: 15px;
 }
 
-.booking-page .bp-btn:hover {
+.bp-btn:hover {
     transform: translateY(-1px);
 }
 
-.booking-page .bp-btn:disabled {
+.bp-btn:disabled {
     cursor: not-allowed;
     transform: none;
     opacity: .55;
 }
 
-/* TOMBOL DETAIL (HIJAU) */
-.booking-page .bp-view {
+.bp-view {
     background: #dcfce7;
     border-color: rgba(22, 163, 74, .28);
     color: #15803d;
 }
 
-.booking-page .bp-view:hover {
+.bp-view:hover {
     background: #bbf7d0;
     border-color: rgba(21, 128, 61, .38);
     color: #166534;
 }
 
-.booking-page .bp-approve {
-    background: var(--bp-green-mid);
+.bp-approve {
+    background: #237c4d;
     color: #fff;
     box-shadow: 0 4px 12px rgba(35, 124, 77, .22);
 }
 
-.booking-page .bp-approve:hover {
-    background: var(--bp-green);
+.bp-approve:hover {
+    background: #1f7a49;
 }
 
-.booking-page .bp-reject {
+.bp-reject {
     background: #fee2e2;
     border-color: rgba(220, 38, 38, .25);
     color: #991b1b;
 }
 
-.booking-page .bp-reject:hover {
+.bp-reject:hover {
     background: #fecaca;
 }
 
-.booking-page .bp-revision {
+.bp-revision {
     background: #fef3c7;
     border-color: rgba(217, 119, 6, .28);
     color: #92400e;
 }
 
-.booking-page .bp-revision:hover {
+.bp-revision:hover {
     background: #fde68a;
 }
 
@@ -583,91 +586,6 @@
     background: rgba(255, 255, 255, .25);
 }
 
-/* MODAL KEPUTUSAN */
-.booking-page .bp-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(16, 34, 25, .48);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 10005;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
-}
-
-.booking-page .bp-modal-backdrop.show {
-    display: flex;
-}
-
-.booking-page .bp-modal {
-    width: min(520px, 100%);
-    max-height: 90vh;
-    overflow-y: auto;
-    background: rgba(255, 255, 255, .96);
-    border: 1px solid rgba(255, 255, 255, .75);
-    border-radius: 18px;
-    padding: 24px;
-    box-shadow: 0 25px 70px rgba(7, 27, 16, .22);
-}
-
-.booking-page .bp-modal h3 {
-    font-size: 17px;
-    font-weight: 800;
-    margin: 0 0 8px;
-    color: var(--bp-ink);
-}
-
-.booking-page .bp-modal p {
-    font-size: 12.5px;
-    color: var(--bp-muted);
-    line-height: 1.6;
-}
-
-.booking-page .bp-modal label {
-    display: block;
-    font-size: 11.5px;
-    font-weight: 700;
-    margin: 14px 0 6px;
-    color: var(--bp-ink);
-}
-
-.booking-page .bp-modal textarea {
-    width: 100%;
-    border: 1px solid rgba(22, 54, 38, .15);
-    border-radius: 12px;
-    padding: 11px 12px;
-    font-size: 12.5px;
-    min-height: 86px;
-    resize: vertical;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.booking-page .bp-modal textarea:focus {
-    border-color: var(--bp-green);
-    box-shadow: 0 0 0 3px rgba(31, 122, 73, .14);
-}
-
-.booking-page .bp-modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 18px;
-}
-
-.booking-page .bp-modal .bp-confirm {
-    background: var(--bp-green-mid);
-    color: #fff;
-}
-
-.booking-page .bp-modal .bp-cancel {
-    background: #eef2ef;
-    color: #3c5446;
-}
-
-/* DRAWER TINJAU PENGAJUAN & PRIORITAS */
 .booking-page .bp-detail-open {
     min-width: 82px;
     min-height: 36px;
@@ -693,41 +611,42 @@
     height: 11px;
 }
 
-.booking-page .bp-drawer-backdrop {
+/* DRAWER TINJAU PENGAJUAN & PRIORITAS (ISOLATED FIXED LAYER) */
+.sipadu-booking-overlay {
     position: fixed;
-    inset: 0;
-    z-index: 10000;
-    display: flex;
-    justify-content: flex-end;
-    background: rgba(15, 32, 23, .40);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .25s ease, visibility .25s ease;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99990;
+    background: rgba(15, 32, 23, .45);
+    display: none;
 }
 
-.booking-page .bp-drawer-backdrop.show {
-    opacity: 1;
-    visibility: visible;
+.sipadu-booking-overlay.is-open {
+    display: block;
 }
 
-.booking-page .bp-drawer {
+.sipadu-booking-panel {
+    position: fixed;
+    top: 0;
+    right: -540px;
+    bottom: 0;
+    z-index: 99995;
+    width: min(510px, 100vw);
+    background: #f8fbf9;
+    box-shadow: -18px 0 55px rgba(12, 32, 21, .22);
     display: flex;
     flex-direction: column;
-    width: min(510px, 100%);
-    height: 100%;
-    background: #f8fbf9;
-    box-shadow: -18px 0 55px rgba(12, 32, 21, .16);
-    transform: translateX(100%);
-    transition: transform .28s ease;
+    transition: right .26s ease;
+    color: #163626;
 }
 
-.booking-page .bp-drawer-backdrop.show .bp-drawer {
-    transform: translateX(0);
+.sipadu-booking-panel.is-open {
+    right: 0;
 }
 
-.booking-page .bp-drawer-header {
+.sipadu-booking-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -738,22 +657,22 @@
     flex-shrink: 0;
 }
 
-.booking-page .bp-drawer-header h2 {
+.sipadu-booking-panel-header h2 {
     margin: 0;
-    color: var(--bp-ink);
+    color: #163626;
     font-size: 18px;
     font-weight: 800;
     letter-spacing: -.02em;
 }
 
-.booking-page .bp-drawer-header p {
+.sipadu-booking-panel-header p {
     margin: 4px 0 0;
-    color: var(--bp-subtle);
+    color: #64786c;
     font-size: 12px;
 }
 
-.booking-page .bp-drawer-close,
-.booking-page .bp-pdf-header button {
+.sipadu-booking-panel-close,
+.sipadu-pdf-header button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -764,26 +683,26 @@
     border: 1px solid rgba(22, 54, 38, .12);
     border-radius: 50%;
     background: #fff;
-    color: var(--bp-muted);
+    color: #4c6456;
     line-height: 0;
     cursor: pointer;
     transition: background .2s ease, color .2s ease;
 }
 
-.booking-page .bp-drawer-close svg,
-.booking-page .bp-pdf-header button svg {
+.sipadu-booking-panel-close svg,
+.sipadu-pdf-header button svg {
     width: 17px;
     height: 17px;
     display: block;
 }
 
-.booking-page .bp-drawer-close:hover,
-.booking-page .bp-pdf-header button:hover {
+.sipadu-booking-panel-close:hover,
+.sipadu-pdf-header button:hover {
     background: #f1f6f2;
-    color: var(--bp-ink);
+    color: #163626;
 }
 
-.booking-page .bp-drawer-body {
+.sipadu-booking-panel-body {
     flex: 1;
     overflow-y: auto;
     padding: 20px 24px 0;
@@ -791,13 +710,13 @@
     flex-direction: column;
 }
 
-.booking-page .bp-drawer-content {
+.bp-drawer-content {
     flex: 1;
     padding-bottom: 20px;
 }
 
 /* KARTU UTAMA PENGAJUAN */
-.booking-page .bp-drawer-summary {
+.bp-drawer-summary {
     padding: 20px;
     border: 1px solid rgba(22, 54, 38, .10);
     border-radius: 16px;
@@ -805,12 +724,12 @@
     box-shadow: 0 4px 18px rgba(22, 54, 38, .04);
 }
 
-.booking-page .bp-drawer-summary.is-pending {
-    border: 2px solid var(--bp-green-mid);
+.bp-drawer-summary.is-pending {
+    border: 2px solid #237c4d;
     box-shadow: 0 6px 20px rgba(35, 124, 77, .09);
 }
 
-.booking-page .bp-drawer-summary-top {
+.bp-drawer-summary-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -818,76 +737,71 @@
     flex-wrap: wrap;
 }
 
-.booking-page .bp-drawer-summary-top .bp-code {
-    font-size: 11px;
-    color: var(--bp-green);
-}
-
-.booking-page .bp-drawer-summary h3 {
+.bp-drawer-summary h3 {
     margin: 13px 0 5px;
-    color: var(--bp-ink);
+    color: #163626;
     font-size: 17px;
     line-height: 1.38;
     font-weight: 800;
     letter-spacing: -.02em;
 }
 
-.booking-page .bp-drawer-date {
+.bp-drawer-date {
     margin: 0;
-    color: var(--bp-subtle);
+    color: #64786c;
     font-size: 12.5px;
     font-weight: 500;
 }
 
-.booking-page .bp-drawer-tags {
+.bp-drawer-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
     margin-top: 13px;
 }
 
-.booking-page .bp-drawer-tags span {
+.bp-drawer-tags span {
     padding: 5px 10px;
     border-radius: 8px;
     background: rgba(33, 128, 77, .12);
-    color: var(--bp-green);
+    color: #1f7a49;
     font-size: 11px;
     font-weight: 700;
 }
 
-.booking-page .bp-drawer-info-grid {
+.bp-drawer-info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px 20px;
     padding: 18px 0 16px;
 }
 
-.booking-page .bp-drawer-info-grid small,
-.booking-page .bp-drawer-description small {
+.bp-drawer-info-grid small,
+.bp-drawer-description small {
     display: block;
     margin-bottom: 3px;
-    color: var(--bp-subtle);
+    color: #64786c;
     font-size: 11px;
     font-weight: 600;
 }
 
-.booking-page .bp-drawer-info-grid strong {
+.bp-drawer-info-grid strong {
     display: block;
-    color: var(--bp-ink);
+    color: #163626;
     font-size: 12.5px;
     font-weight: 800;
     line-height: 1.45;
 }
 
-.booking-page .bp-drawer-info-grid span {
+.bp-drawer-info-grid span {
     display: block;
-    color: var(--bp-subtle);
+    color: #64786c;
     font-size: 11px;
     margin-top: 2px;
 }
 
 /* KELENGKAPAN PERIZINAN */
-.booking-page .bp-drawer-check {
+.bp-drawer-check {
     display: flex;
     align-items: flex-start;
     gap: 11px;
@@ -897,7 +811,7 @@
     background: #f6faf7;
 }
 
-.booking-page .bp-check-icon {
+.bp-check-icon {
     display: grid;
     place-items: center;
     width: 22px;
@@ -905,29 +819,29 @@
     margin-top: 1px;
     flex-shrink: 0;
     border-radius: 6px;
-    background: var(--bp-green-mid);
+    background: #237c4d;
     color: #fff;
     font-size: 12px;
     font-weight: 800;
 }
 
-.booking-page .bp-check-icon.is-missing {
+.bp-check-icon.is-missing {
     background: #d97706;
 }
 
-.booking-page .bp-drawer-check p {
+.bp-drawer-check p {
     margin: 0;
     color: #3c5446;
     font-size: 12px;
     line-height: 1.55;
 }
 
-.booking-page .bp-drawer-check p strong {
-    color: var(--bp-ink);
+.bp-drawer-check p strong {
+    color: #163626;
     font-weight: 800;
 }
 
-.booking-page .bp-inline-pdf-link {
+.bp-inline-pdf-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -936,25 +850,25 @@
     border: 1px solid rgba(31, 122, 73, .28);
     border-radius: 8px;
     background: #fff;
-    color: var(--bp-green);
+    color: #1f7a49;
     font-size: 11.5px;
     font-weight: 700;
     cursor: pointer;
     transition: background .2s ease;
 }
 
-.booking-page .bp-inline-pdf-link:hover {
+.bp-inline-pdf-link:hover {
     background: rgba(33, 128, 77, .10);
 }
 
-.booking-page .bp-drawer-description {
+.bp-drawer-description {
     margin-top: 13px;
     padding: 12px 14px;
     border-radius: 12px;
     background: #f6faf7;
 }
 
-.booking-page .bp-drawer-description p {
+.bp-drawer-description p {
     margin: 3px 0 0;
     color: #3c5446;
     font-size: 12px;
@@ -962,11 +876,11 @@
 }
 
 /* PENGAJUAN BENTROK */
-.booking-page .bp-conflict-section {
+.bp-conflict-section {
     margin-top: 20px;
 }
 
-.booking-page .bp-conflict-header {
+.bp-conflict-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -974,7 +888,7 @@
     margin-bottom: 10px;
 }
 
-.booking-page .bp-conflict-title {
+.bp-conflict-title {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -983,19 +897,19 @@
     font-weight: 800;
 }
 
-.booking-page .bp-conflict-hint {
-    color: var(--bp-subtle);
+.bp-conflict-hint {
+    color: #64786c;
     font-size: 11px;
     font-weight: 600;
 }
 
-.booking-page .bp-conflict-list {
+.bp-conflict-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.booking-page .bp-conflict-card {
+.bp-conflict-card {
     padding: 15px 16px;
     border: 1px solid rgba(22, 54, 38, .10);
     border-radius: 14px;
@@ -1003,28 +917,28 @@
     transition: border-color .2s ease, box-shadow .2s ease;
 }
 
-.booking-page .bp-conflict-card:hover {
+.bp-conflict-card:hover {
     border-color: rgba(31, 122, 73, .38);
     box-shadow: 0 4px 14px rgba(22, 54, 38, .06);
 }
 
-.booking-page .bp-conflict-card-top {
+.bp-conflict-card-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
 }
 
-.booking-page .bp-conflict-code {
-    color: var(--bp-muted);
+.bp-conflict-code {
+    color: #4c6456;
     font-size: 11.5px;
     font-weight: 800;
 }
 
-.booking-page .bp-prioritize-btn {
+.bp-prioritize-btn {
     border: 0;
     border-radius: 9px;
-    background: var(--bp-green-mid);
+    background: #237c4d;
     color: #fff;
     padding: 6px 12px;
     font-size: 11.5px;
@@ -1033,56 +947,56 @@
     transition: background .2s ease;
 }
 
-.booking-page .bp-prioritize-btn:hover {
-    background: var(--bp-green);
+.bp-prioritize-btn:hover {
+    background: #1f7a49;
 }
 
-.booking-page .bp-conflict-card h4 {
+.bp-conflict-card h4 {
     margin: 10px 0 4px;
-    color: var(--bp-ink);
+    color: #163626;
     font-size: 14px;
     font-weight: 800;
     line-height: 1.4;
 }
 
-.booking-page .bp-conflict-meta {
+.bp-conflict-meta {
     margin: 0;
-    color: var(--bp-subtle);
+    color: #64786c;
     font-size: 12px;
 }
 
-.booking-page .bp-conflict-tags {
+.bp-conflict-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     margin-top: 10px;
 }
 
-.booking-page .bp-conflict-tags span {
+.bp-conflict-tags span {
     padding: 4px 9px;
     border: 1px solid rgba(22, 54, 38, .10);
     border-radius: 7px;
     background: #f8fbf9;
-    color: var(--bp-muted);
+    color: #4c6456;
     font-size: 10.5px;
     font-weight: 700;
 }
 
 /* RIWAYAT KEPUTUSAN */
-.booking-page .bp-drawer-history {
+.bp-drawer-history {
     margin-top: 18px;
     padding-top: 14px;
     border-top: 1px solid rgba(22, 54, 38, .08);
 }
 
-.booking-page .bp-drawer-history > strong {
+.bp-drawer-history > strong {
     display: block;
     margin-bottom: 8px;
-    color: var(--bp-ink);
+    color: #163626;
     font-size: 12.5px;
 }
 
-.booking-page .bp-history-item {
+.bp-history-item {
     margin-top: 8px;
     padding: 11px 13px;
     border: 1px solid rgba(22, 54, 38, .09);
@@ -1090,41 +1004,39 @@
     background: #fff;
 }
 
-.booking-page .bp-history-item span {
+.bp-history-item span {
     display: block;
-    color: var(--bp-ink);
+    color: #163626;
     font-size: 11.5px;
     font-weight: 800;
 }
 
-.booking-page .bp-history-item small {
+.bp-history-item small {
     display: block;
     margin-top: 3px;
-    color: var(--bp-subtle);
+    color: #64786c;
     font-size: 10.5px;
 }
 
-.booking-page .bp-history-item p {
+.bp-history-item p {
     margin: 5px 0 0;
-    color: var(--bp-muted);
+    color: #4c6456;
     font-size: 11.5px;
     line-height: 1.5;
 }
 
 /* FOOTER TOMBOL KEPUTUSAN DRAWER */
-.booking-page .bp-drawer-actions {
+.bp-drawer-actions {
     position: sticky;
     bottom: 0;
     margin: 0 -24px;
     padding: 16px 24px 20px;
     border-top: 1px solid rgba(22, 54, 38, .08);
-    background: rgba(255, 255, 255, .96);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: #fff;
     flex-shrink: 0;
 }
 
-.booking-page .bp-drawer-actions > .bp-btn {
+.bp-drawer-actions > .bp-btn {
     width: 100%;
     min-height: 44px;
     border-radius: 12px;
@@ -1132,14 +1044,14 @@
     font-weight: 700;
 }
 
-.booking-page .bp-drawer-actions-row {
+.bp-drawer-actions-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-top: 10px;
 }
 
-.booking-page .bp-drawer-actions-row .bp-btn {
+.bp-drawer-actions-row .bp-btn {
     min-height: 42px;
     border-radius: 12px;
     font-size: 12.5px;
@@ -1147,24 +1059,22 @@
 }
 
 /* PENAMPIL PDF */
-.booking-page .bp-pdf-backdrop {
+.sipadu-pdf-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 10002;
+    z-index: 99997;
     display: none;
     align-items: center;
     justify-content: center;
     padding: 24px;
     background: rgba(10, 25, 16, .62);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
 }
 
-.booking-page .bp-pdf-backdrop.show {
+.sipadu-pdf-backdrop.is-open {
     display: flex;
 }
 
-.booking-page .bp-pdf-window {
+.sipadu-pdf-window {
     display: flex;
     flex-direction: column;
     width: min(1000px, 100%);
@@ -1175,22 +1085,104 @@
     box-shadow: 0 25px 70px rgba(0, 0, 0, .28);
 }
 
-.booking-page .bp-pdf-header {
+.sipadu-pdf-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 13px 18px;
     border-bottom: 1px solid rgba(22, 54, 38, .09);
-    color: var(--bp-ink);
+    color: #163626;
     font-size: 13.5px;
 }
 
-.booking-page .bp-pdf-window iframe {
+.sipadu-pdf-window iframe {
     flex: 1;
     width: 100%;
     min-height: 0;
     border: 0;
     background: #eef1ef;
+}
+
+/* MODAL KEPUTUSAN */
+.sipadu-decision-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(16, 34, 25, .52);
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.sipadu-decision-backdrop.is-open {
+    display: flex;
+}
+
+.sipadu-booking-modal {
+    width: min(520px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 25px 70px rgba(7, 27, 16, .25);
+    color: #163626;
+}
+
+.sipadu-booking-modal h3 {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    color: #163626;
+}
+
+.sipadu-booking-modal p {
+    font-size: 12.5px;
+    color: #4c6456;
+    line-height: 1.6;
+}
+
+.sipadu-booking-modal label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 700;
+    margin: 14px 0 6px;
+    color: #163626;
+}
+
+.sipadu-booking-modal textarea {
+    width: 100%;
+    border: 1px solid rgba(22, 54, 38, .15);
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 12.5px;
+    min-height: 86px;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.sipadu-booking-modal textarea:focus {
+    border-color: #1f7a49;
+    box-shadow: 0 0 0 3px rgba(31, 122, 73, .14);
+}
+
+.bp-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.sipadu-booking-modal .bp-confirm {
+    background: #237c4d;
+    color: #fff;
+}
+
+.sipadu-booking-modal .bp-cancel {
+    background: #eef2ef;
+    color: #3c5446;
 }
 
 body.bp-drawer-open {
@@ -1216,28 +1208,28 @@ body.bp-drawer-open {
 }
 
 @media (max-width: 600px) {
-    .booking-page .bp-drawer {
-        width: 100%;
+    .sipadu-booking-panel {
+        width: 100vw;
     }
 
-    .booking-page .bp-drawer-header {
+    .sipadu-booking-panel-header {
         padding: 15px 17px;
     }
 
-    .booking-page .bp-drawer-body {
+    .sipadu-booking-panel-body {
         padding: 16px 16px 0;
     }
 
-    .booking-page .bp-drawer-actions {
+    .bp-drawer-actions {
         margin: 0 -16px;
         padding: 13px 16px 18px;
     }
 
-    .booking-page .bp-pdf-backdrop {
+    .sipadu-pdf-backdrop {
         padding: 8px;
     }
 
-    .booking-page .bp-pdf-window {
+    .sipadu-pdf-window {
         height: 96vh;
         border-radius: 12px;
     }
@@ -1664,7 +1656,7 @@ body.bp-drawer-open {
                         <div class="bp-conflict-section">
                             <div class="bp-conflict-header">
                                 <span class="bp-conflict-title">
-                                    ⚡ Total Pengajuan Bentrok di Slot Ini ({{ $totalConflicts + 1 }})
+                                     <i data-lucide="alert-triangle"></i> Total Pengajuan Bentrok di Slot Ini ({{ $totalConflicts + 1 }})
                                 </span>
                                 <span class="bp-conflict-hint">Pilih yang diprioritaskan</span>
                             </div>
@@ -1776,117 +1768,116 @@ body.bp-drawer-open {
             </template>
         @endforeach
     </div>
+</div>
 
-    {{-- PANEL DETAIL DARI SISI KANAN --}}
-    <div class="bp-drawer-backdrop" id="bookingDrawerBackdrop" aria-hidden="true">
-        <aside class="bp-drawer" id="bookingDrawer" aria-labelledby="bookingDrawerTitle">
-            <header class="bp-drawer-header">
-                <div>
-                    <h2 id="bookingDrawerTitle">Tinjau Pengajuan & Prioritas</h2>
-                    <p id="bookingDrawerSubtitle">Periksa detail pengajuan sebelum mengambil keputusan.</p>
-                </div>
-                <button type="button" class="bp-drawer-close" id="closeBookingDrawer" aria-label="Tutup">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                    </svg>
-                </button>
-            </header>
-            <div class="bp-drawer-body" id="bookingDrawerBody"></div>
-        </aside>
-    </div>
-
-    {{-- PENAMPIL PDF --}}
-    <div class="bp-pdf-backdrop" id="pdfPreviewModal" aria-hidden="true">
-        <div class="bp-pdf-window">
-            <header class="bp-pdf-header">
-                <strong>Pratinjau Surat Permohonan</strong>
-                <button type="button" id="closePdfPreview" aria-label="Tutup">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                    </svg>
-                </button>
-            </header>
-            <iframe id="pdfPreviewFrame" title="Pratinjau dokumen PDF"></iframe>
+{{-- PANEL DETAIL DARI SISI KANAN --}}
+<div class="sipadu-booking-overlay" id="bookingOverlay"></div>
+<aside class="sipadu-booking-panel" id="bookingPanel" role="dialog" aria-modal="true" aria-labelledby="bookingDrawerTitle">
+    <header class="sipadu-booking-panel-header">
+        <div>
+            <h2 id="bookingDrawerTitle">Tinjau Pengajuan & Prioritas</h2>
+            <p id="bookingDrawerSubtitle">Periksa detail pengajuan sebelum mengambil keputusan.</p>
         </div>
+        <button type="button" class="sipadu-booking-panel-close" id="closeBookingDrawer" aria-label="Tutup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+            </svg>
+        </button>
+    </header>
+    <div class="sipadu-booking-panel-body" id="bookingDrawerBody"></div>
+</aside>
+
+{{-- PENAMPIL PDF --}}
+<div class="sipadu-pdf-backdrop" id="pdfPreviewModal">
+    <div class="sipadu-pdf-window" role="dialog" aria-modal="true">
+        <header class="sipadu-pdf-header">
+            <strong>Pratinjau Surat Permohonan</strong>
+            <button type="button" id="closePdfPreview" aria-label="Tutup">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                </svg>
+            </button>
+        </header>
+        <iframe id="pdfPreviewFrame" title="Pratinjau dokumen PDF"></iframe>
     </div>
+</div>
 
-    {{-- MODAL KEPUTUSAN --}}
-    <div class="bp-modal-backdrop" id="decisionModal" role="dialog" aria-modal="true" aria-labelledby="decisionTitle">
-        <div class="bp-modal">
-            <h3 id="decisionTitle">Konfirmasi Keputusan</h3>
+{{-- MODAL KEPUTUSAN --}}
+<div class="sipadu-decision-backdrop" id="decisionModal" role="dialog" aria-modal="true" aria-labelledby="decisionTitle">
+    <div class="sipadu-booking-modal">
+        <h3 id="decisionTitle">Konfirmasi Keputusan</h3>
 
-            <p id="decisionDescription">
-                Pastikan data pengajuan telah diperiksa sebelum keputusan disimpan.
-            </p>
+        <p id="decisionDescription">
+            Pastikan data pengajuan telah diperiksa sebelum keputusan disimpan.
+        </p>
 
-            <form
-                method="POST"
-                id="decisionForm"
-                data-action-base="{{ url('/admin/pengajuan') }}"
-            >
-                @csrf
-                @method('PATCH')
+        <form
+            method="POST"
+            id="decisionForm"
+            data-action-base="{{ url('/admin/pengajuan') }}"
+        >
+            @csrf
+            @method('PATCH')
 
-                <input type="hidden" name="status" id="decisionStatus">
+            <input type="hidden" name="status" id="decisionStatus">
 
-                <div id="normalNote">
-                    <label for="adminNote">Catatan Admin (opsional)</label>
-                    <textarea
-                        name="admin_note"
-                        id="adminNote"
-                        placeholder="Tambahkan catatan untuk peminjam..."
-                    ></textarea>
-                </div>
+            <div id="normalNote">
+                <label for="adminNote">Catatan Admin (opsional)</label>
+                <textarea
+                    name="admin_note"
+                    id="adminNote"
+                    placeholder="Tambahkan catatan untuk peminjam..."
+                ></textarea>
+            </div>
 
-                <div id="conflictReason" style="display:none">
-                    <label for="conflictNote">
-                        Alasan penolakan otomatis pengajuan yang bentrok (wajib)
-                    </label>
+            <div id="conflictReason" style="display:none">
+                <label for="conflictNote">
+                    Alasan penolakan otomatis pengajuan yang bentrok (wajib)
+                </label>
 
-                    <textarea
-                        name="conflict_rejection_reason"
-                        id="conflictNote"
-                        placeholder="Jelaskan alasan prioritas atau keputusan BUK..."
-                    ></textarea>
+                <textarea
+                    name="conflict_rejection_reason"
+                    id="conflictNote"
+                    placeholder="Jelaskan alasan prioritas atau keputusan BUK..."
+                ></textarea>
 
-                    <p style="margin-top:6px">
-                        Pengajuan lain yang menggunakan auditorium dan waktu yang beririsan
-                        akan ditolak otomatis setelah pengajuan ini disetujui.
-                        Pastikan pertimbangan prioritas sudah dilakukan.
-                    </p>
-                </div>
+                <p style="margin-top:6px">
+                    Pengajuan lain yang menggunakan auditorium dan waktu yang beririsan
+                    akan ditolak otomatis setelah pengajuan ini disetujui.
+                    Pastikan pertimbangan prioritas sudah dilakukan.
+                </p>
+            </div>
 
-                <div class="bp-modal-actions">
-                    <button
-                        type="button"
-                        class="bp-btn bp-cancel"
-                        onclick="closeDecisionModal()"
-                    >
-                        Batal
-                    </button>
+            <div class="bp-modal-actions">
+                <button
+                    type="button"
+                    class="bp-btn bp-cancel"
+                    onclick="closeDecisionModal()"
+                >
+                    Batal
+                </button>
 
-                    <button
-                        type="submit"
-                        class="bp-btn bp-confirm"
-                        id="decisionSubmit"
-                    >
-                        Simpan Keputusan
-                    </button>
-                </div>
-            </form>
-        </div>
+                <button
+                    type="submit"
+                    class="bp-btn bp-confirm"
+                    id="decisionSubmit"
+                >
+                    Simpan Keputusan
+                </button>
+            </div>
+        </form>
     </div>
-
 </div>
 
 <script>
     function openBookingDrawer(id, button) {
         const template = document.getElementById('booking-drawer-' + id);
-        const backdrop = document.getElementById('bookingDrawerBackdrop');
+        const overlay = document.getElementById('bookingOverlay');
+        const panel = document.getElementById('bookingPanel');
         const body = document.getElementById('bookingDrawerBody');
         const subtitle = document.getElementById('bookingDrawerSubtitle');
 
-        if (!template || !backdrop || !body) return;
+        if (!template || !overlay || !panel || !body) return;
 
         body.innerHTML = template.innerHTML;
         body.scrollTop = 0;
@@ -1898,17 +1889,17 @@ body.bp-drawer-open {
             window.lucide.createIcons();
         }
 
-        backdrop.classList.add('show');
-        backdrop.setAttribute('aria-hidden', 'false');
+        overlay.classList.add('is-open');
+        panel.classList.add('is-open');
         document.body.classList.add('bp-drawer-open');
     }
 
     function closeBookingDrawer() {
-        const backdrop = document.getElementById('bookingDrawerBackdrop');
-        if (!backdrop) return;
+        const overlay = document.getElementById('bookingOverlay');
+        const panel = document.getElementById('bookingPanel');
 
-        backdrop.classList.remove('show');
-        backdrop.setAttribute('aria-hidden', 'true');
+        overlay?.classList.remove('is-open');
+        panel?.classList.remove('is-open');
         document.body.classList.remove('bp-drawer-open');
     }
 
@@ -1917,16 +1908,14 @@ body.bp-drawer-open {
         const frame = document.getElementById('pdfPreviewFrame');
 
         frame.src = url;
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
+        modal.classList.add('is-open');
     }
 
     function closePdfPreview() {
         const modal = document.getElementById('pdfPreviewModal');
         const frame = document.getElementById('pdfPreviewFrame');
 
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
+        modal.classList.remove('is-open');
         frame.src = 'about:blank';
     }
 
@@ -1985,11 +1974,11 @@ body.bp-drawer-open {
         document.getElementById('adminNote').value = '';
         conflictNote.value = '';
 
-        modal.classList.add('show');
+        modal.classList.add('is-open');
     }
 
     function closeDecisionModal() {
-        document.getElementById('decisionModal').classList.remove('show');
+        document.getElementById('decisionModal').classList.remove('is-open');
     }
 
     /* LIVE SEARCH & FILTER TANPA RELOAD HALAMAN */
@@ -2137,7 +2126,7 @@ body.bp-drawer-open {
             return;
         }
 
-        if (event.target.id === 'bookingDrawerBackdrop') {
+        if (event.target.id === 'bookingOverlay') {
             closeBookingDrawer();
         }
 
