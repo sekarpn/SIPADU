@@ -7,6 +7,8 @@ use App\Models\SiteContent;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -109,7 +111,58 @@ class AdminController extends Controller
     public function users()
     {
         $users = User::latest()->paginate(20);
-
         return view('admin.users', compact('users'));
+    }
+
+    public function storeUser(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:30',
+            'nim_nip' => 'nullable|string|max:50|unique:users,nim_nip',
+            'role' => 'required|in:mahasiswa,pegawai,admin',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+        User::create($data);
+        return redirect()->route('admin.users')->with('success', 'Pengguna berhasil ditambahkan.');
+    }
+
+    public function showUser(User $user)
+    {
+        $user->loadCount('bookings');
+        return view('admin.users-show', compact('user'));
+    }
+
+    public function editUser(User $user)
+    {
+        return view('admin.users-edit', compact('user'));
+    }
+
+    public function updateUser(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required','email','max:255',Rule::unique('users','email')->ignore($user->id)],
+            'phone' => 'nullable|string|max:30',
+            'nim_nip' => ['nullable','string','max:50',Rule::unique('users','nim_nip')->ignore($user->id)],
+            'role' => 'required|in:mahasiswa,pegawai,admin',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+        if (empty($data['password'])) unset($data['password']);
+        $user->update($data);
+        return redirect()->route('admin.users')->with('success', 'Data pengguna berhasil diperbarui.');
+    }
+
+    public function deleteUser(User $user)
+    {
+        if ((string) $user->getAuthIdentifier() === (string) \Illuminate\Support\Facades\Auth::id()) {
+            return back()->with('error', 'Akun admin yang sedang digunakan tidak dapat dihapus.');
+        }
+        if ($user->bookings()->exists()) {
+            return back()->with('error', 'Pengguna tidak dapat dihapus karena masih memiliki riwayat peminjaman.');
+        }
+        $user->delete();
+        return redirect()->route('admin.users')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

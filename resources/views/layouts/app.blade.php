@@ -12,6 +12,15 @@
 
     <link rel="stylesheet" href="{{ asset('css/sipadu.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sipadu-theme.css') }}">
+
+    <style>
+        /* Satu keluarga font untuk seluruh SIPADU: landing, auth, sidebar, topbar, dan konten */
+        html, body, body *, body *::before, body *::after {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+        /* Ikon berbasis SVG tetap dirender sebagai ikon, bukan glyph font */
+        svg, svg * { font-family: inherit !important; }
+    </style>
 </head>
 
 <body>

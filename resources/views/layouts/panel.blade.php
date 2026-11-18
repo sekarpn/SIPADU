@@ -30,6 +30,21 @@ body,
     background-attachment: fixed !important;
     color: #163626;
     font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
+}
+
+/* Konsistensi tipografi seluruh halaman setelah login: Admin, Pegawai, dan Mahasiswa */
+.app-layout,
+.app-layout *,
+.app-layout *::before,
+.app-layout *::after {
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif !important;
+}
+
+/* Elemen ikon tetap menggunakan bentuk SVG, bukan font glyph */
+.app-layout svg,
+.app-layout svg * {
+    font-family: inherit !important;
 }
 
 /* MAIN LAYOUT */

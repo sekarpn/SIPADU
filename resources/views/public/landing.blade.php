@@ -850,7 +850,7 @@
             border: 1px solid #cce4d5;
             border-radius: 10px;
 
-            font-family: Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 27px;
             font-weight: 500;
         }

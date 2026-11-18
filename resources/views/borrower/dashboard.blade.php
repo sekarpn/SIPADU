@@ -380,10 +380,49 @@
         margin-top: 0;
     }
 
+    .auditorium-carousel-wrap {
+        position: relative;
+        min-width: 0;
+    }
+
+    .auditorium-carousel-controls {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .auditorium-arrow {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(35, 124, 77, .22);
+        border-radius: 50%;
+        background: rgba(255,255,255,.72);
+        color: #237c4d;
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease, opacity .2s ease;
+    }
+
+    .auditorium-arrow:hover { background: #e5f3e9; transform: scale(1.06); }
+    .auditorium-arrow svg { width: 17px; height: 17px; }
+
     .auditorium-cards {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        display: flex;
         gap: 16px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        padding: 3px 2px 12px;
+        overscroll-behavior-x: contain;
+    }
+    .auditorium-cards::-webkit-scrollbar { display: none; }
+    .auditorium-cards > .auditorium-card {
+        flex: 0 0 calc((100% - 32px) / 3);
+        scroll-snap-align: start;
     }
 
     .auditorium-card {
@@ -557,16 +596,26 @@
         position: fixed;
         inset: 0;
         z-index: 9999;
-        display: none;
+        display: flex;
         align-items: center;
         justify-content: center;
         padding: 20px;
-        background: rgba(12, 30, 20, .62);
-        backdrop-filter: blur(4px);
+        background: rgba(12, 30, 20, .0);
+        backdrop-filter: blur(0);
+        -webkit-backdrop-filter: blur(0);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .28s ease, background .28s ease, backdrop-filter .28s ease, visibility .28s ease;
     }
 
     .auditorium-modal.show {
-        display: flex;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        background: rgba(12, 30, 20, .58);
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
     }
 
     .auditorium-modal-box {
@@ -578,18 +627,14 @@
         background: white;
         border-radius: 16px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
-        animation: modalAppear .22s ease;
+        opacity: 0;
+        transform: translateY(14px) scale(.985);
+        transition: opacity .28s ease, transform .28s cubic-bezier(.2,.8,.2,1);
     }
 
-    @keyframes modalAppear {
-        from {
-            opacity: 0;
-            transform: translateY(15px) scale(.98);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+    .auditorium-modal.show .auditorium-modal-box {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 
     .modal-close {
@@ -736,9 +781,7 @@
 
     /* RESPONSIVE */
     @media (max-width: 1100px) {
-        .auditorium-cards {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+        .auditorium-cards > .auditorium-card { flex-basis: calc((100% - 16px) / 2); }
     }
 
     @media (max-width: 900px) {
@@ -776,9 +819,8 @@
             font-size: 22px;
         }
 
-        .auditorium-cards {
-            grid-template-columns: 1fr;
-        }
+        .auditorium-cards > .auditorium-card { flex-basis: 85%; }
+        .auditorium-arrow { width: 32px; height: 32px; }
 
         .dashboard-panel {
             padding: 12px 15px 15px 15px !important;
@@ -792,6 +834,39 @@
             padding: 17px;
         }
     }
+
+    /* DETAIL AUDITORIUM: PANEL SAMPING, MENGIKUTI DETAIL KELOLA PEMINJAMAN ADMIN */
+    .auditorium-modal {
+        align-items: stretch !important;
+        justify-content: flex-end !important;
+        padding: 0 !important;
+        background: rgba(15, 32, 23, .40) !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
+    }
+    .auditorium-modal.show { background: rgba(15, 32, 23, .40) !important; }
+    .auditorium-modal-box {
+        width: min(510px, 100%) !important;
+        max-width: 510px !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        margin-left: auto;
+        border-radius: 0 !important;
+        overflow-y: auto !important;
+        opacity: 1 !important;
+        transform: translateX(100%) !important;
+        transition: transform .28s ease !important;
+        box-shadow: -18px 0 55px rgba(12, 32, 21, .16) !important;
+    }
+    .auditorium-modal.show .auditorium-modal-box { transform: translateX(0) !important; }
+    .modal-image { height: 250px !important; }
+    .modal-close { position: sticky !important; float: right; top: 14px !important; margin-bottom: -40px; }
+    @media (max-width: 600px) {
+        .auditorium-modal-box { width: 100% !important; }
+        .modal-image { height: 210px !important; }
+        .modal-content { padding: 22px !important; }
+    }
+
 </style>
 
 <div class="dashboard-page">
@@ -965,11 +1040,16 @@
         <div class="section-head">
             <div>
                 <h2>Pilihan Auditorium</h2>
-                <p>Daftar auditorium yang tersedia pada SIPADU</p>
+                <p>Geser untuk melihat auditorium lainnya</p>
+            </div>
+            <div class="auditorium-carousel-controls" aria-label="Navigasi pilihan auditorium">
+                <button type="button" class="auditorium-arrow" aria-label="Auditorium sebelumnya" onclick="scrollAuditoriums(this, -1)"><i data-lucide="chevron-left"></i></button>
+                <button type="button" class="auditorium-arrow" aria-label="Auditorium berikutnya" onclick="scrollAuditoriums(this, 1)"><i data-lucide="chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="auditorium-cards">
+        <div class="auditorium-carousel-wrap">
+        <div class="auditorium-cards" id="auditoriumCards">
             @forelse($auditoriums as $a)
 
                 @php
@@ -1149,11 +1229,20 @@
                 </div>
             @endforelse
         </div>
+        </div>
     </div>
 </div>
 
-{{-- JAVASCRIPT MODAL --}}
+{{-- JAVASCRIPT DETAIL AUDITORIUM --}}
 <script>
+    function scrollAuditoriums(button, direction) {
+        const track = document.getElementById('auditoriumCards');
+        if (!track) return;
+        const card = track.querySelector('.auditorium-card');
+        const distance = card ? card.getBoundingClientRect().width + 16 : track.clientWidth * 0.8;
+        track.scrollBy({ left: distance * direction, behavior: 'smooth' });
+    }
+
     function openAuditoriumModal(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
