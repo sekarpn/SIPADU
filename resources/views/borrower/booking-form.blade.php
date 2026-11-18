@@ -472,6 +472,20 @@
             @error('start_time') <p class="notice">{{ $message }}</p> @enderror
             @error('end_time') <p class="notice">{{ $message }}</p> @enderror
 
+            <h3>Data Pemohon</h3>
+            <div class="form-card" style="margin:0 0 18px;padding:14px 16px;background:#f5faf6;border:1px solid #dcebe0;border-radius:10px;">
+                <p style="margin:0 0 6px;"><strong>Nama:</strong> {{ auth()->user()->name }}</p>
+                <p style="margin:0 0 6px;"><strong>Jenis Akun:</strong> {{ auth()->user()->role === 'pegawai' ? 'Pegawai' : 'Mahasiswa' }}</p>
+                <p style="margin:0 0 6px;"><strong>{{ auth()->user()->role === 'pegawai' ? 'NIP' : 'NIM' }}:</strong> {{ auth()->user()->nim_nip }}</p>
+                @if(auth()->user()->role === 'pegawai')
+                    <p style="margin:0 0 6px;"><strong>Unit / Biro:</strong> {{ auth()->user()->employee_unit ?: 'Belum diisi pada profil' }}</p>
+                    <p style="margin:0;"><strong>Jabatan:</strong> {{ auth()->user()->position ?: 'Belum diisi pada profil' }}</p>
+                @else
+                    <p style="margin:0 0 6px;"><strong>Fakultas:</strong> {{ auth()->user()->faculty ?: 'Belum diisi pada profil' }}</p>
+                    <p style="margin:0;"><strong>Program Studi:</strong> {{ auth()->user()->study_program ?: 'Belum diisi pada profil' }}</p>
+                @endif
+            </div>
+
             <h3>Informasi Kegiatan</h3>
 
             <label>Nama Kegiatan *</label>
@@ -577,6 +591,179 @@
         </aside>
 
     </div>
+    @if(!$profileComplete)
+        <div class="profile-required-overlay" role="dialog" aria-modal="true" aria-labelledby="profileRequiredTitle">
+            <div class="profile-required-modal">
+                <div class="profile-required-icon">
+                    <i data-lucide="user-round-check"></i>
+                </div>
+                <h2 id="profileRequiredTitle">Lengkapi Profil Terlebih Dahulu</h2>
+                <p>
+                    Sebelum mengajukan peminjaman auditorium, lengkapi data identitas pada profil akun Anda terlebih dahulu.
+                </p>
+                <a href="{{ route('borrower.profile') }}" class="profile-required-button">
+                    Lengkapi Profil
+                </a>
+            </div>
+        </div>
+
+        <style>
+            /* Kunci scroll tanpa mengubah posisi body agar layout tidak bergeser */
+            html.profile-modal-open {
+                overflow: hidden !important;
+                scrollbar-gutter: stable;
+                overscroll-behavior: none !important;
+            }
+
+            body.profile-modal-open {
+                overflow: hidden !important;
+                overscroll-behavior: none !important;
+            }
+
+            .profile-required-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 99999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+                overflow: hidden;
+                overscroll-behavior: contain;
+                touch-action: none;
+                background: rgba(15, 23, 42, .58);
+                -webkit-backdrop-filter: blur(3px);
+                backdrop-filter: blur(3px);
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: opacity .28s ease, visibility .28s ease;
+                isolation: isolate;
+            }
+
+            .profile-required-overlay.is-visible {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .profile-required-modal {
+                width: min(100%, 430px);
+                padding: 32px 30px;
+                box-sizing: border-box;
+                border: 1px solid #e2e8f0;
+                border-radius: 18px;
+                background: #fff;
+                box-shadow: 0 24px 70px rgba(15, 23, 42, .20);
+                text-align: center;
+                opacity: 0;
+                transform: translate3d(0, 12px, 0) scale(.985);
+                transition:
+                    opacity .28s ease,
+                    transform .36s cubic-bezier(.2, .75, .25, 1);
+                will-change: transform, opacity;
+            }
+
+            .profile-required-overlay.is-visible .profile-required-modal {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+
+            .profile-required-icon {
+                display: grid;
+                place-items: center;
+                width: 58px;
+                height: 58px;
+                margin: 0 auto 17px;
+                border-radius: 50%;
+                background: #eaf5ee;
+                color: #16834a;
+            }
+
+            .profile-required-icon svg {
+                width: 27px;
+                height: 27px;
+            }
+
+            .profile-required-modal h2 {
+                margin: 0 0 10px;
+                color: #172b20;
+                font-size: 21px;
+                font-weight: 750;
+                line-height: 1.35;
+            }
+
+            .profile-required-modal p {
+                margin: 0 0 23px;
+                color: #64736a;
+                font-size: 13px;
+                line-height: 1.7;
+            }
+
+            .profile-required-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                min-height: 44px;
+                padding: 10px 18px;
+                box-sizing: border-box;
+                border: 1px solid #11643a;
+                border-radius: 9px;
+                background: #16834a;
+                color: #fff !important;
+                font-size: 13px;
+                font-weight: 700;
+                text-decoration: none !important;
+                transition: background .2s ease, transform .2s ease;
+            }
+
+            .profile-required-button:hover {
+                background: #11643a;
+                transform: translateY(-1px);
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .profile-required-overlay,
+                .profile-required-modal {
+                    transition: none !important;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .profile-required-modal {
+                    padding: 27px 22px;
+                    border-radius: 15px;
+                }
+
+                .profile-required-modal h2 { font-size: 19px; }
+                .profile-required-modal p { font-size: 12px; }
+            }
+        </style>
+
+        <script>
+            (function () {
+                const root = document.documentElement;
+                const body = document.body;
+                const overlay = document.querySelector('.profile-required-overlay');
+
+                // Kunci scroll tanpa position:fixed agar halaman tidak meloncat/repaint.
+                root.classList.add('profile-modal-open');
+                body.classList.add('profile-modal-open');
+
+                // Pisahkan render awal dan animasi masuk agar blur tidak berkedip.
+                if (overlay) {
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(function () {
+                            overlay.classList.add('is-visible');
+                        });
+                    });
+                }
+            })();
+        </script>
+    @endif
+
 </div>
 
 <script>

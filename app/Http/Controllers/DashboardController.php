@@ -24,7 +24,9 @@ class DashboardController extends Controller
 
         $auditoriums = Auditorium::where('is_active', true)->get();
 
-        return view('borrower.dashboard', compact(
+        $view = $r->user()->role === 'pegawai' ? 'pegawai.dashboard' : 'borrower.dashboard';
+
+        return view($view, compact(
             'stats',
             'bookings',
             'auditoriums'
@@ -49,9 +51,10 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact('stats', 'bookings'));
     }
 
-    public function profile()
+    public function profile(Request $r)
     {
-        return view('partials.profile');
+        $view = $r->user()->role === 'pegawai' ? 'pegawai.profile' : 'partials.profile';
+        return view($view);
     }
 
     public function updateProfile(Request $r)
@@ -61,12 +64,19 @@ class DashboardController extends Controller
         $data = $r->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'nim_nip' => $user->role === 'admin' ? 'nullable|string|max:40' : 'required|string|max:40|unique:users,nim_nip,' . $user->id,
             'phone' => 'nullable|string|max:20',
+            'faculty' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
+            'study_program' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
+            'employee_unit' => $user->role === 'pegawai' ? 'required|string|max:150' : 'nullable|string|max:150',
+            'position' => $user->role === 'pegawai' ? 'required|string|max:150' : 'nullable|string|max:150',
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan akun lain.',
+            'nim_nip.required' => 'NIM atau NIP wajib diisi.',
+            'nim_nip.unique' => 'NIM atau NIP sudah digunakan akun lain.',
             'phone.max' => 'Nomor telepon maksimal 20 karakter.',
         ]);
 
@@ -95,10 +105,10 @@ class DashboardController extends Controller
         return back()->with('password_success', 'Password berhasil diperbarui.');
     }
 
-    public function guides()
+    public function guides(Request $r)
     {
         $contents = SiteContent::orderBy('sort_order')->get();
-
-        return view('borrower.guides', compact('contents'));
+        $view = $r->user()->role === 'pegawai' ? 'pegawai.guides' : 'borrower.guides';
+        return view($view, compact('contents'));
     }
 }

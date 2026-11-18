@@ -24,32 +24,38 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// ROUTE PEMINJAM
-Route::middleware(['auth', 'role:peminjam'])
-    ->prefix('peminjam')
+// ROUTE MAHASISWA
+Route::middleware(['auth', 'role:mahasiswa'])
+    ->prefix('mahasiswa')
     ->name('borrower.')
     ->group(function () {
-
         Route::get('/', [DashboardController::class, 'borrower'])->name('dashboard');
-
         Route::get('/pengajuan', [BookingController::class, 'index'])->name('bookings');
         Route::get('/ajukan', [BookingController::class, 'create'])->name('booking.create');
         Route::post('/ajukan', [BookingController::class, 'store'])->name('booking.store');
         Route::patch('/pengajuan/{booking}/batal', [BookingController::class, 'cancel'])->name('booking.cancel');
-
-        // DOWNLOAD TEMPLATE SURAT PENGAJUAN (SUDAH DIPERBAIKI)
-        Route::get('/template-surat', [BookingController::class, 'downloadTemplateSurat'])
-            ->name('booking.template');
-
+        Route::get('/template-surat', [BookingController::class, 'downloadTemplateSurat'])->name('booking.template');
         Route::get('/panduan', [DashboardController::class, 'guides'])->name('guides');
-
-        // PROFIL PEMINJAM
         Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
         Route::put('/profil', [DashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profil/password', [DashboardController::class, 'updatePassword'])->name('profile.password');
+    });
 
-        // UBAH PASSWORD PEMINJAM
-        Route::put('/profil/password', [DashboardController::class, 'updatePassword'])
-            ->name('profile.password');
+// ROUTE PEGAWAI: fitur sama, halaman dan URL terpisah dari mahasiswa
+Route::middleware(['auth', 'role:pegawai'])
+    ->prefix('pegawai')
+    ->name('pegawai.')
+    ->group(function () {
+        Route::get('/', [DashboardController::class, 'borrower'])->name('dashboard');
+        Route::get('/pengajuan', [BookingController::class, 'index'])->name('bookings');
+        Route::get('/ajukan', [BookingController::class, 'create'])->name('booking.create');
+        Route::post('/ajukan', [BookingController::class, 'store'])->name('booking.store');
+        Route::patch('/pengajuan/{booking}/batal', [BookingController::class, 'cancel'])->name('booking.cancel');
+        Route::get('/template-surat', [BookingController::class, 'downloadTemplateSurat'])->name('booking.template');
+        Route::get('/panduan', [DashboardController::class, 'guides'])->name('guides');
+        Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
+        Route::put('/profil', [DashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profil/password', [DashboardController::class, 'updatePassword'])->name('profile.password');
     });
 
 // ROUTE ADMIN

@@ -4,8 +4,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 class RoleMiddleware {
- public function handle(Request $request, Closure $next, string $role): Response {
-  abort_unless($request->user() && $request->user()->role === $role, 403, 'Anda tidak memiliki akses ke halaman ini.');
+ public function handle(Request $request, Closure $next, string ...$roles): Response {
+  abort_unless($request->user() && in_array($request->user()->role, $roles, true), 403, 'Anda tidak memiliki akses ke halaman ini.');
   return $next($request);
  }
 }

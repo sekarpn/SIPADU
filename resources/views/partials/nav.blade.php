@@ -1,5 +1,7 @@
 @php
     $isAdmin = auth()->user()->role === 'admin';
+    $isEmployee = auth()->user()->role === 'pegawai';
+    $userRoutePrefix = $isEmployee ? 'pegawai.' : 'borrower.';
     $pendingBookingsCount = $isAdmin
         ? ($pendingBookingsCount ?? \App\Models\Booking::where('status', 'Pending')->count())
         : 0;
@@ -323,7 +325,7 @@
     {{-- LOGO SIPADU --}}
     <a
         class="brand sidebar-brand"
-        href="{{ $isAdmin ? route('admin.dashboard') : route('borrower.dashboard') }}"
+        href="{{ $isAdmin ? route('admin.dashboard') : route($userRoutePrefix . 'dashboard') }}"
         title="SIPADU"
     >
         <span class="brand-icon">
@@ -341,7 +343,7 @@
 
     {{-- MENU TITLE --}}
     <div class="nav-caption">
-        {{ $isAdmin ? 'MENU ADMIN' : 'MENU PEMINJAM' }}
+        {{ $isAdmin ? 'MENU ADMIN' : ($isEmployee ? 'MENU PEGAWAI' : 'MENU MAHASISWA') }}
     </div>
 
     {{-- MENU ADMIN --}}
@@ -411,8 +413,8 @@
     @else
 
         <a
-            class="nav-link {{ request()->routeIs('borrower.dashboard') ? 'active' : '' }}"
-            href="{{ route('borrower.dashboard') }}"
+            class="nav-link {{ request()->routeIs($userRoutePrefix . 'dashboard') ? 'active' : '' }}"
+            href="{{ route($userRoutePrefix . 'dashboard') }}"
             title="Beranda"
         >
             <i data-lucide="house"></i>
@@ -420,8 +422,8 @@
         </a>
 
         <a
-            class="nav-link {{ request()->routeIs('borrower.booking.create') ? 'active' : '' }}"
-            href="{{ route('borrower.booking.create') }}"
+            class="nav-link {{ request()->routeIs($userRoutePrefix . 'booking.create') ? 'active' : '' }}"
+            href="{{ route($userRoutePrefix . 'booking.create') }}"
             title="Ajukan Peminjaman"
         >
             <i data-lucide="calendar-plus"></i>
@@ -429,8 +431,8 @@
         </a>
 
         <a
-            class="nav-link {{ request()->routeIs('borrower.bookings*') ? 'active' : '' }}"
-            href="{{ route('borrower.bookings') }}"
+            class="nav-link {{ request()->routeIs($userRoutePrefix . 'bookings*') ? 'active' : '' }}"
+            href="{{ route($userRoutePrefix . 'bookings') }}"
             title="Peminjaman Saya"
         >
             <i data-lucide="clipboard-check"></i>
@@ -438,8 +440,8 @@
         </a>
 
         <a
-            class="nav-link {{ request()->routeIs('borrower.guides') ? 'active' : '' }}"
-            href="{{ route('borrower.guides') }}"
+            class="nav-link {{ request()->routeIs($userRoutePrefix . 'guides') ? 'active' : '' }}"
+            href="{{ route($userRoutePrefix . 'guides') }}"
             title="SOP & FAQ"
         >
             <i data-lucide="book-open"></i>
@@ -447,8 +449,8 @@
         </a>
 
         <a
-            class="nav-link {{ request()->routeIs('borrower.profile*') ? 'active' : '' }}"
-            href="{{ route('borrower.profile') }}"
+            class="nav-link {{ request()->routeIs($userRoutePrefix . 'profile*') ? 'active' : '' }}"
+            href="{{ route($userRoutePrefix . 'profile') }}"
             title="Profil Akun"
         >
             <i data-lucide="user-round"></i>

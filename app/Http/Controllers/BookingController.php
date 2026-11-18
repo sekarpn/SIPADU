@@ -21,19 +21,48 @@ class BookingController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('borrower.bookings', compact('bookings'));
+        $view = $r->user()->role === 'pegawai' ? 'pegawai.bookings' : 'borrower.bookings';
+        return view($view, compact('bookings'));
+    }
+
+    private function profileIsComplete($user): bool
+    {
+        if ($user->role === 'mahasiswa') {
+            return filled($user->nim_nip) && filled($user->faculty) && filled($user->study_program);
+        }
+
+        if ($user->role === 'pegawai') {
+            return filled($user->nim_nip) && filled($user->employee_unit) && filled($user->position);
+        }
+
+        return true;
+    }
+
+    private function redirectToIncompleteProfile($user)
+    {
+        $route = $user->role === 'pegawai' ? 'pegawai.profile' : 'borrower.profile';
+
+        return redirect()
+            ->route($route)
+            ->with('profile_incomplete', 'Lengkapi data profil terlebih dahulu sebelum mengajukan peminjaman.');
     }
 
     public function create(Request $r)
     {
+        $profileComplete = $this->profileIsComplete($r->user());
         $auditoriums = Auditorium::where('is_active', true)->get();
         $selected = $r->query('auditorium');
 
-        return view('borrower.booking-form', compact('auditoriums', 'selected'));
+        $view = $r->user()->role === 'pegawai' ? 'pegawai.booking-form' : 'borrower.booking-form';
+        return view($view, compact('auditoriums', 'selected', 'profileComplete'));
     }
 
     public function store(Request $r)
     {
+        if (!$this->profileIsComplete($r->user())) {
+            return $this->redirectToIncompleteProfile($r->user());
+        }
+
         $data = $r->validate([
             'auditorium_id' => 'required|exists:auditoriums,id',
             'event_name' => 'required|string|max:255',
@@ -68,12 +97,19 @@ class BookingController extends Controller
         unset($data['surat']);
 
         $data['surat_path'] = $suratPath;
-        $data['user_id'] = $r->user()->id;
+        $user = $r->user();
+        $data['user_id'] = $user->id;
+        $data['applicant_role'] = $user->role;
+        $data['applicant_identifier'] = $user->nim_nip;
+        $data['applicant_faculty'] = $user->faculty;
+        $data['applicant_program'] = $user->study_program;
+        $data['applicant_unit'] = $user->employee_unit;
+        $data['applicant_position'] = $user->position;
         $data['status'] = 'Pending';
 
         Booking::create($data);
 
-        return redirect()->route('borrower.bookings')
+        return redirect()->route($user->role === 'pegawai' ? 'pegawai.bookings' : 'borrower.bookings')
             ->with('success', 'Pengajuan berhasil dikirim dan menunggu verifikasi admin.');
     }
 

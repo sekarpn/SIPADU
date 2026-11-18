@@ -20,6 +20,12 @@ class Booking extends Model
         'surat_path',
         'status',
         'admin_note',
+        'applicant_role',
+        'applicant_identifier',
+        'applicant_faculty',
+        'applicant_program',
+        'applicant_unit',
+        'applicant_position',
     ];
 
     protected function casts(): array

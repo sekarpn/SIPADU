@@ -78,21 +78,10 @@
         animation: authSlide 20s infinite;
     }
 
-    .auth-slideshow img:nth-child(1) {
-        animation-delay: 0s;
-    }
-
-    .auth-slideshow img:nth-child(2) {
-        animation-delay: 5s;
-    }
-
-    .auth-slideshow img:nth-child(3) {
-        animation-delay: 10s;
-    }
-
-    .auth-slideshow img:nth-child(4) {
-        animation-delay: 15s;
-    }
+    .auth-slideshow img:nth-child(1) { animation-delay: 0s; }
+    .auth-slideshow img:nth-child(2) { animation-delay: 5s; }
+    .auth-slideshow img:nth-child(3) { animation-delay: 10s; }
+    .auth-slideshow img:nth-child(4) { animation-delay: 15s; }
 
     .auth-art::after {
         content: "";
@@ -137,17 +126,9 @@
     }
 
     @keyframes authSlide {
-        0%, 5% {
-            opacity: 0;
-        }
-
-        10%, 27% {
-            opacity: 1;
-        }
-
-        32%, 100% {
-            opacity: 0;
-        }
+        0%, 5% { opacity: 0; }
+        10%, 27% { opacity: 1; }
+        32%, 100% { opacity: 0; }
     }
 
     /* PANEL FORM */
@@ -158,15 +139,16 @@
         min-width: 0;
         min-height: 0;
         overflow: hidden;
-        padding: 24px clamp(20px, 3.5vw, 52px);
+        padding: 30px clamp(28px, 5vw, 72px);
         box-sizing: border-box;
         background: #fff;
     }
 
     /* FORM REGISTRASI */
     .auth-form {
-        width: min(440px, 100%);
-        margin: 0;
+        width: min(410px, 100%);
+        max-height: none;
+        margin: 0 auto;
         flex-shrink: 0;
         color: #172b20;
     }
@@ -194,7 +176,7 @@
     }
 
     .auth-intro {
-        margin: 0 0 13px;
+        margin: 0 0 20px;
         color: #68736c;
         font-size: 12px;
         line-height: 1.5;
@@ -206,7 +188,7 @@
     }
 
     .auth-form form > label {
-        margin: 0 0 4px;
+        margin: 0 0 7px;
         color: #20372a;
         font-size: 11px;
         font-weight: 700;
@@ -215,9 +197,9 @@
     .auth-form input:not([type=checkbox]) {
         box-sizing: border-box;
         width: 100%;
-        height: 36px;
-        margin: 0 0 8px;
-        padding: 0 12px;
+        height: 42px;
+        margin: 0 0 15px;
+        padding: 0 14px;
         border: 1px solid #dce5e0;
         border-radius: 8px;
         outline: none;
@@ -233,7 +215,7 @@
 
     .password-field {
         position: relative;
-        margin: 0 0 8px;
+        margin: 0 0 15px;
     }
 
     .auth-form .password-field input {
@@ -243,7 +225,7 @@
 
     .password-toggle {
         position: absolute;
-        top: 1px;
+        top: 5px;
         right: 5px;
         display: grid;
         place-items: center;
@@ -327,23 +309,112 @@
         }
 
         .auth-form-panel {
-            padding: 20px 16px;
+            padding: 30px 22px;
+        }
+    }
+
+    /* LAPTOP DENGAN LAYAR PENDEK */
+    @media (max-height: 760px) and (min-width: 761px) {
+        .auth-page {
+            align-items: flex-start;
+            overflow-y: auto;
+        }
+
+        .auth-shell {
+            height: auto;
+            min-height: calc(100dvh - 2 * clamp(12px, 2.2vw, 30px));
+            max-height: none;
+        }
+
+        .auth-form-panel {
+            padding-top: 22px;
+            padding-bottom: 22px;
+        }
+
+        .auth-intro {
+            margin-bottom: 12px;
+        }
+
+        .auth-form form > label {
+            margin-bottom: 5px;
+        }
+
+        .auth-form input:not([type=checkbox]) {
+            height: 38px;
+            margin-bottom: 10px;
+        }
+
+        .password-field {
+            margin-bottom: 10px;
+        }
+    }
+
+    /* TABLET DAN MOBILE */
+    @media (max-width: 760px) {
+        html,
+        body {
+            height: auto;
+            min-height: 100%;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+        }
+
+        .auth-page {
+            position: relative;
+            inset: auto;
+            align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            height: auto;
+            min-height: 100dvh;
+            padding: 10px;
+            overflow: visible;
+        }
+
+        .auth-shell {
+            width: 100%;
+            height: auto;
+            min-height: calc(100dvh - 20px);
+            max-height: none;
+            overflow: hidden;
+        }
+
+        .auth-form-panel {
+            align-items: center;
+            overflow: visible;
+        }
+
+        .auth-form {
+            width: min(410px, 100%);
+            transform: none;
         }
     }
 
     /* MOBILE */
     @media (max-width: 560px) {
+        .auth-page {
+            min-height: 100dvh;
+            padding: 10px 10px 30px;
+        }
+
         .auth-shell {
+            display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: minmax(115px, 23%) minmax(0, 1fr);
+            grid-template-rows: auto auto;
+            min-height: 0;
+            height: auto;
+            border-radius: 14px;
+            overflow: hidden;
         }
 
         .auth-art {
+            min-height: 145px;
             padding: 14px 20px;
         }
 
         .auth-art h1 {
             font-size: 20px;
+            line-height: 1.2;
             margin-bottom: 5px;
         }
 
@@ -357,75 +428,87 @@
         }
 
         .auth-form-panel {
-            padding: 16px 20px;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            padding: 30px 20px 64px;
+            overflow: visible;
+        }
+
+        .auth-form {
+            width: 100%;
+            max-width: 410px;
+            margin: 0 auto;
         }
 
         .auth-form .back {
-            margin-bottom: 8px;
-        }
-
-        .auth-intro {
             margin-bottom: 10px;
         }
 
-        .auth-form input:not([type=checkbox]) {
-            height: 34px;
-            margin-bottom: 7px;
-        }
-
-        .password-field {
-            margin-bottom: 7px;
-        }
-
-        .password-toggle {
-            top: 0;
-            height: 32px;
-        }
-
-        .auth-switch {
-            margin-top: 9px;
-        }
-
-        .btn.wide {
-            min-height: 36px;
-        }
-    }
-
-    /* LAYAR PENDEK */
-    @media (max-height: 700px) and (min-width: 561px) {
-        .auth-form-panel {
-            padding-top: 12px;
-            padding-bottom: 12px;
-        }
-
-        .auth-form .back {
-            margin-bottom: 7px;
+        .auth-form h2 {
+            font-size: 25px;
         }
 
         .auth-intro {
-            margin-bottom: 9px;
+            margin-bottom: 20px;
+        }
+
+        .auth-form form > label {
+            margin-bottom: 7px;
         }
 
         .auth-form input:not([type=checkbox]) {
-            height: 32px;
-            margin-bottom: 6px;
+            height: 42px;
+            margin-bottom: 14px;
+            font-size: 13px;
         }
 
         .password-field {
-            margin-bottom: 6px;
+            margin-bottom: 14px;
         }
 
         .password-toggle {
-            top: 0;
-            height: 30px;
-        }
-
-        .auth-switch {
-            margin-top: 8px;
+            top: 5px;
+            height: 32px;
         }
 
         .btn.wide {
-            min-height: 34px;
+            min-height: 42px;
+            margin-top: 4px;
+        }
+
+        .auth-switch {
+            margin-top: 16px;
+            padding-bottom: 8px;
+        }
+    }
+
+    /* MOBILE DENGAN TINGGI LAYAR PENDEK */
+    @media (max-width: 560px) and (max-height: 700px) {
+        .auth-page {
+            padding-bottom: 24px;
+        }
+
+        .auth-form-panel {
+            padding-top: 24px;
+            padding-bottom: 56px;
+        }
+
+        .auth-intro {
+            margin-bottom: 14px;
+        }
+
+        .auth-form input:not([type=checkbox]) {
+            height: 38px;
+            margin-bottom: 10px;
+        }
+
+        .password-field {
+            margin-bottom: 10px;
+        }
+
+        .auth-switch {
+            margin-top: 12px;
         }
     }
 </style>
@@ -461,7 +544,7 @@
                 <h2>Daftar Akun</h2>
 
                 <p class="auth-intro">
-                    Lengkapi informasi berikut untuk membuat akun peminjam.
+                    Isi data dasar menggunakan email institusi yang sesuai dengan status Anda.
                 </p>
 
                 <form method="POST" action="{{ route('register.post') }}">
@@ -482,32 +565,33 @@
                         <p class="auth-error">{{ $message }}</p>
                     @enderror
 
-                    <label for="nim_nip">NIM/NIP</label>
-                    <input
-                        id="nim_nip"
-                        name="nim_nip"
-                        type="text"
-                        value="{{ old('nim_nip') }}"
-                        placeholder="Masukkan NIM/NIP"
-                        required
-                    >
-
-                    @error('nim_nip')
-                        <p class="auth-error">{{ $message }}</p>
-                    @enderror
-
-                    <label for="email">Email</label>
+                    <label for="email">Email Institusi</label>
                     <input
                         id="email"
                         name="email"
                         type="email"
                         value="{{ old('email') }}"
-                        placeholder="Masukkan email"
+                        placeholder="Masukkan email institusi"
                         autocomplete="email"
                         required
                     >
 
                     @error('email')
+                        <p class="auth-error">{{ $message }}</p>
+                    @enderror
+
+                    <label for="phone">Nomor Telepon</label>
+                    <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value="{{ old('phone') }}"
+                        placeholder="Masukkan nomor telepon aktif"
+                        autocomplete="tel"
+                        required
+                    >
+
+                    @error('phone')
                         <p class="auth-error">{{ $message }}</p>
                     @enderror
 
@@ -579,7 +663,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        if (window.lucide) window.lucide.createIcons();
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
 
         document.querySelectorAll('[data-toggle-password]').forEach(function (button) {
             button.addEventListener('click', function () {
@@ -602,7 +688,9 @@
                     ? '<i data-lucide="eye-off"></i>'
                     : '<i data-lucide="eye"></i>';
 
-                if (window.lucide) window.lucide.createIcons();
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
             });
         });
     });

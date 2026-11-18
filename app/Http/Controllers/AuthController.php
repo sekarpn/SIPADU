@@ -23,26 +23,43 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'nim_nip' => 'required|string|max:40|unique:users,nim_nip',
-            'email' => 'required|email|max:255|unique:users,email',
+            'email' => [
+                'required', 'email', 'max:255', 'unique:users,email',
+                function ($attribute, $value, $fail) {
+                    $email = strtolower(trim($value));
+                    if (!str_ends_with($email, '@upnvj.ac.id') &&
+                        !str_ends_with($email, '@mahasiswa.upnvj.ac.id')) {
+                        $fail('Gunakan email @upnvj.ac.id untuk pegawai atau @mahasiswa.upnvj.ac.id untuk mahasiswa.');
+                    }
+                },
+            ],
+            'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email institusi wajib diisi.',
+            'phone.required' => 'Nomor telepon wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
+
+        $email = strtolower(trim($validated['email']));
+        $role = str_ends_with($email, '@mahasiswa.upnvj.ac.id')
+            ? 'mahasiswa'
+            : 'pegawai';
 
         $user = User::create([
             'name' => $validated['name'],
-            'nim_nip' => $validated['nim_nip'],
-            'email' => $validated['email'],
+            'email' => $email,
+            'phone' => $validated['phone'],
             'password' => Hash::make($validated['password']),
-            'role' => 'peminjam',
+            'role' => $role,
         ]);
 
         Auth::login($user);
-
         $request->session()->regenerate();
 
-        return redirect()
-            ->route('borrower.dashboard')
-            ->with('success', 'Pendaftaran berhasil. Selamat datang di SIPADU.');
+        return redirect()->route($role === 'pegawai' ? 'pegawai.dashboard' : 'borrower.dashboard');
     }
 
     public function login(Request $request)
@@ -70,8 +87,12 @@ class AuthController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->role === 'peminjam') {
+        if ($user->role === 'mahasiswa') {
             return redirect()->route('borrower.dashboard');
+        }
+
+        if ($user->role === 'pegawai') {
+            return redirect()->route('pegawai.dashboard');
         }
 
         Auth::logout();

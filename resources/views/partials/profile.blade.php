@@ -6,6 +6,9 @@
 @php
     $user = auth()->user();
     $isAdmin = $user->role === 'admin';
+    $isEmployee = $user->role === 'pegawai';
+    $profileUpdateRoute = $isAdmin ? route('admin.profile.update') : ($isEmployee ? route('pegawai.profile.update') : route('borrower.profile.update'));
+    $profilePasswordRoute = $isAdmin ? route('admin.profile.password') : ($isEmployee ? route('pegawai.profile.password') : route('borrower.profile.password'));
 @endphp
 
 <style>
@@ -290,6 +293,12 @@
         <p>Kelola informasi pribadi dan keamanan akun SIPADU.</p>
     </div>
 
+    @if(session('profile_incomplete'))
+        <div class="profile-alert error">
+            {{ session('profile_incomplete') }} Isi data identitas yang masih kosong, lalu simpan perubahan.
+        </div>
+    @endif
+
     {{-- BANNER PROFIL --}}
     <div class="profile-banner">
         <div class="profile-avatar">
@@ -301,7 +310,7 @@
             <p>{{ $user->email }}</p>
 
             <span class="profile-role">
-                {{ $isAdmin ? 'ADMINISTRATOR' : 'PEMINJAM' }}
+                {{ $isAdmin ? 'ADMINISTRATOR' : ($isEmployee ? 'PEGAWAI' : 'MAHASISWA') }}
             </span>
         </div>
     </div>
@@ -338,13 +347,13 @@
             <div class="profile-card-header">
                 <div class="profile-icon">👤</div>
                 <div>
-                    <h3>Informasi Pribadi</h3>
-                    <p>Perbarui informasi akun kamu.</p>
+                    <h3>Informasi {{ $isAdmin ? 'Administrator' : ($isEmployee ? 'Pegawai' : 'Mahasiswa') }}</h3>
+                    <p>Perbarui informasi profil sesuai identitas akun.</p>
                 </div>
             </div>
 
             <form method="POST"
-                  action="{{ $isAdmin ? route('admin.profile.update') : route('borrower.profile.update') }}">
+                  action="{{ $profileUpdateRoute }}">
 
                 @csrf
                 @method('PUT')
@@ -375,16 +384,48 @@
                     @enderror
                 </div>
 
-                <div class="profile-field">
-                    <label>NIM / Nomor Pegawai</label>
-                    <input type="text"
-                           value="{{ $user->nim_np ?: 'Admin' }}"
-                           disabled>
-
-                    <div class="profile-hint">
-                        NIM atau nomor pegawai tidak dapat diubah melalui halaman ini.
+                @if($isAdmin)
+                    <div class="profile-field">
+                        <label>ID Admin</label>
+                        <input type="text" value="Admin" disabled>
                     </div>
-                </div>
+                @else
+                    <div class="profile-field">
+                        <label>{{ $isEmployee ? 'NIP' : 'NIM' }}</label>
+                        <input type="text"
+                               name="nim_nip"
+                               value="{{ old('nim_nip', $user->nim_nip ?? $user->nim_np) }}"
+                               placeholder="Masukkan {{ $isEmployee ? 'NIP' : 'NIM' }}"
+                               required>
+                        @error('nim_nip')
+                            <div class="profile-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    @if($isEmployee)
+                        <div class="profile-field">
+                            <label>Unit / Biro Kerja</label>
+                            <input name="employee_unit" value="{{ old('employee_unit', $user->employee_unit) }}" placeholder="Masukkan unit atau biro" required>
+                            @error('employee_unit') <div class="profile-error">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="profile-field">
+                            <label>Jabatan</label>
+                            <input name="position" value="{{ old('position', $user->position) }}" placeholder="Masukkan jabatan" required>
+                            @error('position') <div class="profile-error">{{ $message }}</div> @enderror
+                        </div>
+                    @else
+                        <div class="profile-field">
+                            <label>Fakultas</label>
+                            <input name="faculty" value="{{ old('faculty', $user->faculty) }}" placeholder="Masukkan fakultas" required>
+                            @error('faculty') <div class="profile-error">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="profile-field">
+                            <label>Program Studi</label>
+                            <input name="study_program" value="{{ old('study_program', $user->study_program) }}" placeholder="Masukkan program studi" required>
+                            @error('study_program') <div class="profile-error">{{ $message }}</div> @enderror
+                        </div>
+                    @endif
+                @endif
 
                 <div class="profile-field">
                     <label>Nomor Telepon</label>
@@ -417,7 +458,7 @@
             </div>
 
             <form method="POST"
-                  action="{{ $isAdmin ? route('admin.profile.password') : route('borrower.profile.password') }}">
+                  action="{{ $profilePasswordRoute }}">
 
                 @csrf
                 @method('PUT')

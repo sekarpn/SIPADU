@@ -423,7 +423,7 @@ html.page-ready .app-layout > main > .main-content {
                         $topbarUser = auth()->user();
                         $profileRoute = $topbarUser->role === 'admin'
                             ? route('admin.profile')
-                            : route('borrower.profile');
+                            : ($topbarUser->role === 'pegawai' ? route('pegawai.profile') : route('borrower.profile'));
                     @endphp
 
                     <span class="topbar-date">
@@ -438,7 +438,7 @@ html.page-ready .app-layout > main > .main-content {
                         <span class="topbar-user-info">
                             <strong>{{ $topbarUser->name }}</strong>
                             <small>
-                                {{ $topbarUser->role === 'admin' ? 'Administrator' : 'Peminjam' }}
+                                {{ $topbarUser->role === 'admin' ? 'Administrator' : ($topbarUser->role === 'pegawai' ? 'Pegawai' : 'Mahasiswa') }}
                             </small>
                         </span>
 
