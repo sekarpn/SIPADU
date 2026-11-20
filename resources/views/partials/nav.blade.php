@@ -166,38 +166,78 @@
         flex-shrink: 0 !important;
     }
 
-    /* LOGOUT */
-    .sidebar .logout {
+    /* LOGOUT — POLOS SEPERTI MENU SIDEBAR LAIN, MERAH SAAT HOVER */
+    html body .app-layout aside#mainSidebar.sidebar form.logout,
+    aside#mainSidebar.sidebar form.logout {
         margin-top: auto !important;
+        margin-bottom: 0 !important;
         padding-top: 14px !important;
         border-top: 1px solid rgba(22,54,38,.08) !important;
+        background: transparent !important;
     }
 
-    .sidebar .logout button {
+    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"],
+    aside#mainSidebar.sidebar form.logout button[type="submit"] {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-start !important;
         gap: 12px !important;
         width: 100% !important;
         min-height: 42px !important;
+        margin: 3px 0 !important;
         padding: 10px 12px !important;
-        border: none !important;
+        border: 1px solid transparent !important;
         border-radius: 12px !important;
         background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
         color: #3c5446 !important;
         font: 700 12.5px 'Plus Jakarta Sans', 'Instrument Sans', sans-serif !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
         cursor: pointer;
         white-space: nowrap;
-        transition: background .2s ease, color .2s ease;
+        box-shadow: none !important;
+        transform: none !important;
+        transition: background .2s ease, background-color .2s ease, color .2s ease, border-color .2s ease;
     }
 
-    .sidebar .logout button span {
+    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] svg,
+    aside#mainSidebar.sidebar form.logout button[type="submit"] svg {
+        width: 18px !important;
+        height: 18px !important;
+        min-width: 18px !important;
+        color: #3c5446 !important;
+        stroke: currentColor !important;
+        fill: none !important;
+        transition: color .2s ease;
+    }
+
+    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] span,
+    aside#mainSidebar.sidebar form.logout button[type="submit"] span {
         display: inline !important;
+        color: inherit !important;
     }
 
-    .sidebar .logout button:hover {
-        background: rgba(254,226,226,.85) !important;
-        color: #c53030 !important;
+    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:hover,
+    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible,
+    aside#mainSidebar.sidebar form.logout button[type="submit"]:hover,
+    aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible {
+        background: rgba(254, 226, 226, .92) !important;
+        background-color: rgba(254, 226, 226, .92) !important;
+        background-image: none !important;
+        border-color: rgba(220, 38, 38, .26) !important;
+        color: #dc2626 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:hover svg,
+    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible svg,
+    aside#mainSidebar.sidebar form.logout button[type="submit"]:hover svg,
+    aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible svg {
+        color: #dc2626 !important;
+        stroke: currentColor !important;
     }
 
     /* COLLAPSED SIDEBAR */
@@ -216,11 +256,11 @@
     .app-layout.sidebar-closed .sidebar .brand-text,
     .app-layout.sidebar-closed .sidebar .nav-caption,
     .app-layout.sidebar-closed .sidebar .nav-link span,
-    .app-layout.sidebar-closed .sidebar .logout button span,
     html.sipadu-sidebar-closed .app-layout .sidebar .brand-text,
     html.sipadu-sidebar-closed .app-layout .sidebar .nav-caption,
     html.sipadu-sidebar-closed .app-layout .sidebar .nav-link span,
-    html.sipadu-sidebar-closed .app-layout .sidebar .logout button span {
+    html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] span,
+    html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] span {
         display: none !important;
     }
 
@@ -244,8 +284,8 @@
         font-size: 9px !important;
     }
 
-    .app-layout.sidebar-closed .sidebar .logout button,
-    html.sipadu-sidebar-closed .app-layout .sidebar .logout button {
+    html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"],
+    html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] {
         justify-content: center !important;
         gap: 0 !important;
         padding: 10px 0 !important;
@@ -286,11 +326,11 @@
         .app-layout.sidebar-closed .sidebar .brand-text,
         .app-layout.sidebar-closed .sidebar .nav-caption,
         .app-layout.sidebar-closed .sidebar .nav-link span,
-        .app-layout.sidebar-closed .sidebar .logout button span,
         html.sipadu-sidebar-closed .app-layout .sidebar .brand-text,
         html.sipadu-sidebar-closed .app-layout .sidebar .nav-caption,
         html.sipadu-sidebar-closed .app-layout .sidebar .nav-link span,
-        html.sipadu-sidebar-closed .app-layout .sidebar .logout button span {
+        html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] span,
+        html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] span {
             display: inline !important;
         }
 
@@ -311,8 +351,8 @@
             font-size: 10.5px !important;
         }
 
-        .app-layout.sidebar-closed .sidebar .logout button,
-        html.sipadu-sidebar-closed .app-layout .sidebar .logout button {
+        html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"],
+        html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] {
             justify-content: flex-start !important;
             gap: 12px !important;
             padding: 10px 12px !important;
