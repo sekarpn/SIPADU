@@ -64,7 +64,9 @@ class AdminController extends Controller
             array_map('trim', explode(',', $data['facilities'] ?? ''))
         );
 
-        $data['is_active'] = $r->boolean('is_active');
+        $data['is_active'] = $r->has('is_active')
+            ? $r->boolean('is_active')
+            : ($auditorium?->is_active ?? true);
 
         // Simpan foto auditorium jika admin mengunggah foto baru
         if ($r->hasFile('image')) {
@@ -110,8 +112,17 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::latest()->paginate(20);
-        return view('admin.users', compact('users'));
+        // Seluruh data dimuat satu kali agar pencarian, filter role, dan slider
+        // pagination bekerja pada dataset yang sama tanpa pagination ganda.
+        $users = User::latest()->get();
+        $roleCounts = [
+            'all' => $users->count(),
+            'mahasiswa' => $users->where('role', 'mahasiswa')->count(),
+            'pegawai' => $users->where('role', 'pegawai')->count(),
+            'admin' => $users->where('role', 'admin')->count(),
+        ];
+
+        return view('admin.users', compact('users', 'roleCounts'));
     }
 
     public function storeUser(Request $request)

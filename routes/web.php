@@ -38,6 +38,7 @@ Route::middleware(['auth', 'role:mahasiswa'])
         Route::get('/panduan', [DashboardController::class, 'guides'])->name('guides');
         Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
         Route::put('/profil', [DashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profil/notifikasi', [DashboardController::class, 'updateNotificationPreferences'])->name('profile.preferences');
         Route::put('/profil/password', [DashboardController::class, 'updatePassword'])->name('profile.password');
     });
 
@@ -55,6 +56,7 @@ Route::middleware(['auth', 'role:pegawai'])
         Route::get('/panduan', [DashboardController::class, 'guides'])->name('guides');
         Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
         Route::put('/profil', [DashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profil/notifikasi', [DashboardController::class, 'updateNotificationPreferences'])->name('profile.preferences');
         Route::put('/profil/password', [DashboardController::class, 'updatePassword'])->name('profile.password');
     });
 
@@ -100,6 +102,7 @@ Route::middleware(['auth', 'role:admin'])
         // PROFIL ADMIN
         Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
         Route::put('/profil', [DashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profil/notifikasi', [DashboardController::class, 'updateNotificationPreferences'])->name('profile.preferences');
 
         // UBAH PASSWORD ADMIN
         Route::put('/profil/password', [DashboardController::class, 'updatePassword'])

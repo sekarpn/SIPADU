@@ -312,6 +312,25 @@
             width: 290px;
         }
     }
+
+    .auditorium-status-control { display: inline-flex; align-items: center; gap: 9px; color: #294735; font-size: 12px; font-weight: 600; }
+    .auditorium-switch { position: relative; display: inline-block; width: 46px; height: 26px; cursor: pointer; }
+    .auditorium-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .auditorium-switch-track { position: absolute; inset: 0; border-radius: 99px; background: #cbd5cf; transition: background .2s ease; }
+    .auditorium-switch-track::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.18); transition: transform .2s ease; }
+    .auditorium-switch input:checked + .auditorium-switch-track { background: #237c4d; }
+    .auditorium-switch input:checked + .auditorium-switch-track::before { transform: translateX(20px); }
+    .auditorium-switch input:focus-visible + .auditorium-switch-track { outline: 3px solid rgba(35,124,77,.2); outline-offset: 2px; }
+    .aud-status-modal { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(12, 28, 19, .48); backdrop-filter: blur(4px); }
+    .aud-status-modal.is-open { display: flex; }
+    .aud-status-dialog { width: min(420px, 100%); padding: 24px; border-radius: 17px; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.2); color: #163626; }
+    .aud-status-dialog h3 { margin: 0 0 8px; font-size: 17px; }
+    .aud-status-dialog p { margin: 0 0 20px; color: #64786c; font-size: 13px; line-height: 1.55; }
+    .aud-status-modal-actions { display: flex; justify-content: flex-end; gap: 9px; }
+    .aud-status-cancel { background: #edf1ee; color: #294735; border: 1px solid #dce5de; }
+    .aud-status-confirm { background: #237c4d; color: #fff; border: 1px solid #237c4d; }
+    .aud-status-confirm.is-deactivate { background: #dc2626; border-color: #dc2626; }
+
 </style>
 
 <div class="auditorium-page">
@@ -410,13 +429,17 @@
                         </div>
 
                         <div class="auditorium-actions">
-                            <form method="POST" action="{{ route('admin.auditoriums.toggle', $a->id) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="aud-btn aud-btn-status">
-                                    {{ $a->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                </button>
-                            </form>
+                            <div class="auditorium-status-control">
+                                <span>{{ $a->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                <label class="auditorium-switch" aria-label="Ubah status {{ $a->name }}">
+                                    <input type="checkbox" data-auditorium-toggle
+                                           data-toggle-url="{{ route('admin.auditoriums.toggle', $a->id) }}"
+                                           data-auditorium-name="{{ $a->name }}"
+                                           data-current-status="{{ $a->is_active ? '1' : '0' }}"
+                                           {{ $a->is_active ? 'checked' : '' }}>
+                                    <span class="auditorium-switch-track"></span>
+                                </label>
+                            </div>
 
                             <form method="POST"
                                   action="{{ route('admin.auditoriums.delete', $a->id) }}"
@@ -474,14 +497,6 @@
                                            accept=".jpg,.jpeg,.png,.webp,image/*">
                                     <small>Kosongkan jika tidak ingin mengganti foto. Maksimal 2 MB.</small>
 
-                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                                        <input type="checkbox"
-                                               name="is_active"
-                                               value="1"
-                                               {{ $a->is_active ? 'checked' : '' }}>
-                                        Aktif
-                                    </label>
-
                                     <button type="submit" class="aud-btn aud-btn-edit" style="margin-top: 14px; width: 100%;">
                                         Simpan Perubahan
                                     </button>
@@ -503,5 +518,69 @@
         {{ $auditoriums->links() }}
     </div>
 </div>
+
+<div class="aud-status-modal" id="auditoriumStatusModal" aria-hidden="true">
+    <div class="aud-status-dialog" role="dialog" aria-modal="true" aria-labelledby="audStatusTitle">
+        <h3 id="audStatusTitle">Konfirmasi Perubahan Status</h3>
+        <p id="audStatusMessage">Apakah kamu yakin ingin mengubah status auditorium ini?</p>
+        <div class="aud-status-modal-actions">
+            <button type="button" class="aud-btn aud-status-cancel" id="audStatusCancel">Tidak</button>
+            <button type="button" class="aud-btn aud-status-confirm" id="audStatusConfirm">Ya, Lanjutkan</button>
+        </div>
+    </div>
+</div>
+<form method="POST" id="auditoriumStatusForm" style="display:none;">
+    @csrf
+    @method('PATCH')
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('auditoriumStatusModal');
+    const message = document.getElementById('audStatusMessage');
+    const confirmButton = document.getElementById('audStatusConfirm');
+    const cancelButton = document.getElementById('audStatusCancel');
+    const form = document.getElementById('auditoriumStatusForm');
+    let pendingSwitch = null;
+
+    document.querySelectorAll('[data-auditorium-toggle]').forEach(function (toggle) {
+        toggle.addEventListener('change', function () {
+            pendingSwitch = toggle;
+            const willActivate = toggle.checked;
+            const auditoriumName = toggle.dataset.auditoriumName || 'auditorium ini';
+            message.textContent = willActivate
+                ? 'Yakin ingin mengaktifkan ' + auditoriumName + '? Auditorium akan tersedia untuk dipinjam.'
+                : 'Yakin ingin menonaktifkan ' + auditoriumName + '? Auditorium tidak akan tersedia untuk peminjaman baru.';
+            confirmButton.textContent = willActivate ? 'Ya, Aktifkan' : 'Ya, Nonaktifkan';
+            confirmButton.classList.toggle('is-deactivate', !willActivate);
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            confirmButton.focus();
+        });
+    });
+
+    function closeModal(restoreSwitch) {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        if (restoreSwitch && pendingSwitch) {
+            pendingSwitch.checked = pendingSwitch.dataset.currentStatus === '1';
+        }
+        pendingSwitch = null;
+    }
+
+    cancelButton.addEventListener('click', function () { closeModal(true); });
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) closeModal(true);
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) closeModal(true);
+    });
+    confirmButton.addEventListener('click', function () {
+        if (!pendingSwitch) return;
+        form.action = pendingSwitch.dataset.toggleUrl;
+        form.submit();
+    });
+});
+</script>
 
 @endsection

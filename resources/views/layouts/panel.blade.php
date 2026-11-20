@@ -305,6 +305,360 @@ html.page-ready .app-layout > main > .main-content {
     margin-top: 10px !important;
 }
 
+/* UNDERLINE TABS SERAGAM DI SELURUH HALAMAN */
+.app-layout > main > .main-content .sipadu-underline-tabs,
+.app-layout > main > .main-content .up-tabs,
+.app-layout > main > .main-content .bp-tabs,
+.app-layout > main > .main-content .ap-tabs,
+.app-layout > main > .main-content .cp-tabs,
+.app-layout > main > .main-content .hp-tabs,
+.app-layout > main > .main-content .mp-tabs,
+.app-layout > main > .main-content .rp-tabs {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    padding: 0 18px !important;
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(22, 54, 38, .12) !important;
+    border-radius: 0 !important;
+    background: rgba(255, 255, 255, .18) !important;
+    box-shadow: none !important;
+}
+
+.app-layout > main > .main-content .sipadu-underline-tab,
+.app-layout > main > .main-content .up-tab,
+.app-layout > main > .main-content .bp-tab,
+.app-layout > main > .main-content .ap-tab,
+.app-layout > main > .main-content .cp-tab,
+.app-layout > main > .main-content .hp-tab,
+.app-layout > main > .main-content .mp-tab,
+.app-layout > main > .main-content .rp-tab {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    padding: 14px 18px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 2.5px solid transparent !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #4c6456 !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transform: none !important;
+    transition: color .2s ease, border-color .2s ease !important;
+}
+
+.app-layout > main > .main-content .sipadu-underline-tab:hover:not(.active):not(.is-active):not([aria-selected="true"]):not([aria-current="page"]),
+.app-layout > main > .main-content .up-tab:hover:not(.active),
+.app-layout > main > .main-content .bp-tab:hover:not(.active),
+.app-layout > main > .main-content .ap-tab:hover:not(.active),
+.app-layout > main > .main-content .cp-tab:hover:not(.active),
+.app-layout > main > .main-content .hp-tab:hover:not(.active),
+.app-layout > main > .main-content .mp-tab:hover:not(.active),
+.app-layout > main > .main-content .rp-tab:hover:not(.active) {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #163626 !important;
+    transform: none !important;
+}
+
+.app-layout > main > .main-content .sipadu-underline-tab.active,
+.app-layout > main > .main-content .sipadu-underline-tab.is-active,
+.app-layout > main > .main-content .sipadu-underline-tab[aria-selected="true"],
+.app-layout > main > .main-content .sipadu-underline-tab[aria-current="page"],
+.app-layout > main > .main-content .up-tab.active,
+.app-layout > main > .main-content .bp-tab.active,
+.app-layout > main > .main-content .ap-tab.active,
+.app-layout > main > .main-content .cp-tab.active,
+.app-layout > main > .main-content .hp-tab.active,
+.app-layout > main > .main-content .mp-tab.active,
+.app-layout > main > .main-content .rp-tab.active {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #163626 !important;
+    font-weight: 700 !important;
+    border-bottom: 2.5px solid #237c4d !important;
+}
+
+.app-layout > main > .main-content .sipadu-underline-tab span,
+.app-layout > main > .main-content .up-tab span,
+.app-layout > main > .main-content .bp-tab span,
+.app-layout > main > .main-content .ap-tab span,
+.app-layout > main > .main-content .cp-tab span,
+.app-layout > main > .main-content .hp-tab span,
+.app-layout > main > .main-content .mp-tab span,
+.app-layout > main > .main-content .rp-tab span {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #64786c !important;
+}
+
+.app-layout > main > .main-content .sipadu-underline-tab span::before,
+.app-layout > main > .main-content .up-tab span::before,
+.app-layout > main > .main-content .bp-tab span::before,
+.app-layout > main > .main-content .ap-tab span::before,
+.app-layout > main > .main-content .cp-tab span::before,
+.app-layout > main > .main-content .hp-tab span::before,
+.app-layout > main > .main-content .mp-tab span::before,
+.app-layout > main > .main-content .rp-tab span::before {
+    content: "(";
+}
+
+.app-layout > main > .main-content .sipadu-underline-tab span::after,
+.app-layout > main > .main-content .up-tab span::after,
+.app-layout > main > .main-content .bp-tab span::after,
+.app-layout > main > .main-content .ap-tab span::after,
+.app-layout > main > .main-content .cp-tab span::after,
+.app-layout > main > .main-content .hp-tab span::after,
+.app-layout > main > .main-content .mp-tab span::after,
+.app-layout > main > .main-content .rp-tab span::after {
+    content: ")";
+}
+
+.app-layout > main > .main-content .sipadu-underline-tab.active span,
+.app-layout > main > .main-content .sipadu-underline-tab.is-active span,
+.app-layout > main > .main-content .sipadu-underline-tab[aria-selected="true"] span,
+.app-layout > main > .main-content .sipadu-underline-tab[aria-current="page"] span,
+.app-layout > main > .main-content .up-tab.active span,
+.app-layout > main > .main-content .bp-tab.active span,
+.app-layout > main > .main-content .ap-tab.active span,
+.app-layout > main > .main-content .cp-tab.active span,
+.app-layout > main > .main-content .hp-tab.active span,
+.app-layout > main > .main-content .mp-tab.active span,
+.app-layout > main > .main-content .rp-tab.active span {
+    color: #237c4d !important;
+    font-weight: 700 !important;
+}
+
+/* =====================================================================
+   KARTU & TABEL GLASSMORPHISM SERAGAM SEPERTI HALAMAN DATA PENGGUNA
+   ===================================================================== */
+.app-layout > main > .main-content .sipadu-glass-card {
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, .68) 0%,
+        rgba(255, 255, 255, .42) 100%
+    ) !important;
+    background-color: transparent !important;
+    backdrop-filter: blur(18px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+    border: 1px solid rgba(255, 255, 255, .55) !important;
+    box-shadow: 0 8px 28px rgba(22, 54, 38, .06) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+}
+
+/* TOP BAR TABEL: TAMPILKAN [10 v] DATA */
+.sipadu-table-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(22, 54, 38, .09);
+    background: rgba(255, 255, 255, .25);
+    font-size: 12.5px;
+    color: #4c6456;
+    box-sizing: border-box;
+}
+
+.sipadu-pager-size {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 500;
+    color: #294735;
+}
+
+.sipadu-pager-select {
+    appearance: auto;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid rgba(22, 54, 38, .15);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .86);
+    color: #163626;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.sipadu-pager-select:focus {
+    border-color: #237c4d;
+    box-shadow: 0 0 0 3px rgba(35, 124, 77, .14);
+}
+
+/* SCROLL HORIZONTAL TABEL AGAR BISA DIGESER */
+.sipadu-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* GAYA TABEL GLASS SERAGAM DI SELURUH HALAMAN (IDENTIK DENGAN DATA PENGGUNA) */
+.app-layout > main > .main-content table:not([class*="fc-"]) {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    min-width: 780px;
+    font-size: 13px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+.app-layout > main > .main-content .dash-tables-grid table:not([class*="fc-"]) {
+    min-width: 560px;
+}
+
+.app-layout > main > .main-content table:not([class*="fc-"]) thead,
+.app-layout > main > .main-content table:not([class*="fc-"]) thead tr {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+.app-layout > main > .main-content table:not([class*="fc-"]) th {
+    padding: 13px 18px !important;
+    text-align: left !important;
+    background: rgba(255, 255, 255, .36) !important;
+    background-color: rgba(255, 255, 255, .36) !important;
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(22, 54, 38, .09) !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: .07em !important;
+    text-transform: uppercase !important;
+    color: #4c6456 !important;
+    white-space: nowrap !important;
+}
+
+.app-layout > main > .main-content table:not([class*="fc-"]) tbody,
+.app-layout > main > .main-content table:not([class*="fc-"]) tbody tr {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+.app-layout > main > .main-content table:not([class*="fc-"]) td {
+    padding: 15px 18px !important;
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(22, 54, 38, .06) !important;
+    vertical-align: middle !important;
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+    color: #163626 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    transition: background .18s ease !important;
+}
+
+.app-layout > main > .main-content table:not([class*="fc-"]) tbody tr:hover td {
+    background: rgba(255, 255, 255, .42) !important;
+    background-color: rgba(255, 255, 255, .42) !important;
+}
+
+.app-layout > main > .main-content table:not([class*="fc-"]) tbody tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+/* BOTTOM BAR TABEL: KALIMAT "MENAMPILKAN ..." (TIDAK BOLD) & NAVIGASI HALAMAN */
+.sipadu-pager-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 13px 18px;
+    border-top: 1px solid rgba(22, 54, 38, .09);
+    background: rgba(255, 255, 255, .25);
+    font-size: 12.5px;
+    color: #4c6456;
+    box-sizing: border-box;
+}
+
+.sipadu-pager-info {
+    font-weight: 400 !important;
+    font-size: 12.5px;
+    color: #4c6456;
+}
+
+.sipadu-pager-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* SLIDER NAVIGASI HALAMAN TABEL, TANPA TOMBOL NOMOR */
+.sipadu-pager-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: min(340px, 100%);
+    flex: 0 1 340px;
+}
+
+.sipadu-page-range {
+    width: 100%;
+    min-width: 120px;
+    height: 6px;
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 999px;
+    background: linear-gradient(to right, #237c4d 0%, #dce8df 0%);
+    outline: none;
+    cursor: pointer;
+}
+
+.sipadu-page-range::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    background: #237c4d;
+    box-shadow: 0 1px 5px rgba(22, 54, 38, .2);
+}
+
+.sipadu-page-range::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    background: #237c4d;
+    box-shadow: 0 1px 5px rgba(22, 54, 38, .2);
+}
+
+.sipadu-page-indicator {
+    flex: 0 0 auto;
+    min-width: 76px;
+    text-align: right;
+    color: #4c6456;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
 /* MOBILE */
 @media (max-width: 900px) {
     html,
@@ -384,6 +738,46 @@ html.page-ready .app-layout > main > .main-content {
 
     .topbar-right {
         gap: 10px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .app-layout > main > .main-content .sipadu-underline-tabs,
+    .app-layout > main > .main-content .up-tabs,
+    .app-layout > main > .main-content .bp-tabs,
+    .app-layout > main > .main-content .ap-tabs,
+    .app-layout > main > .main-content .cp-tabs,
+    .app-layout > main > .main-content .hp-tabs,
+    .app-layout > main > .main-content .mp-tabs,
+    .app-layout > main > .main-content .rp-tabs {
+        padding: 0 12px !important;
+    }
+
+    .app-layout > main > .main-content .sipadu-underline-tab,
+    .app-layout > main > .main-content .up-tab,
+    .app-layout > main > .main-content .bp-tab,
+    .app-layout > main > .main-content .ap-tab,
+    .app-layout > main > .main-content .cp-tab,
+    .app-layout > main > .main-content .hp-tab,
+    .app-layout > main > .main-content .mp-tab,
+    .app-layout > main > .main-content .rp-tab {
+        padding: 12px 14px !important;
+        font-size: 12.5px !important;
+    }
+
+    .sipadu-table-top {
+        padding: 11px 14px;
+    }
+
+    .sipadu-pager-bar {
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sipadu-pager-nav {
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 
@@ -577,6 +971,169 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     window.addEventListener('resize', sync);
+
+    /* SERAGAMKAN SEMUA TAB FILTER MENJADI UNDERLINE TAB DI SELURUH HALAMAN */
+    document.querySelectorAll('.main-content [class*="-tabs"], .main-content .tabs, .main-content [role="tablist"]').forEach(function (tabBar) {
+        if (tabBar.closest('table') || tabBar.closest('.bp-drawer') || tabBar.closest('form')) return;
+        const items = Array.from(tabBar.children).filter(function (el) {
+            return el.matches('a, button, [role="tab"]');
+        });
+        if (items.length < 2) return;
+
+        tabBar.classList.add('sipadu-underline-tabs');
+        items.forEach(function (item) {
+            item.classList.add('sipadu-underline-tab');
+        });
+    });
+
+    /* PAGINASI, GLASS CARD & SCROLL HORIZONTAL OTOMATIS UNTUK SEMUA TABEL */
+    function initTablePagination(table) {
+        if (!table || table.dataset.sipaduPaginated === '1') return;
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        table.dataset.sipaduPaginated = '1';
+
+        /* Bungkus tabel dengan container scroll horizontal jika belum ada */
+        let scrollWrap = table.parentElement;
+        if (!scrollWrap || getComputedStyle(scrollWrap).overflowX === 'visible') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'sipadu-table-scroll';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+            scrollWrap = wrapper;
+        } else {
+            scrollWrap.style.webkitOverflowScrolling = 'touch';
+        }
+
+        /* Samakan pembungkus kartu menjadi glassmorphism seperti halaman Data Pengguna */
+        let cardContainer = scrollWrap.parentElement;
+        if (cardContainer && !cardContainer.classList.contains('main-content')) {
+            cardContainer.classList.add('sipadu-glass-card');
+        } else {
+            const glassBox = document.createElement('div');
+            glassBox.className = 'sipadu-glass-card';
+            scrollWrap.parentNode.insertBefore(glassBox, scrollWrap);
+            glassBox.appendChild(scrollWrap);
+            cardContainer = glassBox;
+        }
+
+        /* 1. TOP BAR: Dropdown "Tampilkan [10 v] data" di atas tabel */
+        const topBar = document.createElement('div');
+        topBar.className = 'sipadu-table-top';
+        topBar.innerHTML =
+            '<label class="sipadu-pager-size">' +
+                '<span>Tampilkan</span>' +
+                '<select class="sipadu-pager-select" aria-label="Jumlah data per halaman">' +
+                    '<option value="10" selected>10</option>' +
+                    '<option value="25">25</option>' +
+                    '<option value="50">50</option>' +
+                    '<option value="100">100</option>' +
+                '</select>' +
+                '<span>data</span>' +
+            '</label>';
+
+        scrollWrap.insertAdjacentElement('beforebegin', topBar);
+
+        /* 2. BOTTOM BAR: jumlah data + slider untuk berpindah halaman */
+        const pagerBar = document.createElement('div');
+        pagerBar.className = 'sipadu-pager-bar';
+        pagerBar.innerHTML =
+            '<span class="sipadu-pager-info"></span>' +
+            '<div class="sipadu-pager-nav" aria-label="Navigasi halaman tabel">' +
+                '<input class="sipadu-page-range" type="range" min="1" max="1" value="1" step="1" aria-label="Geser untuk memilih halaman">' +
+                '<span class="sipadu-page-indicator">Halaman 1 / 1</span>' +
+            '</div>';
+
+        const existingPagination = cardContainer.querySelector('.up-pagination, .bp-pagination, [class*="-pagination"]');
+        if (existingPagination) {
+            existingPagination.innerHTML = '';
+            existingPagination.style.padding = '0';
+            existingPagination.style.borderTop = '0';
+            existingPagination.style.background = 'transparent';
+            existingPagination.appendChild(pagerBar);
+        } else {
+            scrollWrap.insertAdjacentElement('afterend', pagerBar);
+            const nextEl = pagerBar.nextElementSibling;
+            if (nextEl && (nextEl.matches('nav[role="navigation"]') || nextEl.classList.contains('pagination'))) {
+                nextEl.style.display = 'none';
+            }
+        }
+
+        const perPageSelect = topBar.querySelector('.sipadu-pager-select');
+        const infoEl = pagerBar.querySelector('.sipadu-pager-info');
+        const pageRange = pagerBar.querySelector('.sipadu-page-range');
+        const pageIndicator = pagerBar.querySelector('.sipadu-page-indicator');
+
+        let currentPage = 1;
+        let perPage = parseInt(perPageSelect.value, 10) || 10;
+
+        function getDataRows() {
+            return Array.from(tbody.querySelectorAll('tr')).filter(function (tr) {
+                if (tr.dataset.emptyRow === '1') return false;
+                if (tr.id === 'userFilterEmptyRow') return false;
+                if (tr.querySelector('td[colspan]')) return false;
+                return true;
+            });
+        }
+
+        function render() {
+            const allRows = getDataRows();
+            const activeRows = allRows.filter(function (tr) {
+                return tr.dataset.filterHidden !== '1';
+            });
+
+            const totalItems = activeRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIdx = (currentPage - 1) * perPage;
+            const endIdx = Math.min(startIdx + perPage, totalItems);
+
+            allRows.forEach(function (tr) {
+                if (tr.dataset.filterHidden === '1') {
+                    tr.style.display = 'none';
+                }
+            });
+
+            activeRows.forEach(function (tr, idx) {
+                tr.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+            });
+
+            const fromNum = totalItems === 0 ? 0 : startIdx + 1;
+            const toNum = totalItems === 0 ? 0 : endIdx;
+            infoEl.textContent = 'Menampilkan ' + fromNum + ' - ' + toNum + ' dari ' + totalItems + ' data';
+
+            pageRange.max = String(totalPages);
+            pageRange.value = String(currentPage);
+            pageRange.disabled = totalPages <= 1 || totalItems === 0;
+            pageIndicator.textContent = 'Halaman ' + currentPage + ' / ' + totalPages;
+
+            const progress = totalPages <= 1 ? 0 : ((currentPage - 1) / (totalPages - 1)) * 100;
+            pageRange.style.background = 'linear-gradient(to right, #237c4d ' + progress + '%, #dce8df ' + progress + '%)';
+        }
+
+        pageRange.addEventListener('input', function () {
+            currentPage = parseInt(this.value, 10) || 1;
+            render();
+        });
+
+        perPageSelect.addEventListener('change', function () {
+            perPage = parseInt(this.value, 10) || 10;
+            currentPage = 1;
+            render();
+        });
+
+        table.sipaduRefreshPagination = function (resetPage) {
+            if (resetPage) currentPage = 1;
+            render();
+        };
+
+        render();
+    }
+
+    document.querySelectorAll('.main-content table:not([class*="fc-"])').forEach(initTablePagination);
 
     if (window.lucide) {
         window.lucide.createIcons();
