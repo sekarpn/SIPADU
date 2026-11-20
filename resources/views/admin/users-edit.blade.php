@@ -147,6 +147,43 @@
     color: #294735;
 }
 
+.user-edit-password-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.user-edit-password-wrap input {
+    padding-right: 44px;
+}
+
+.user-edit-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 9px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #718078;
+    cursor: pointer;
+}
+
+.user-edit-password-toggle:hover {
+    background: rgba(35, 124, 77, .08);
+    color: var(--ue-green-mid);
+}
+
+.user-edit-password-toggle svg {
+    width: 17px;
+    height: 17px;
+}
+
 .user-edit-field input,
 .user-edit-field select {
     width: 100%;
@@ -364,14 +401,50 @@
 
                 <div class="user-edit-field">
                     <label for="editUserPassword">Password Baru</label>
-                    <input id="editUserPassword" type="password" name="password" minlength="8" autocomplete="new-password" placeholder="••••••••">
+                    <div class="user-edit-password-wrap">
+                        <input
+                            id="editUserPassword"
+                            type="password"
+                            name="password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            placeholder="••••••••"
+                        >
+                        <button
+                            type="button"
+                            class="user-edit-password-toggle"
+                            data-toggle-password="editUserPassword"
+                            aria-label="Tampilkan password"
+                            aria-pressed="false"
+                        >
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
                     <small>Kosongkan jika tidak ingin mengubah password.</small>
                     @error('password')<div class="user-edit-field-error">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="user-edit-field">
                     <label for="editUserPasswordConfirm">Konfirmasi Password Baru</label>
-                    <input id="editUserPasswordConfirm" type="password" name="password_confirmation" minlength="8" autocomplete="new-password" placeholder="••••••••">
+                    <div class="user-edit-password-wrap">
+                        <input
+                            id="editUserPasswordConfirm"
+                            type="password"
+                            name="password_confirmation"
+                            minlength="8"
+                            autocomplete="new-password"
+                            placeholder="••••••••"
+                        >
+                        <button
+                            type="button"
+                            class="user-edit-password-toggle"
+                            data-toggle-password="editUserPasswordConfirm"
+                            aria-label="Tampilkan password"
+                            aria-pressed="false"
+                        >
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
                     <small>Ulangi password baru jika mengganti password.</small>
                 </div>
             </div>
@@ -418,6 +491,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
     roleSelect?.addEventListener('change', syncEditRoleFields);
     syncEditRoleFields();
+
+    // Tampilkan/sembunyikan password dengan ikon mata.
+    document.querySelectorAll('[data-toggle-password]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const input = document.getElementById(button.dataset.togglePassword);
+
+            if (!input) return;
+
+            const isPasswordHidden = input.type === 'password';
+            input.type = isPasswordHidden ? 'text' : 'password';
+
+            button.setAttribute(
+                'aria-label',
+                isPasswordHidden ? 'Sembunyikan password' : 'Tampilkan password'
+            );
+
+            button.setAttribute(
+                'aria-pressed',
+                isPasswordHidden ? 'true' : 'false'
+            );
+
+            button.innerHTML = isPasswordHidden
+                ? '<i data-lucide="eye-off"></i>'
+                : '<i data-lucide="eye"></i>';
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
+    });
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 });
 </script>
 @endsection

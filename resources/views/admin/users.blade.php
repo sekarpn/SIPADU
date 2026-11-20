@@ -619,6 +619,43 @@
     transition: border-color .2s, box-shadow .2s;
 }
 
+.user-password-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.user-password-wrap input {
+    padding-right: 42px;
+}
+
+.user-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 9px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #718078;
+    cursor: pointer;
+}
+
+.user-password-toggle:hover {
+    background: rgba(35, 124, 77, .08);
+    color: #237c4d;
+}
+
+.user-password-toggle svg {
+    width: 17px;
+    height: 17px;
+}
+
 .user-field input:focus,
 .user-field select:focus {
     border-color: #237c4d;
@@ -868,8 +905,57 @@ body.user-drawer-open {
                         <option value="admin" @selected(old('role') === 'admin')>Admin</option>
                     </select>
                 </div>
-                <div class="user-field"><label for="newUserPassword">Password</label><input id="newUserPassword" type="password" name="password" required minlength="8" autocomplete="new-password"></div>
-                <div class="user-field"><label for="newUserPasswordConfirm">Konfirmasi Password</label><input id="newUserPasswordConfirm" type="password" name="password_confirmation" required minlength="8" autocomplete="new-password"></div>
+                <div class="user-field">
+                    <label for="newUserPassword">Password</label>
+
+                    <div class="user-password-wrap">
+                        <input
+                            id="newUserPassword"
+                            type="password"
+                            name="password"
+                            required
+                            minlength="8"
+                            autocomplete="new-password"
+                        >
+
+                        <button
+                            type="button"
+                            class="user-password-toggle"
+                            data-toggle-password="newUserPassword"
+                            aria-label="Tampilkan password"
+                            aria-pressed="false"
+                        >
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="user-field">
+                    <label for="newUserPasswordConfirm">
+                        Konfirmasi Password
+                    </label>
+
+                    <div class="user-password-wrap">
+                        <input
+                            id="newUserPasswordConfirm"
+                            type="password"
+                            name="password_confirmation"
+                            required
+                            minlength="8"
+                            autocomplete="new-password"
+                        >
+
+                        <button
+                            type="button"
+                            class="user-password-toggle"
+                            data-toggle-password="newUserPasswordConfirm"
+                            aria-label="Tampilkan password"
+                            aria-pressed="false"
+                        >
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="user-form-actions">
                 <button class="up-btn secondary" type="button" id="cancelAddUserDrawer">Batal</button>
@@ -1048,6 +1134,36 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.lucide) {
         window.lucide.createIcons();
     }
+
+    document.querySelectorAll('[data-toggle-password]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const input = document.getElementById(button.dataset.togglePassword);
+
+            if (!input) return;
+
+            const showing = input.type === 'password';
+
+            input.type = showing ? 'text' : 'password';
+
+            button.setAttribute(
+                'aria-label',
+                showing ? 'Sembunyikan password' : 'Tampilkan password'
+            );
+
+            button.setAttribute(
+                'aria-pressed',
+                showing ? 'true' : 'false'
+            );
+
+            button.innerHTML = showing
+                ? '<i data-lucide="eye-off"></i>'
+                : '<i data-lucide="eye"></i>';
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
+    });
 });
 </script>
 @endsection
