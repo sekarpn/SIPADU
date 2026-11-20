@@ -204,6 +204,7 @@ class BookingController extends Controller
             'approved' => Booking::where('status', 'Disetujui')->count(),
             'rejected' => Booking::where('status', 'Ditolak')->count(),
             'revision' => Booking::where('status', 'Perlu Revisi')->count(),
+            'cancelled' => Booking::where('status', 'Dibatalkan')->count(),
             'total' => Booking::count(),
         ];
 

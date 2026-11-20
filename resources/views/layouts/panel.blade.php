@@ -607,56 +607,123 @@ html.page-ready .app-layout > main > .main-content {
     flex-wrap: wrap;
 }
 
-/* SLIDER NAVIGASI HALAMAN TABEL, TANPA TOMBOL NOMOR */
+/* NAVIGASI HALAMAN TABEL: TOMBOL KIRI/KANAN DENGAN NOMOR DI TENGAH */
 .sipadu-pager-nav {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
-    min-width: min(340px, 100%);
-    flex: 0 1 340px;
+    min-width: 150px;
+    flex: 0 0 auto;
 }
 
-.sipadu-page-range {
-    width: 100%;
-    min-width: 120px;
-    height: 6px;
-    margin: 0;
-    appearance: none;
-    -webkit-appearance: none;
-    border-radius: 999px;
-    background: linear-gradient(to right, #237c4d 0%, #dce8df 0%);
-    outline: none;
+.sipadu-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #d8e4dc;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #237c4d;
     cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
 }
 
-.sipadu-page-range::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
+.sipadu-page-btn:hover:not(:disabled) {
+    background: #edf5ef;
+    border-color: #237c4d;
+    transform: translateY(-1px);
+}
+
+.sipadu-page-btn:disabled {
+    color: #aab8af;
+    background: #f5f7f5;
+    border-color: #e7ece8;
+    cursor: not-allowed;
+    opacity: .7;
+}
+
+.sipadu-page-btn i,
+.sipadu-page-btn svg {
     width: 16px;
     height: 16px;
-    border: 3px solid #ffffff;
-    border-radius: 50%;
-    background: #237c4d;
-    box-shadow: 0 1px 5px rgba(22, 54, 38, .2);
-}
-
-.sipadu-page-range::-moz-range-thumb {
-    width: 11px;
-    height: 11px;
-    border: 3px solid #ffffff;
-    border-radius: 50%;
-    background: #237c4d;
-    box-shadow: 0 1px 5px rgba(22, 54, 38, .2);
 }
 
 .sipadu-page-indicator {
-    flex: 0 0 auto;
-    min-width: 76px;
-    text-align: right;
-    color: #4c6456;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #d8e4dc;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #237c4d;
     font-size: 12px;
     font-weight: 500;
+    line-height: 1;
+    text-align: center;
     white-space: nowrap;
+    box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+    .sipadu-pager-bar { gap: 10px; }
+    .sipadu-pager-nav { order: 3; width: 100%; justify-content: center; }
+}
+
+/* TOMBOL GESER HORIZONTAL TABEL DI KANAN BAWAH */
+.sipadu-table-scroll-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    padding: 0 16px 12px;
+    box-sizing: border-box;
+}
+
+.sipadu-table-scroll-controls {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.sipadu-table-scroll-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid rgba(35, 124, 77, .22);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .8);
+    color: #237c4d;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.sipadu-table-scroll-btn:hover:not(:disabled) {
+    background: rgba(35, 124, 77, .1);
+    border-color: rgba(35, 124, 77, .4);
+    transform: translateY(-1px);
+}
+
+.sipadu-table-scroll-btn:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.sipadu-table-scroll-btn svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* MOBILE */
@@ -1035,14 +1102,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         scrollWrap.insertAdjacentElement('beforebegin', topBar);
 
-        /* 2. BOTTOM BAR: jumlah data + slider untuk berpindah halaman */
+        /* 2. BOTTOM BAR: jumlah data + tombol navigasi halaman */
         const pagerBar = document.createElement('div');
         pagerBar.className = 'sipadu-pager-bar';
         pagerBar.innerHTML =
             '<span class="sipadu-pager-info"></span>' +
             '<div class="sipadu-pager-nav" aria-label="Navigasi halaman tabel">' +
-                '<input class="sipadu-page-range" type="range" min="1" max="1" value="1" step="1" aria-label="Geser untuk memilih halaman">' +
-                '<span class="sipadu-page-indicator">Halaman 1 / 1</span>' +
+                '<button type="button" class="sipadu-page-btn sipadu-page-prev" aria-label="Halaman sebelumnya" title="Halaman sebelumnya"><i data-lucide="chevron-left"></i></button>' +
+                '<span class="sipadu-page-indicator" aria-live="polite">1</span>' +
+                '<button type="button" class="sipadu-page-btn sipadu-page-next" aria-label="Halaman berikutnya" title="Halaman berikutnya"><i data-lucide="chevron-right"></i></button>' +
             '</div>';
 
         const existingPagination = cardContainer.querySelector('.up-pagination, .bp-pagination, [class*="-pagination"]');
@@ -1060,10 +1128,40 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        /* 3. TOMBOL GESER TABEL: TERPISAH DARI PAGINATION HALAMAN */
+        const scrollFooter = document.createElement('div');
+        scrollFooter.className = 'sipadu-table-scroll-footer';
+        scrollFooter.innerHTML =
+            '<div class="sipadu-table-scroll-controls" aria-label="Tombol geser tabel secara horizontal">' +
+                '<button type="button" class="sipadu-table-scroll-btn sipadu-scroll-left" aria-label="Geser tabel ke kiri" title="Geser tabel ke kiri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+                '<button type="button" class="sipadu-table-scroll-btn sipadu-scroll-right" aria-label="Geser tabel ke kanan" title="Geser tabel ke kanan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+            '</div>';
+        cardContainer.appendChild(scrollFooter);
+
         const perPageSelect = topBar.querySelector('.sipadu-pager-select');
         const infoEl = pagerBar.querySelector('.sipadu-pager-info');
-        const pageRange = pagerBar.querySelector('.sipadu-page-range');
         const pageIndicator = pagerBar.querySelector('.sipadu-page-indicator');
+        const pagePrevButton = pagerBar.querySelector('.sipadu-page-prev');
+        const pageNextButton = pagerBar.querySelector('.sipadu-page-next');
+        const scrollLeftButton = scrollFooter.querySelector('.sipadu-scroll-left');
+        const scrollRightButton = scrollFooter.querySelector('.sipadu-scroll-right');
+
+        function syncTableScrollButtons() {
+            const maxScroll = Math.max(0, scrollWrap.scrollWidth - scrollWrap.clientWidth);
+            const canScroll = maxScroll > 2;
+            scrollLeftButton.disabled = !canScroll || scrollWrap.scrollLeft <= 2;
+            scrollRightButton.disabled = !canScroll || scrollWrap.scrollLeft >= maxScroll - 2;
+            scrollFooter.style.display = canScroll ? 'flex' : 'none';
+        }
+
+        scrollLeftButton.addEventListener('click', function () {
+            scrollWrap.scrollBy({ left: -Math.max(240, scrollWrap.clientWidth * 0.7), behavior: 'smooth' });
+        });
+        scrollRightButton.addEventListener('click', function () {
+            scrollWrap.scrollBy({ left: Math.max(240, scrollWrap.clientWidth * 0.7), behavior: 'smooth' });
+        });
+        scrollWrap.addEventListener('scroll', syncTableScrollButtons, { passive: true });
+        window.addEventListener('resize', syncTableScrollButtons);
 
         let currentPage = 1;
         let perPage = parseInt(perPageSelect.value, 10) || 10;
@@ -1105,18 +1203,27 @@ document.addEventListener('DOMContentLoaded', function () {
             const toNum = totalItems === 0 ? 0 : endIdx;
             infoEl.textContent = 'Menampilkan ' + fromNum + ' - ' + toNum + ' dari ' + totalItems + ' data';
 
-            pageRange.max = String(totalPages);
-            pageRange.value = String(currentPage);
-            pageRange.disabled = totalPages <= 1 || totalItems === 0;
-            pageIndicator.textContent = 'Halaman ' + currentPage + ' / ' + totalPages;
-
-            const progress = totalPages <= 1 ? 0 : ((currentPage - 1) / (totalPages - 1)) * 100;
-            pageRange.style.background = 'linear-gradient(to right, #237c4d ' + progress + '%, #dce8df ' + progress + '%)';
+            pageIndicator.textContent = String(currentPage);
+            pagePrevButton.disabled = currentPage <= 1 || totalItems === 0;
+            pageNextButton.disabled = currentPage >= totalPages || totalItems === 0;
+            syncTableScrollButtons();
         }
 
-        pageRange.addEventListener('input', function () {
-            currentPage = parseInt(this.value, 10) || 1;
-            render();
+        pagePrevButton.addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage -= 1;
+                render();
+            }
+        });
+
+        pageNextButton.addEventListener('click', function () {
+            const totalPages = Math.max(1, Math.ceil(getDataRows().filter(function (tr) {
+                return tr.dataset.filterHidden !== '1';
+            }).length / perPage));
+            if (currentPage < totalPages) {
+                currentPage += 1;
+                render();
+            }
         });
 
         perPageSelect.addEventListener('change', function () {

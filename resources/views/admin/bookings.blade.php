@@ -1378,14 +1378,9 @@ body.bp-drawer-open {
                 </button>
             </div>
 
-            <select class="bp-filter" name="status">
-                <option value="">Semua Status</option>
-                @foreach($statusOptions as $value => $label)
-                    <option value="{{ $value }}" @selected(request('status') === $value)>
-                        {{ $label }}
-                    </option>
-                @endforeach
-            </select>
+            @if(request('status'))
+                <input type="hidden" name="status" value="{{ request('status') }}">
+            @endif
 
             <select class="bp-filter" name="auditorium">
                 <option value="">Semua Auditorium</option>
@@ -1452,6 +1447,13 @@ body.bp-drawer-open {
                 href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Perlu Revisi'])) }}"
             >
                 Perlu Revisi <span>{{ $stats['revision'] }}</span>
+            </a>
+
+            <a
+                class="bp-tab {{ request('status') === 'Dibatalkan' ? 'active' : '' }}"
+                href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Dibatalkan'])) }}"
+            >
+                Dibatalkan <span>{{ $stats['cancelled'] }}</span>
             </a>
         </div>
 
@@ -1996,20 +1998,33 @@ body.bp-drawer-open {
         let debounceTimer = null;
         let activeController = null;
 
+        // Nilai filter auditorium dan tanggal yang sudah diterapkan.
+        // Perubahan dropdown tidak diterapkan sampai tombol Terapkan Filter diklik.
+        let appliedFilters = {
+            auditorium: form.elements.auditorium ? form.elements.auditorium.value : '',
+            date: form.elements.date ? form.elements.date.value : ''
+        };
+
         function toggleClearButton() {
             if (!clearBtn) return;
             clearBtn.classList.toggle('show', searchInput.value.trim().length > 0);
         }
 
-        function buildFilterUrl() {
+        function buildFilterUrl(applyPendingFilters = false) {
             const url = new URL(form.action, window.location.origin);
-            const formData = new FormData(form);
+            const searchValue = searchInput.value.trim();
+            const auditoriumValue = applyPendingFilters
+                ? (form.elements.auditorium ? form.elements.auditorium.value : '')
+                : appliedFilters.auditorium;
+            const dateValue = applyPendingFilters
+                ? (form.elements.date ? form.elements.date.value : '')
+                : appliedFilters.date;
+            const statusValue = form.elements.status ? form.elements.status.value : '';
 
-            formData.forEach(function (value, key) {
-                if (String(value).trim() !== '') {
-                    url.searchParams.set(key, String(value).trim());
-                }
-            });
+            if (searchValue) url.searchParams.set('q', searchValue);
+            if (auditoriumValue) url.searchParams.set('auditorium', auditoriumValue);
+            if (dateValue) url.searchParams.set('date', dateValue);
+            if (statusValue) url.searchParams.set('status', statusValue);
 
             return url.toString();
         }
@@ -2077,16 +2092,19 @@ body.bp-drawer-open {
             });
         }
 
-        form.querySelectorAll('select, input[type="date"]').forEach(function (field) {
-            field.addEventListener('change', function () {
-                fetchFilteredBookings(buildFilterUrl());
-            });
-        });
-
+        // Auditorium dan tanggal hanya diterapkan saat tombol Terapkan Filter diklik.
         form.addEventListener('submit', function (event) {
             event.preventDefault();
             clearTimeout(debounceTimer);
-            fetchFilteredBookings(buildFilterUrl());
+
+            appliedFilters.auditorium = form.elements.auditorium
+                ? form.elements.auditorium.value
+                : '';
+            appliedFilters.date = form.elements.date
+                ? form.elements.date.value
+                : '';
+
+            fetchFilteredBookings(buildFilterUrl(true));
         });
 
         toggleClearButton();
