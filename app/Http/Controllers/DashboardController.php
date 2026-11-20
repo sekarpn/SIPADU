@@ -64,7 +64,7 @@ class DashboardController extends Controller
         $data = $r->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'nim_nip' => $user->role === 'admin' ? 'nullable|string|max:40' : 'required|string|max:40|unique:users,nim_nip,' . $user->id,
+            'nim_nip' => $user->role === 'admin' ? 'nullable|string|max:40|unique:users,nim_nip,' . $user->id : 'required|string|max:40|unique:users,nim_nip,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'faculty' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
             'study_program' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
@@ -83,6 +83,21 @@ class DashboardController extends Controller
         $user->update($data);
 
         return back()->with('success', 'Informasi profil berhasil diperbarui.');
+    }
+
+    public function updateNotificationPreferences(Request $r)
+    {
+        $data = $r->validate([
+            'email_notifications' => 'required|boolean',
+            'system_notifications' => 'required|boolean',
+        ]);
+
+        $r->user()->update([
+            'email_notifications' => (bool) $data['email_notifications'],
+            'system_notifications' => (bool) $data['system_notifications'],
+        ]);
+
+        return back()->with('preferences_success', 'Pengaturan notifikasi berhasil diperbarui.');
     }
 
     public function updatePassword(Request $r)

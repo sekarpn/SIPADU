@@ -364,7 +364,7 @@
             title="Pengajuan"
         >
             <i data-lucide="clipboard-list"></i>
-            <span>Pengajuan</span>
+            <span>Kelola Pengajuan</span>
 
             @if ($pendingBookingsCount > 0)
                 <small class="nav-badge">

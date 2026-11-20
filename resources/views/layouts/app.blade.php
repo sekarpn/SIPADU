@@ -64,5 +64,24 @@
         });
     </script>
 
+    <style>
+        /* Samakan posisi panah dropdown dengan posisi ikon lihat password.
+           Jarak visual ikon dari sisi kanan field adalah 16px. */
+        body select:not([multiple]) {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234c6456' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 16px center !important;
+            background-size: 16px 16px !important;
+            padding-right: 44px !important;
+        }
+
+        body select:not([multiple]):disabled {
+            cursor: not-allowed;
+        }
+    </style>
+
 </body>
 </html>

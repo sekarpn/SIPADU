@@ -2,7 +2,7 @@
 
 @section('panel')
 @php
-    $userCollection = $users->getCollection();
+    $userCollection = collect($users);
     $countAll = $roleCounts['all'] ?? $userCollection->count();
     $countMahasiswa = $roleCounts['mahasiswa'] ?? $userCollection->where('role', 'mahasiswa')->count();
     $countPegawai = $roleCounts['pegawai'] ?? $userCollection->where('role', 'pegawai')->count();
@@ -837,10 +837,6 @@ body.user-drawer-open {
             </table>
         </div>
 
-        {{-- PAGINATION --}}
-        <div class="up-pagination">
-            {{ $users->withQueryString()->links() }}
-        </div>
     </section>
 </div>
 

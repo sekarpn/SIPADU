@@ -91,6 +91,12 @@
             font-weight: 700;
             color: #31413c;
             text-decoration: none;
+            transition: color .2s ease;
+        }
+
+        .lnav-links a:hover,
+        .lnav-links a.active {
+            color: var(--lp-green);
         }
 
         .lnav-actions {
@@ -121,9 +127,15 @@
         }
 
         .primary {
-            background: linear-gradient(135deg, #2e9b73, #1d7050);
+            background: var(--lp-green);
             color: #fff;
-            box-shadow: 0 10px 24px rgba(35, 123, 84, .18);
+            box-shadow: none;
+        }
+
+        .primary:hover {
+            background: #276b4c;
+            color: #fff;
+            box-shadow: none;
         }
 
         .hero {
@@ -1018,6 +1030,7 @@
 
             <div class="lnav-actions">
                 <a class="lbtn login" href="{{ route('login') }}">Login</a>
+                <a class="lbtn primary" href="{{ route('register') }}">Register</a>
             </div>
     </nav>
 
@@ -1412,6 +1425,56 @@
                     }
                 });
             });
+
+            // Tandai menu navbar sesuai bagian halaman yang sedang dibuka.
+            var navLinks = Array.from(document.querySelectorAll('.lnav-links a[href^="#"]'));
+            var navSections = navLinks
+                .map(function (link) {
+                    return document.querySelector(link.getAttribute('href'));
+                })
+                .filter(Boolean);
+
+            function setActiveNav(sectionId) {
+                navLinks.forEach(function (link) {
+                    var isActive = link.getAttribute('href') === '#' + sectionId;
+                    link.classList.toggle('active', isActive);
+                    if (isActive) {
+                        link.setAttribute('aria-current', 'location');
+                    } else {
+                        link.removeAttribute('aria-current');
+                    }
+                });
+            }
+
+            navLinks.forEach(function (link) {
+                link.addEventListener('click', function () {
+                    setActiveNav(this.getAttribute('href').slice(1));
+                });
+            });
+
+            function updateActiveNav() {
+                var marker = 150;
+                var currentSection = null;
+
+                navSections.forEach(function (section) {
+                    if (section.getBoundingClientRect().top <= marker) {
+                        currentSection = section;
+                    }
+                });
+
+                if (currentSection) {
+                    setActiveNav(currentSection.id);
+                } else {
+                    navLinks.forEach(function (link) {
+                        link.classList.remove('active');
+                        link.removeAttribute('aria-current');
+                    });
+                }
+            }
+
+            window.addEventListener('scroll', updateActiveNav, { passive: true });
+            window.addEventListener('resize', updateActiveNav);
+            updateActiveNav();
 
             var items = document.querySelectorAll('.reveal');
 

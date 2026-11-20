@@ -607,59 +607,56 @@ html.page-ready .app-layout > main > .main-content {
     flex-wrap: wrap;
 }
 
-/* TOMBOL HALAMAN & PANAH SOFT BOOTSTRAP CHEVRON */
-.sipadu-pager-btn {
-    min-width: 34px;
-    height: 34px;
-    padding: 0 10px;
-    border: 1px solid rgba(22, 54, 38, .11);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .78) !important;
-    color: #294735 !important;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-flex;
+/* SLIDER NAVIGASI HALAMAN TABEL, TANPA TOMBOL NOMOR */
+.sipadu-pager-nav {
+    display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 12px;
+    min-width: min(340px, 100%);
+    flex: 0 1 340px;
+}
+
+.sipadu-page-range {
+    width: 100%;
+    min-width: 120px;
+    height: 6px;
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 999px;
+    background: linear-gradient(to right, #237c4d 0%, #dce8df 0%);
+    outline: none;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(22, 54, 38, .03) !important;
-    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .15s ease, box-shadow .2s ease;
 }
 
-.sipadu-pager-btn svg.bi {
-    width: 13px;
-    height: 13px;
-    display: block;
-    transition: transform .18s ease;
+.sipadu-page-range::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    background: #237c4d;
+    box-shadow: 0 1px 5px rgba(22, 54, 38, .2);
 }
 
-.sipadu-pager-btn:hover:not(:disabled):not(.active) {
-    background: #ffffff !important;
-    border-color: rgba(35, 124, 77, .35) !important;
-    color: #237c4d !important;
-    box-shadow: 0 4px 10px rgba(35, 124, 77, .10) !important;
-    transform: translateY(-1px);
+.sipadu-page-range::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    background: #237c4d;
+    box-shadow: 0 1px 5px rgba(22, 54, 38, .2);
 }
 
-.sipadu-pager-btn.active {
-    background: #237c4d !important;
-    border-color: #237c4d !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 10px rgba(35, 124, 77, .22) !important;
-}
-
-.sipadu-pager-btn:disabled {
-    opacity: .38 !important;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none !important;
-}
-
-.sipadu-pager-ellipsis {
-    padding: 0 4px;
-    color: #64786c;
-    font-weight: 600;
-    user-select: none;
+.sipadu-page-indicator {
+    flex: 0 0 auto;
+    min-width: 76px;
+    text-align: right;
+    color: #4c6456;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
 /* MOBILE */
@@ -989,17 +986,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* IKON CHEVRON LEMBUT DARI BOOTSTRAP ICONS */
-    const bsChevronLeftSvg =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16" aria-hidden="true">' +
-            '<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>' +
-        '</svg>';
-
-    const bsChevronRightSvg =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">' +
-            '<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>' +
-        '</svg>';
-
     /* PAGINASI, GLASS CARD & SCROLL HORIZONTAL OTOMATIS UNTUK SEMUA TABEL */
     function initTablePagination(table) {
         if (!table || table.dataset.sipaduPaginated === '1') return;
@@ -1049,12 +1035,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         scrollWrap.insertAdjacentElement('beforebegin', topBar);
 
-        /* 2. BOTTOM BAR: Kalimat "Menampilkan X - Y dari Z data" (tidak bold) + tombol halaman */
+        /* 2. BOTTOM BAR: jumlah data + slider untuk berpindah halaman */
         const pagerBar = document.createElement('div');
         pagerBar.className = 'sipadu-pager-bar';
         pagerBar.innerHTML =
             '<span class="sipadu-pager-info"></span>' +
-            '<div class="sipadu-pager-nav" role="navigation" aria-label="Navigasi halaman tabel"></div>';
+            '<div class="sipadu-pager-nav" aria-label="Navigasi halaman tabel">' +
+                '<input class="sipadu-page-range" type="range" min="1" max="1" value="1" step="1" aria-label="Geser untuk memilih halaman">' +
+                '<span class="sipadu-page-indicator">Halaman 1 / 1</span>' +
+            '</div>';
 
         const existingPagination = cardContainer.querySelector('.up-pagination, .bp-pagination, [class*="-pagination"]');
         if (existingPagination) {
@@ -1073,7 +1062,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const perPageSelect = topBar.querySelector('.sipadu-pager-select');
         const infoEl = pagerBar.querySelector('.sipadu-pager-info');
-        const navEl = pagerBar.querySelector('.sipadu-pager-nav');
+        const pageRange = pagerBar.querySelector('.sipadu-page-range');
+        const pageIndicator = pagerBar.querySelector('.sipadu-page-indicator');
 
         let currentPage = 1;
         let perPage = parseInt(perPageSelect.value, 10) || 10;
@@ -1085,22 +1075,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (tr.querySelector('td[colspan]')) return false;
                 return true;
             });
-        }
-
-        function buildPageNumbers(totalPages, current) {
-            if (totalPages <= 7) {
-                return Array.from({ length: totalPages }, function (_, i) {
-                    return i + 1;
-                });
-            }
-            const pages = [1];
-            if (current > 3) pages.push('...');
-            const start = Math.max(2, current - 1);
-            const end = Math.min(totalPages - 1, current + 1);
-            for (let p = start; p <= end; p++) pages.push(p);
-            if (current < totalPages - 2) pages.push('...');
-            pages.push(totalPages);
-            return pages;
         }
 
         function render() {
@@ -1131,58 +1105,19 @@ document.addEventListener('DOMContentLoaded', function () {
             const toNum = totalItems === 0 ? 0 : endIdx;
             infoEl.textContent = 'Menampilkan ' + fromNum + ' - ' + toNum + ' dari ' + totalItems + ' data';
 
-            navEl.innerHTML = '';
+            pageRange.max = String(totalPages);
+            pageRange.value = String(currentPage);
+            pageRange.disabled = totalPages <= 1 || totalItems === 0;
+            pageIndicator.textContent = 'Halaman ' + currentPage + ' / ' + totalPages;
 
-            const prevBtn = document.createElement('button');
-            prevBtn.type = 'button';
-            prevBtn.className = 'sipadu-pager-btn';
-            prevBtn.innerHTML = bsChevronLeftSvg;
-            prevBtn.title = 'Halaman sebelumnya';
-            prevBtn.setAttribute('aria-label', 'Halaman sebelumnya');
-            prevBtn.disabled = currentPage <= 1 || totalItems === 0;
-            prevBtn.addEventListener('click', function () {
-                if (currentPage > 1) {
-                    currentPage--;
-                    render();
-                }
-            });
-            navEl.appendChild(prevBtn);
-
-            const pageList = buildPageNumbers(totalPages, currentPage);
-            pageList.forEach(function (item) {
-                if (item === '...') {
-                    const dots = document.createElement('span');
-                    dots.className = 'sipadu-pager-ellipsis';
-                    dots.textContent = '…';
-                    navEl.appendChild(dots);
-                    return;
-                }
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'sipadu-pager-btn' + (item === currentPage ? ' active' : '');
-                btn.textContent = String(item);
-                btn.addEventListener('click', function () {
-                    currentPage = item;
-                    render();
-                });
-                navEl.appendChild(btn);
-            });
-
-            const nextBtn = document.createElement('button');
-            nextBtn.type = 'button';
-            nextBtn.className = 'sipadu-pager-btn';
-            nextBtn.innerHTML = bsChevronRightSvg;
-            nextBtn.title = 'Halaman berikutnya';
-            nextBtn.setAttribute('aria-label', 'Halaman berikutnya');
-            nextBtn.disabled = currentPage >= totalPages || totalItems === 0;
-            nextBtn.addEventListener('click', function () {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    render();
-                }
-            });
-            navEl.appendChild(nextBtn);
+            const progress = totalPages <= 1 ? 0 : ((currentPage - 1) / (totalPages - 1)) * 100;
+            pageRange.style.background = 'linear-gradient(to right, #237c4d ' + progress + '%, #dce8df ' + progress + '%)';
         }
+
+        pageRange.addEventListener('input', function () {
+            currentPage = parseInt(this.value, 10) || 1;
+            render();
+        });
 
         perPageSelect.addEventListener('change', function () {
             perPage = parseInt(this.value, 10) || 10;

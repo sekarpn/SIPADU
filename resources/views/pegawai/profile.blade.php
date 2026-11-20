@@ -349,6 +349,28 @@
         margin-top: 5px;
     }
 
+
+    .notification-setting-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--pf-line);
+    }
+    .notification-setting-row:first-of-type { padding-top: 2px; }
+    .notification-setting-row:last-of-type { border-bottom: 0; margin-bottom: 12px; }
+    .notification-setting-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .notification-setting-copy strong { color: var(--pf-ink); font-size: 13px; font-weight: 700; }
+    .notification-setting-copy span { color: var(--pf-subtle); font-size: 11.5px; line-height: 1.45; }
+    .setting-switch { position: relative; display: inline-block; width: 48px; height: 27px; flex: 0 0 48px; cursor: pointer; }
+    .setting-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .setting-slider { position: absolute; inset: 0; border-radius: 99px; background: #cbd5cf; transition: background .2s ease; }
+    .setting-slider::before { content: ''; position: absolute; width: 21px; height: 21px; left: 3px; top: 3px; border-radius: 50%; background: #fff; transition: transform .2s ease; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+    .setting-switch input:checked + .setting-slider { background: #237c4d; }
+    .setting-switch input:checked + .setting-slider::before { transform: translateX(21px); }
+    .setting-switch input:focus-visible + .setting-slider { outline: 3px solid rgba(35,124,77,.2); outline-offset: 2px; }
+
     /* TABLET */
     @media (max-width: 900px) {
         .profile-grid {
@@ -432,6 +454,12 @@
         </div>
     @endif
 
+    @if(session('preferences_success'))
+        <div class="profile-alert success">
+            {{ session('preferences_success') }}
+        </div>
+    @endif
+
     @if($errors->any())
         <div class="profile-alert error">
             <strong>Periksa kembali data yang kamu masukkan.</strong>
@@ -489,6 +517,17 @@
                 </div>
 
                 @if($isAdmin)
+                    <div class="profile-field">
+                        <label for="profileAdminNip">NIP</label>
+                        <input id="profileAdminNip"
+                               type="text"
+                               name="nim_nip"
+                               value="{{ old('nim_nip', data_get($user, 'nim_nip')) }}"
+                               placeholder="Masukkan NIP">
+                        @error('nim_nip')
+                            <div class="profile-error">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <div class="profile-field">
                         <label>Peran Akun</label>
                         <input type="text" value="Administrator" disabled>
@@ -654,6 +693,48 @@
                 <button type="submit" class="profile-button">
                     Ubah Password
                 </button>
+            </form>
+        </div>
+
+        {{-- PREFERENSI NOTIFIKASI --}}
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <div class="profile-icon"><i data-lucide="bell"></i></div>
+                <div>
+                    <h3>Pengaturan Notifikasi</h3>
+                    <p>Atur jenis notifikasi yang ingin kamu terima.</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ route(strtolower((string) $user->role) === 'admin' ? 'admin.profile.preferences' : (strtolower((string) $user->role) === 'pegawai' ? 'pegawai.profile.preferences' : 'borrower.profile.preferences')) }}">
+                @csrf
+                @method('PUT')
+
+                <div class="notification-setting-row">
+                    <div class="notification-setting-copy">
+                        <strong>Nyalakan Email</strong>
+                        <span>Izinkan SIPADU mengirim pemberitahuan melalui email.</span>
+                    </div>
+                    <input type="hidden" name="email_notifications" value="0">
+                    <label class="setting-switch" aria-label="Nyalakan notifikasi email">
+                        <input type="checkbox" name="email_notifications" value="1" {{ old('email_notifications', $user->email_notifications ?? true) ? 'checked' : '' }}>
+                        <span class="setting-slider"></span>
+                    </label>
+                </div>
+
+                <div class="notification-setting-row">
+                    <div class="notification-setting-copy">
+                        <strong>Nyalakan Notifikasi Sistem</strong>
+                        <span>Tampilkan pemberitahuan di dalam aplikasi SIPADU.</span>
+                    </div>
+                    <input type="hidden" name="system_notifications" value="0">
+                    <label class="setting-switch" aria-label="Nyalakan notifikasi sistem">
+                        <input type="checkbox" name="system_notifications" value="1" {{ old('system_notifications', $user->system_notifications ?? true) ? 'checked' : '' }}>
+                        <span class="setting-slider"></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="profile-button">Simpan Pengaturan Notifikasi</button>
             </form>
         </div>
 
