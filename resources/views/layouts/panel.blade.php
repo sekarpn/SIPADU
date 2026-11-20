@@ -512,7 +512,7 @@ html.page-ready .app-layout > main > .main-content {
     -webkit-overflow-scrolling: touch;
 }
 
-/* GAYA TABEL GLASS SERAGAM DI SELURUH HALAMAN (IDENTIK DENGAN DATA PENGGUNA) */
+/* GAYA TABEL GLASS SERAGAM DI SELURUH HALAMAN */
 .app-layout > main > .main-content table:not([class*="fc-"]) {
     width: 100% !important;
     border-collapse: collapse !important;
@@ -579,7 +579,7 @@ html.page-ready .app-layout > main > .main-content {
     border-bottom: 0 !important;
 }
 
-/* BOTTOM BAR TABEL: KALIMAT "MENAMPILKAN ..." (TIDAK BOLD) & NAVIGASI HALAMAN */
+/* BOTTOM BAR TABEL: KALIMAT "MENAMPILKAN ..." & NAVIGASI HALAMAN */
 .sipadu-pager-bar {
     display: flex;
     align-items: center;
@@ -600,14 +600,6 @@ html.page-ready .app-layout > main > .main-content {
     color: #4c6456;
 }
 
-.sipadu-pager-nav {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-/* NAVIGASI HALAMAN TABEL: TOMBOL KIRI/KANAN DENGAN NOMOR DI TENGAH */
 .sipadu-pager-nav {
     display: inline-flex;
     align-items: center;
@@ -673,8 +665,15 @@ html.page-ready .app-layout > main > .main-content {
 }
 
 @media (max-width: 640px) {
-    .sipadu-pager-bar { gap: 10px; }
-    .sipadu-pager-nav { order: 3; width: 100%; justify-content: center; }
+    .sipadu-pager-bar {
+        gap: 10px;
+    }
+
+    .sipadu-pager-nav {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* TOMBOL GESER HORIZONTAL TABEL DI KANAN BAWAH */
@@ -914,7 +913,7 @@ html.page-ready .app-layout > main > .main-content {
                         <span class="topbar-user-info">
                             <strong>{{ $topbarUser->name }}</strong>
                             <small>
-                                {{ $topbarUser->role === 'admin' ? 'Administrator' : ($topbarUser->role === 'pegawai' ? 'Pegawai' : 'Mahasiswa') }}
+                                {{ $topbarUser->role === 'admin' ? 'Administrator' : ($topbarUser->role === 'pegawai' ? 'Dosen & Tendik' : 'Mahasiswa') }}
                             </small>
                         </span>
 
@@ -1012,7 +1011,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     sync();
 
-    requestAnimationFrame(() => {
+    requestAnimationFrame(function () {
         document.documentElement.classList.add('sidebar-ready');
         document.documentElement.classList.add('page-ready');
     });
@@ -1055,13 +1054,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* PAGINASI, GLASS CARD & SCROLL HORIZONTAL OTOMATIS UNTUK SEMUA TABEL */
     function initTablePagination(table) {
-        if (!table || table.dataset.sipaduPaginated === '1') return;
+        if (!table || table.dataset.sipaduPaginated === '1' || table.dataset.noPaginate === '1') return;
         const tbody = table.querySelector('tbody');
         if (!tbody) return;
 
         table.dataset.sipaduPaginated = '1';
 
-        /* Bungkus tabel dengan container scroll horizontal jika belum ada */
         let scrollWrap = table.parentElement;
         if (!scrollWrap || getComputedStyle(scrollWrap).overflowX === 'visible') {
             const wrapper = document.createElement('div');
@@ -1073,7 +1071,6 @@ document.addEventListener('DOMContentLoaded', function () {
             scrollWrap.style.webkitOverflowScrolling = 'touch';
         }
 
-        /* Samakan pembungkus kartu menjadi glassmorphism seperti halaman Data Pengguna */
         let cardContainer = scrollWrap.parentElement;
         if (cardContainer && !cardContainer.classList.contains('main-content')) {
             cardContainer.classList.add('sipadu-glass-card');

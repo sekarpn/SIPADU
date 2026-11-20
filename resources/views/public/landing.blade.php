@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -20,11 +19,13 @@
 
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: 110px;
         }
 
         body {
             background: linear-gradient(135deg, #eef2ef, #e5ebe7) !important;
             color: var(--lp-ink);
+            padding-top: 106px;
         }
 
         .landing-shell {
@@ -38,28 +39,28 @@
             backdrop-filter: blur(18px);
         }
 
+        /* TOPBAR */
         .lnav {
             width: min(1450px, calc(100% - 120px));
             min-height: 76px;
             padding: 0 44px;
-            margin: 18px auto 16px;
+            margin: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-
-            /* GLASS EFFECT */
-            background: rgba(255, 255, 255, .65);
-            border: 1px solid rgba(255, 255, 255, .45);
+            background: rgba(255, 255, 255, .90);
+            border: 1px solid rgba(255, 255, 255, .65);
             border-radius: 18px;
-            box-shadow: 0 8px 28px rgba(22, 54, 38, .05);
-
+            box-shadow: 0 8px 28px rgba(22, 54, 38, .08);
             backdrop-filter: blur(18px) saturate(150%);
             -webkit-backdrop-filter: blur(18px) saturate(150%);
-
-            position: sticky;
+            position: fixed;
             top: 12px;
-            z-index: 1100;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
             isolation: isolate;
+            box-sizing: border-box;
         }
 
         .brand {
@@ -95,8 +96,9 @@
         }
 
         .lnav-links a:hover,
-        .lnav-links a.active {
-            color: var(--lp-green);
+        .lnav-links a.active,
+        .lnav-links a[aria-current="location"] {
+            color: #2f7d58 !important;
         }
 
         .lnav-actions {
@@ -113,7 +115,7 @@
             text-decoration: none;
             font-size: 12px;
             font-weight: 800;
-            transition: transform .2s ease, box-shadow .2s ease;
+            transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease;
         }
 
         .lbtn:hover {
@@ -173,7 +175,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-
             width: min(850px, calc(100% - 40px));
             max-width: 850px;
             padding: 0;
@@ -344,7 +345,12 @@
 
         .section {
             padding: 90px 70px;
-            scroll-margin-top: 92px;
+            scroll-margin-top: 110px;
+        }
+
+        .section#alur {
+            padding-top: 76px;
+            padding-bottom: 76px;
         }
 
         .section-title {
@@ -368,68 +374,55 @@
 
         .feature-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
-            gap: 16px;
-            padding: 16px;
-            border-radius: 24px;
-            background: rgba(246, 250, 248, .75);
-            border: 1px solid rgba(255, 255, 255, .9);
-            box-shadow: 0 18px 55px rgba(18, 45, 35, .06);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            padding: 10px 0;
         }
 
         .feature {
-            min-height: 235px;
-            padding: 28px;
+            min-height: 180px;
+            padding: 26px;
             border-radius: 18px;
-            background: rgba(255, 255, 255, .78);
-            border: 1px solid var(--lp-line);
+            background: #ffffff;
+            border: 1px solid rgba(17, 47, 38, .08);
+            box-shadow: 0 8px 24px #cbe0d5;
+            transition: transform .3s ease, box-shadow .3s ease;
         }
 
-        .feature.wide {
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, .92),
-                rgba(232, 246, 238, .80)
-            );
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+        .feature:hover {
+            transform: translateY(-9px);
+            box-shadow: 0 18px 35px rgba(18, 40, 32, .15);
         }
 
-        .num {
-            width: 44px;
-            height: 44px;
-            border-radius: 13px;
-            display: grid;
-            place-items: center;
-            background: var(--lp-mint);
+        .feature .num {
+            display: block;
+            margin: 0 0 16px;
             color: var(--lp-green);
-            font-size: 12px;
-            font-weight: 850;
+            font-size: 34px;
+            line-height: 1;
+            font-weight: 800;
         }
 
         .feature h3 {
-            font-size: 19px;
-            margin: 20px 0 8px;
+            margin: 0 0 10px;
+            color: var(--lp-ink);
+            font-size: 16px;
+            letter-spacing: -.02em;
         }
 
         .feature p {
+            max-width: 420px;
+            margin: 0;
+            color: var(--lp-muted);
             font-size: 12px;
             line-height: 1.75;
-            color: var(--lp-muted);
-        }
-
-        .feature .big {
-            font-size: 44px;
-            font-weight: 850;
-            color: var(--lp-green);
-            letter-spacing: -.06em;
         }
 
         .dark-section {
             padding: 78px 70px;
             background: linear-gradient(135deg, #0d3028, #153f34);
             color: #fff;
+            scroll-margin-top: 110px;
         }
 
         .dark-section .eyebrow {
@@ -477,53 +470,126 @@
             line-height: 1.7;
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
-        }
-
-        .info-card {
-            padding: 34px;
-            border-radius: 22px;
-            background: rgba(255, 255, 255, .78);
-            border: 1px solid var(--lp-line);
-            box-shadow: 0 12px 35px rgba(20, 50, 39, .05);
-        }
-
-        .info-card h3 {
-            font-size: 24px;
-            margin: 0 0 12px;
-        }
-
-        .info-card p {
-            font-size: 13px;
-            line-height: 1.8;
-            color: var(--lp-muted);
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-top: 18px;
-        }
-
-        .stat {
-            padding: 26px;
-            border-radius: 18px;
-            background: #edf6f1;
+        /* SOP dan FAQ */
+        .panduan-intro {
+            max-width: 700px;
+            margin: 0 auto 38px;
             text-align: center;
         }
 
-        .stat b {
-            display: block;
-            font-size: 28px;
+        .panduan-intro p {
+            color: var(--lp-muted);
+            font-size: 13px;
+            line-height: 1.8;
         }
 
-        .stat span {
-            font-size: 11px;
+        .panduan-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panduan-content > div {
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid rgba(17, 47, 38, .09);
+            border-radius: 22px;
+            box-shadow: 0 12px 35px rgba(18, 40, 32, .07);
+        }
+
+        .panduan-heading {
+            font-size: 22px;
+            margin: 0 0 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #edf1ee;
+            color: var(--lp-ink);
+        }
+
+        .sop-list,
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sop-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sop-symbol {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0;
+            line-height: 1;
+            background: #dceee3;
+            color: #438767;
+            border: 1px solid #cce4d5;
+            border-radius: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 27px;
+            font-weight: 500;
+        }
+
+        .sop-detail {
+            flex: 1;
+            padding: 18px 20px;
+            background: #f4f8f5;
+            border: 1px solid #e7eee9;
+            border-radius: 14px;
+            transition: transform .3s ease, background-color .3s ease, box-shadow .3s ease;
+        }
+
+        .sop-detail:hover {
+            transform: translateY(-5px);
+            background: #ffffff;
+            box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
+        }
+
+        .sop-detail p {
+            margin: 0;
             color: var(--lp-muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .faq-item {
+            padding: 22px 24px;
+            background: #f4f8f5;
+            border: 1px solid #e7eee9;
+            border-radius: 16px;
+            transition: transform .3s ease, background-color .3s ease, box-shadow .3s ease;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-5px);
+            background: #ffffff;
+            box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
+        }
+
+        .faq-question {
+            color: var(--lp-ink);
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .faq-answer {
+            color: var(--lp-muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .faq-answer b {
+            color: var(--lp-green);
         }
 
         .cta {
@@ -536,6 +602,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 28px;
+            scroll-margin-top: 110px;
         }
 
         .cta h2 {
@@ -613,8 +680,11 @@
                 width: calc(100% - 24px);
                 min-height: 68px;
                 padding: 0 20px;
-                margin: 12px auto 14px;
+                margin: 0;
                 top: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                position: fixed;
             }
 
             .lnav-links {
@@ -635,16 +705,12 @@
 
             .hero-copy {
                 width: calc(100% - 40px);
-                padding-top: 0;
+                padding-top: 60px;
             }
 
             .note,
             .status-card {
                 display: none;
-            }
-
-            .hero-copy {
-                padding-top: 60px;
             }
 
             .task-card {
@@ -666,11 +732,7 @@
 
             .feature-grid,
             .steps,
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-row {
+            .panduan-content {
                 grid-template-columns: 1fr;
             }
 
@@ -694,13 +756,27 @@
         }
 
         @media (max-width: 560px) {
+            .landing-shell {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+            }
+
             .hero {
                 min-height: 570px;
+            }
+
+            .hero-copy {
+                width: calc(100% - 36px);
             }
 
             .hero h1 {
                 font-size: clamp(30px, 8vw, 42px);
                 line-height: 1.12;
+            }
+
+            .hero p {
+                font-size: 13px;
             }
 
             .hero-actions {
@@ -716,6 +792,28 @@
                 display: none;
             }
 
+            .section,
+            .dark-section {
+                padding: 48px 18px;
+            }
+
+            .section#alur .feature {
+                min-height: 0;
+            }
+
+            .panduan-content > div {
+                padding: 20px;
+            }
+
+            .cta {
+                margin: 0 18px 30px;
+                padding: 28px 22px;
+            }
+
+            .step {
+                padding: 22px;
+            }
+
             .footer-grid {
                 grid-template-columns: 1fr;
             }
@@ -728,310 +826,25 @@
                 font-size: 16px;
             }
         }
-
-        /* Landing page sizing and three-step process cards */
-        .section#alur {
-            padding-top: 76px;
-            padding-bottom: 76px;
-        }
-
-        .section#alur .feature-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
-            padding: 10px 0;
-            border-radius: 0;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-        }
-
-        .section#alur .feature,
-        .section#alur .feature.wide {
-            min-height: 180px;
-            padding: 26px;
-            border-radius: 18px;
-            background: #ffffff;
-            border: 1px solid rgba(17, 47, 38, .08);
-            box-shadow: 0 8px 24px #cbe0d5;
-            display: block;
-            transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .section#alur .feature:hover {
-            transform: translateY(-9px);
-            box-shadow: 0 18px 35px rgba(18, 40, 32, .15);
-        }
-
-        .section#alur .feature .num {
-            width: auto;
-            height: auto;
-            display: block;
-            padding: 0;
-            margin: 0 0 16px;
-            border: 0;
-            border-radius: 0;
-            background: transparent;
-            color: var(--lp-green);
-            font-size: 34px;
-            line-height: 1;
-            font-weight: 800;
-        }
-
-        .section#alur .feature h3 {
-            margin: 0 0 10px;
-            color: var(--lp-ink);
-            font-size: 16px;
-            letter-spacing: -.02em;
-        }
-
-        .section#alur .feature p {
-            max-width: 420px;
-            margin: 0;
-            color: var(--lp-muted);
-            font-size: 12px;
-            line-height: 1.75;
-        }
-
-        @media (max-width: 900px) {
-            .section#alur .feature-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 560px) {
-            .section#alur .feature {
-                min-height: 0;
-            }
-        }
-
-        /* SOP dan FAQ */
-        .panduan-intro {
-            max-width: 700px;
-            margin: 0 auto 38px;
-            text-align: center;
-        }
-
-        .panduan-intro p {
-            color: var(--lp-muted);
-            font-size: 13px;
-            line-height: 1.8;
-        }
-
-        .panduan-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        .panduan-heading {
-            font-size: 22px;
-            margin: 0 0 22px;
-            color: var(--lp-ink);
-        }
-
-        .sop-list,
-        .faq-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .sop-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sop-symbol {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-            flex-shrink: 0;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            box-sizing: border-box;
-            padding: 0;
-            line-height: 1;
-
-            background: #dceee3;
-            color: #438767;
-            border: 1px solid #cce4d5;
-            border-radius: 10px;
-
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 27px;
-            font-weight: 500;
-        }
-
-        .sop-detail {
-            flex: 1;
-            padding: 18px 20px;
-            background: #fff;
-            border: 1px solid var(--lp-line);
-            border-radius: 14px;
-            box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
-            transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .sop-detail:hover,
-        .faq-item:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 30px rgba(18, 40, 32, .13);
-        }
-
-        .sop-detail p {
-            margin: 0;
-            color: var(--lp-muted);
-            font-size: 12px;
-            line-height: 1.8;
-        }
-
-        .faq-item {
-            padding: 22px 24px;
-            background: #fff;
-            border: 1px solid var(--lp-line);
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(18, 40, 32, .06);
-            transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .faq-question {
-            color: var(--lp-ink);
-            font-size: 13px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .faq-answer {
-            color: var(--lp-muted);
-            font-size: 12px;
-            line-height: 1.8;
-        }
-
-        .faq-answer b {
-            color: var(--lp-green);
-        }
-
-        @media (max-width: 900px) {
-            .panduan-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Kontainer utama SOP dan FAQ */
-        .panduan-content > div {
-            padding: 30px;
-            background: #ffffff;
-            border: 1px solid rgba(17, 47, 38, .09);
-            border-radius: 22px;
-            box-shadow: 0 12px 35px rgba(18, 40, 32, .07);
-        }
-
-        /* Judul di dalam kontainer */
-        .panduan-heading {
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #edf1ee;
-        }
-
-        /* Kotak isi SOP */
-        .sop-detail {
-            background: #f4f8f5;
-            border: 1px solid #e7eee9;
-            box-shadow: none;
-            transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .sop-detail:hover {
-            transform: translateY(-5px);
-            background: #ffffff;
-            box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
-        }
-
-        /* Kotak isi FAQ */
-        .faq-item {
-            background: #f4f8f5;
-            border: 1px solid #e7eee9;
-            box-shadow: none;
-            transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .faq-item:hover {
-            transform: translateY(-5px);
-            background: #ffffff;
-            box-shadow: 0 10px 24px rgba(18, 40, 32, .10);
-        }
-
-        /* Simbol SOP */
-        .sop-symbol {
-            flex-shrink: 0;
-            background: #dceee3;
-            border: 1px solid #cce4d5;
-        }
-
-        @media (max-width: 560px) {
-            .panduan-content > div {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 560px) {
-            .landing-shell {
-                width: 100%;
-                margin: 0;
-                border-radius: 0;
-            }
-
-            .hero {
-                min-height: 570px;
-            }
-
-            .hero-copy {
-                width: calc(100% - 36px);
-            }
-
-            .hero p {
-                font-size: 13px;
-            }
-
-            .section,
-            .dark-section {
-                padding: 48px 18px;
-            }
-
-            .cta {
-                margin: 0 18px 30px;
-                padding: 28px 22px;
-            }
-
-            .info-card,
-            .step {
-                padding: 22px;
-            }
-        }
-</style>
+    </style>
 
     <nav class="lnav">
-            <a class="brand" href="#top">
-                <img src="{{ asset('images/logosipadu.png') }}" alt="SIPADU">
-                <span>SIPADU</span>
-            </a>
+        <a class="brand" href="#top">
+            <img src="{{ asset('images/logosipadu.png') }}" alt="SIPADU">
+            <span>SIPADU</span>
+        </a>
 
-            <div class="lnav-links">
-                <a href="#alur">Alur Pengajuan</a>
-                <a href="#informasi">Informasi</a>
-                <a href="#panduan">SOP & FAQ</a>
-                <a href="#kontak">Kontak</a>
-            </div>
+        <div class="lnav-links">
+            <a href="#alur">Alur Pengajuan</a>
+            <a href="#informasi">Informasi</a>
+            <a href="#panduan">SOP & FAQ</a>
+            <a href="#contact">Kontak</a>
+        </div>
 
-            <div class="lnav-actions">
-                <a class="lbtn login" href="{{ route('login') }}">Login</a>
-                <a class="lbtn primary" href="{{ route('register') }}">Register</a>
-            </div>
+        <div class="lnav-actions">
+            <a class="lbtn login" href="{{ route('login') }}">Login</a>
+            <a class="lbtn primary" href="{{ route('register') }}">Register</a>
+        </div>
     </nav>
 
     <main class="landing-shell">
@@ -1110,12 +923,10 @@
             <div class="section-title">
                 <span class="eyebrow">Alur Pengajuan</span>
 
-                <h2>Alur peminjaman auditorium yang mudah dan terarah.</h2>
+                <h2>{{ $alur?->title ?: 'Alur peminjaman auditorium yang mudah dan terarah.' }}</h2>
 
                 <p>
-                    Peminjam mengajukan permohonan peminjaman auditorium,
-                    kemudian admin melakukan verifikasi. Setelah pengajuan disetujui,
-                    auditorium siap digunakan sesuai jadwal.
+                    {{ $alur?->body ?: 'Peminjam mengajukan permohonan peminjaman auditorium, kemudian admin melakukan verifikasi. Setelah pengajuan disetujui, auditorium siap digunakan sesuai jadwal.' }}
                 </p>
             </div>
 
@@ -1178,180 +989,181 @@
             </div>
         </section>
 
-<section class="section reveal" id="panduan">
-    <div class="section-title">
-        <span class="eyebrow">Panduan</span>
+        <section class="section reveal" id="panduan">
+            <div class="section-title">
+                <span class="eyebrow">Panduan</span>
 
-        <h2>SOP dan FAQ Peminjaman Auditorium SIPADU</h2>
+                <h2>SOP dan FAQ Peminjaman Auditorium SIPADU</h2>
 
-        <p>
-            Pelajari prosedur peminjaman dan temukan jawaban
-            atas pertanyaan umum sebelum mengajukan auditorium.
-        </p>
-    </div>
+                <p>
+                    Pelajari prosedur peminjaman dan temukan jawaban
+                    atas pertanyaan umum sebelum mengajukan auditorium.
+                </p>
+            </div>
 
-    <div class="panduan-content">
+            <div class="panduan-content">
 
-        {{-- SOP --}}
-        <div>
-            <h3 class="panduan-heading">SOP Peminjaman</h3>
+                {{-- SOP --}}
+                <div>
+                    <h3 class="panduan-heading">SOP Peminjaman</h3>
 
-            <div class="sop-list">
+                    <div class="sop-list">
 
-                <div class="sop-item">
-                    <div class="sop-symbol">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-caret-right-fill"
-                            viewBox="0 0 16 16">
-                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                        </svg>
-                    </div>
-                    <div class="sop-detail">
-                        <p>
-                            UKM, BEM, atau Himpunan mengajukan proposal
-                            dan surat peminjaman kepada Koordinator
-                            Bidang Kemahasiswaan.
-                        </p>
+                        <div class="sop-item">
+                            <div class="sop-symbol">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    class="bi bi-caret-right-fill"
+                                    viewBox="0 0 16 16">
+                                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                </svg>
+                            </div>
+                            <div class="sop-detail">
+                                <p>
+                                    UKM, BEM, atau Himpunan mengajukan proposal
+                                    dan surat peminjaman kepada Koordinator
+                                    Bidang Kemahasiswaan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="sop-item">
+                            <div class="sop-symbol">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    class="bi bi-caret-right-fill"
+                                    viewBox="0 0 16 16">
+                                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                </svg>
+                            </div>
+                            <div class="sop-detail">
+                                <p>
+                                    Apabila terdapat jadwal bersamaan dengan
+                                    kegiatan pihak rektorat, kegiatan rektorat
+                                    diprioritaskan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="sop-item">
+                            <div class="sop-symbol">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    class="bi bi-caret-right-fill"
+                                    viewBox="0 0 16 16">
+                                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                </svg>
+                            </div>
+                            <div class="sop-detail">
+                                <p>
+                                    Jika pengajuan BEM dan Himpunan memiliki
+                                    jadwal yang sama, tingkat urgensi dan
+                                    kepentingan kegiatan menjadi pertimbangan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="sop-item">
+                            <div class="sop-symbol">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    class="bi bi-caret-right-fill"
+                                    viewBox="0 0 16 16">
+                                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                </svg>
+                            </div>
+                            <div class="sop-detail">
+                                <p>
+                                    Pengajuan kegiatan eksternal dan internal
+                                    UPN dinilai berdasarkan tujuan kegiatan
+                                    serta asal narasumber.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="sop-item">
+                            <div class="sop-symbol">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    class="bi bi-caret-right-fill"
+                                    viewBox="0 0 16 16">
+                                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                </svg>
+                            </div>
+                            <div class="sop-detail">
+                                <p>
+                                    Lihat panduan lengkap melalui
+                                    <a href="http://bit.ly/AlurPeminjamanRuanganPerFakultas"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       style="color: var(--lp-green); font-weight: 700;">
+                                        tautan SOP peminjaman ruangan
+                                    </a>.
+                                </p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <div class="sop-item">
-                    <div class="sop-symbol">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-caret-right-fill"
-                            viewBox="0 0 16 16">
-                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                        </svg>
-                    </div>
-                    <div class="sop-detail">
-                        <p>
-                            Apabila terdapat jadwal bersamaan dengan
-                            kegiatan pihak rektorat, kegiatan rektorat
-                            diprioritaskan.
-                        </p>
-                    </div>
-                </div>
+                {{-- FAQ --}}
+                <div>
+                    <h3 class="panduan-heading">Frequently Asked Questions (FAQ)</h3>
 
-                <div class="sop-item">
-                    <div class="sop-symbol">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-caret-right-fill"
-                            viewBox="0 0 16 16">
-                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                        </svg>
-                    </div>
-                    <div class="sop-detail">
-                        <p>
-                            Jika pengajuan BEM dan Himpunan memiliki
-                            jadwal yang sama, tingkat urgensi dan
-                            kepentingan kegiatan menjadi pertimbangan.
-                        </p>
-                    </div>
-                </div>
+                    <div class="faq-list">
 
-                <div class="sop-item">
-                    <div class="sop-symbol">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-caret-right-fill"
-                            viewBox="0 0 16 16">
-                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                        </svg>
-                    </div>
-                    <div class="sop-detail">
-                        <p>
-                            Pengajuan kegiatan eksternal dan internal
-                            UPN dinilai berdasarkan tujuan kegiatan
-                            serta asal narasumber.
-                        </p>
-                    </div>
-                </div>
+                        <article class="faq-item">
+                            <div class="faq-question">
+                                Q: Siapa saja yang dapat mengajukan peminjaman auditorium?
+                            </div>
+                            <div class="faq-answer">
+                                <b>A:</b> UKM, BEM, dan Himpunan dapat mengajukan
+                                peminjaman auditorium sesuai prosedur yang berlaku.
+                            </div>
+                        </article>
 
-                <div class="sop-item">
-                    <div class="sop-symbol">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-caret-right-fill"
-                            viewBox="0 0 16 16">
-                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                        </svg>
-                    </div>
-                    <div class="sop-detail">
-                        <p>
-                            Lihat panduan lengkap melalui
-                            <a href="http://bit.ly/AlurPeminjamanRuanganPerFakultas"
-                               target="_blank"
-                               style="color: var(--lp-green); font-weight: 700;">
-                                tautan SOP peminjaman ruangan
-                            </a>.
-                        </p>
+                        <article class="faq-item">
+                            <div class="faq-question">
+                                Q: Bagaimana cara mengajukan peminjaman auditorium?
+                            </div>
+                            <div class="faq-answer">
+                                <b>A:</b> Peminjam mengajukan proposal dan surat
+                                peminjaman kepada Admin Biro Umum & Keuangan sesuai
+                                prosedur peminjaman.
+                            </div>
+                        </article>
+
+                        <article class="faq-item">
+                            <div class="faq-question">
+                                Q: Bagaimana jika terdapat jadwal peminjaman yang bersamaan?
+                            </div>
+                            <div class="faq-answer">
+                                <b>A:</b> Pengajuan akan dipertimbangkan berdasarkan
+                                prioritas, tingkat urgensi, dan kepentingan kegiatan.
+                            </div>
+                        </article>
+
                     </div>
                 </div>
 
             </div>
-        </div>
+        </section>
 
-        {{-- FAQ --}}
-        <div>
-            <h3 class="panduan-heading">Frequently Asked Questions (FAQ)</h3>
-
-            <div class="faq-list">
-
-                <article class="faq-item">
-                    <div class="faq-question">
-                        Q: Siapa saja yang dapat mengajukan peminjaman auditorium?
-                    </div>
-                    <div class="faq-answer">
-                        <b>A:</b> UKM, BEM, dan Himpunan dapat mengajukan
-                        peminjaman auditorium sesuai prosedur yang berlaku.
-                    </div>
-                </article>
-
-                <article class="faq-item">
-                    <div class="faq-question">
-                        Q: Bagaimana cara mengajukan peminjaman auditorium?
-                    </div>
-                    <div class="faq-answer">
-                        <b>A:</b> Peminjam mengajukan proposal dan surat
-                        peminjaman kepada Admin Biro Umum & Keuangan sesuai
-                        prosedur peminjaman.
-                    </div>
-                </article>
-
-                <article class="faq-item">
-                    <div class="faq-question">
-                        Q: Bagaimana jika terdapat jadwal peminjaman yang bersamaan?
-                    </div>
-                    <div class="faq-answer">
-                        <b>A:</b> Pengajuan akan dipertimbangkan berdasarkan
-                        prioritas, tingkat urgensi, dan kepentingan kegiatan.
-                    </div>
-                </article>
-
-            </div>
-        </div>
-
-    </div>
-</section>
-
-        <section class="cta reveal" id="kontak">
+        <section class="cta reveal" id="contact">
             <div>
                 <span class="eyebrow">Mulai Sekarang</span>
 
-                <h2>Siap mengajukan peminjaman auditorium?</h2>
+                <h2>{{ $contact?->title ?: 'Siap mengajukan peminjaman auditorium?' }}</h2>
 
                 <p>
                     {{ $contact?->body ?? 'Masuk ke SIPADU untuk memulai pengajuan dan memantau proses peminjaman.' }}
@@ -1363,8 +1175,8 @@
                     Ajukan Sekarang
                 </a>
 
-                <a class="lbtn login" href="{{ route('login') }}">
-                    Login
+                <a class="lbtn login" href="{{ route('register') }}">
+                    Daftar Akun
                 </a>
             </div>
         </section>
@@ -1398,7 +1210,7 @@
                 <div>
                     <h4>Akses</h4>
                     <a href="{{ route('login') }}">Login SIPADU</a>
-                    <a href="https://upnvj.ac.id" target="_blank">
+                    <a href="https://upnvj.ac.id" target="_blank" rel="noopener noreferrer">
                         UPN Veteran Jakarta
                     </a>
                 </div>
@@ -1412,32 +1224,27 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-                a.addEventListener('click', function (e) {
-                    var t = document.querySelector(this.getAttribute('href'));
+            var navLinks = Array.from(
+                document.querySelectorAll('.lnav-links a[href^="#"]')
+            );
 
-                    if (t) {
-                        e.preventDefault();
-                        t.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-
-            // Tandai menu navbar sesuai bagian halaman yang sedang dibuka.
-            var navLinks = Array.from(document.querySelectorAll('.lnav-links a[href^="#"]'));
             var navSections = navLinks
                 .map(function (link) {
                     return document.querySelector(link.getAttribute('href'));
                 })
                 .filter(Boolean);
 
+            var isNavScrolling = false;
+            var navScrollTimer = null;
+
+            // Mengatur menu yang sedang aktif
             function setActiveNav(sectionId) {
                 navLinks.forEach(function (link) {
-                    var isActive = link.getAttribute('href') === '#' + sectionId;
+                    var isActive =
+                        link.getAttribute('href') === '#' + sectionId;
+
                     link.classList.toggle('active', isActive);
+
                     if (isActive) {
                         link.setAttribute('aria-current', 'location');
                     } else {
@@ -1446,18 +1253,36 @@
                 });
             }
 
-            navLinks.forEach(function (link) {
-                link.addEventListener('click', function () {
-                    setActiveNav(this.getAttribute('href').slice(1));
-                });
-            });
-
+            // Mendeteksi section berdasarkan posisi scroll
             function updateActiveNav() {
-                var marker = 150;
+                if (isNavScrolling) return;
+
+                var scrollPosition =
+                    window.scrollY + window.innerHeight;
+
+                var pageHeight =
+                    document.documentElement.scrollHeight;
+
+                // Prioritaskan Kontak ketika sudah mencapai bagian bawah halaman
+                if (scrollPosition >= pageHeight - 5) {
+                    setActiveNav('contact');
+                    return;
+                }
+
+                // Marker dibuat lebih rendah agar section Kontak
+                // bisa aktif sebelum mencapai footer.
+                var marker = Math.min(
+                    300,
+                    Math.max(160, window.innerHeight * 0.4)
+                );
+
                 var currentSection = null;
 
                 navSections.forEach(function (section) {
-                    if (section.getBoundingClientRect().top <= marker) {
+                    var sectionTop =
+                        section.getBoundingClientRect().top;
+
+                    if (sectionTop <= marker) {
                         currentSection = section;
                     }
                 });
@@ -1472,10 +1297,55 @@
                 }
             }
 
-            window.addEventListener('scroll', updateActiveNav, { passive: true });
+            // Navigasi saat menu topbar diklik
+            navLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    var targetId = this.getAttribute('href');
+                    var target = document.querySelector(targetId);
+
+                    if (!target) return;
+
+                    isNavScrolling = true;
+
+                    // Langsung aktifkan warna hijau pada menu yang diklik
+                    setActiveNav(target.id);
+
+                    clearTimeout(navScrollTimer);
+
+                    var targetPosition =
+                        target.getBoundingClientRect().top +
+                        window.pageYOffset - 110;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+
+                    history.replaceState(null, '', targetId);
+
+                    // Aktifkan kembali pendeteksian scroll setelah animasi
+                    navScrollTimer = setTimeout(function () {
+                        isNavScrolling = false;
+                        updateActiveNav();
+                    }, 1200);
+                });
+            });
+
+            // Deteksi posisi scroll manual
+            window.addEventListener('scroll', updateActiveNav, {
+                passive: true
+            });
+
             window.addEventListener('resize', updateActiveNav);
+
+            window.addEventListener('load', updateActiveNav);
+
+            // Jalankan saat halaman pertama kali dibuka
             updateActiveNav();
 
+            // Animasi tampilan section
             var items = document.querySelectorAll('.reveal');
 
             if ('IntersectionObserver' in window) {

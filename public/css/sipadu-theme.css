@@ -1,5 +1,5 @@
-/* SIPADU UI/UX refresh inspired by the v2.2 interface.
-   Backend markup and behavior are intentionally preserved.
+/* SIPADU UI/UX theme tokens and shared component defaults.
+   Preserves custom CRUD action colors (detail, edit, delete) and auth/landing overrides.
 */
 
 :root {
@@ -9,7 +9,8 @@
     --border-hairline: #dce5e0;
     --text-main: #14201a;
     --text-muted: #4b5b53;
-    --brand-primary: #316f4f;
+    --brand-primary: #237c4d;
+    --brand-primary-hover: #1c663f;
     --brand-dark: #123824;
     --brand-on-primary: #fff;
     --status-ok-bg: #dcfce7;
@@ -140,9 +141,15 @@ tr:hover td {
     padding: 32px !important;
 }
 
-.btn,
-.mini,
-button[type="submit"],
+/* Primary action defaults (do not override semantic CRUD/warning/danger/secondary buttons) */
+
+.btn:not([class*="btn-"]):not(.reject):not(.delete):not(.edit):not(
+        .secondary
+    ):not(.outline),
+.mini:not(.reject):not(.delete):not(.edit):not(.revision):not(.detail),
+button[type="submit"]:not([class*="btn-"]):not([class*="-btn"]):not(.mini):not(
+        .reject
+    ):not(.delete):not(.edit):not(.revision):not(.secondary),
 .dashboard-action {
     border: 0 !important;
     border-radius: 12px !important;
@@ -154,11 +161,15 @@ button[type="submit"],
     transition: 0.18s ease !important;
 }
 
-.btn:hover,
-.mini:hover,
-button[type="submit"]:hover,
+.btn:not([class*="btn-"]):not(.reject):not(.delete):not(.edit):not(
+        .secondary
+    ):not(.outline):hover,
+.mini:not(.reject):not(.delete):not(.edit):not(.revision):not(.detail):hover,
+button[type="submit"]:not([class*="btn-"]):not([class*="-btn"]):not(.mini):not(
+        .reject
+    ):not(.delete):not(.edit):not(.revision):not(.secondary):hover,
 .dashboard-action:hover {
-    background: #24563d !important;
+    background: var(--brand-primary-hover) !important;
     transform: translateY(-1px);
 }
 
@@ -170,6 +181,7 @@ button[type="submit"]:hover,
 
 .mini.approve {
     background: var(--brand-primary) !important;
+    color: #fff !important;
 }
 
 .status {
@@ -219,7 +231,7 @@ input:focus,
 select:focus,
 textarea:focus {
     border-color: var(--brand-primary) !important;
-    box-shadow: 0 0 0 3px rgba(49, 111, 79, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(35, 124, 77, 0.12) !important;
 }
 
 label {
@@ -228,20 +240,7 @@ label {
     color: var(--text-main) !important;
 }
 
-/* Auth */
-
-.auth-shell {
-    min-height: 100vh;
-    background: var(--bg-canvas) !important;
-}
-
-.auth-art {
-    background: linear-gradient(145deg, #123824, #316f4f) !important;
-}
-
-.auth-art::after {
-    background: linear-gradient(145deg, #78a58dcc, #91b49fa6) !important;
-}
+/* Auth defaults */
 
 .auth-form {
     background: var(--bg-card) !important;
@@ -251,18 +250,10 @@ label {
     color: var(--text-main) !important;
 }
 
-.auth-form p {
-    color: var(--text-muted) !important;
-}
-
 .auth-form .back,
 .auth-switch a {
     color: var(--brand-primary) !important;
     font-weight: 700;
-}
-
-.auth-form .btn.wide {
-    background: var(--brand-primary) !important;
 }
 
 /* Dashboard normalization */
@@ -362,9 +353,7 @@ label {
     }
 }
 
-/* Mobile responsiveness reinforcement:
-   UI-only overrides, no application logic changed.
-*/
+/* Mobile responsiveness reinforcement */
 
 @media (max-width: 900px) {
     html,
@@ -479,8 +468,7 @@ label {
         max-width: 100% !important;
     }
 
-    table th,
-    table td {
+    table th {
         white-space: nowrap;
     }
 }
