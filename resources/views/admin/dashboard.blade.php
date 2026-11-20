@@ -3,34 +3,44 @@
 @section('panel')
 
 @php
-    $total = $stats['total'];
+    $total = $stats['total'] ?? 0;
     $cancelled = $stats['cancelled'] ?? 0;
 
-    $pendingPercent = $total > 0 ? ($stats['pending'] / $total) * 100 : 0;
-    $approvedPercent = $total > 0 ? ($stats['approved'] / $total) * 100 : 0;
-    $rejectedPercent = $total > 0 ? ($stats['rejected'] / $total) * 100 : 0;
+    $pendingPercent = $total > 0 ? (($stats['pending'] ?? 0) / $total) * 100 : 0;
+    $approvedPercent = $total > 0 ? (($stats['approved'] ?? 0) / $total) * 100 : 0;
+    $rejectedPercent = $total > 0 ? (($stats['rejected'] ?? 0) / $total) * 100 : 0;
     $cancelledPercent = $total > 0 ? ($cancelled / $total) * 100 : 0;
+
+    $sourceBookings = isset($bookings) ? collect($bookings) : collect();
+
+    $pendingBookings = $sourceBookings->filter(function ($item) {
+        return in_array(strtolower((string) ($item->status ?? '')), ['pending', 'menunggu'], true);
+    });
+
+    if ($pendingBookings->isEmpty() && ($stats['pending'] ?? 0) > 0) {
+        $pendingBookings = \App\Models\Booking::with(['user', 'auditorium'])
+            ->whereIn('status', ['Pending', 'pending', 'PENDING', 'Menunggu', 'menunggu'])
+            ->latest()
+            ->get();
+    }
+
+    $upcomingBookings = isset($upcomingBookings)
+        ? collect($upcomingBookings)
+        : \App\Models\Booking::with(['user', 'auditorium'])
+            ->whereIn('status', ['Disetujui', 'disetujui', 'Approved', 'approved', 'APPROVED'])
+            ->whereDate('booking_date', '>=', now()->toDateString())
+            ->orderBy('booking_date', 'asc')
+            ->get();
 @endphp
 
 <style>
-    /* BACKGROUND GRADASI HALUS AGAR EFEK BLUR KACA TERLIHAT NYATA */
-    body,
-    .main-wrapper,
-    .content-wrapper,
-    main {
-        background-color: #b5d6c5 !important;
-        background-image: linear-gradient(135deg, #cfe6da 0%, #b5d6c5 52%, #a2c9b4 100%) !important;
-        background-attachment: fixed !important;
-        min-height: 100vh;
-    }
-
     .dashboard-page {
         width: 100%;
         box-sizing: border-box;
-        padding: 10px 10px 35px;
+        padding: 10px 0 35px;
     }
 
-    /* HEADER (DISAMAKAN DENGAN DASHBOARD PEMINJAM) */
+    /* HEADER */
     .dashboard-topbar {
         display: flex;
         align-items: center;
@@ -41,16 +51,16 @@
     }
 
     .dashboard-welcome h1 {
-        font-size: 27px;
-        font-weight: 750;
+        font-size: 26px;
+        font-weight: 800;
         color: #163626;
         margin: 0 0 5px;
-        letter-spacing: -0.3px;
+        letter-spacing: -0.03em;
     }
 
     .dashboard-welcome p {
         font-size: 13px;
-        color: #324a3c;
+        color: #4c6456;
         margin: 0;
     }
 
@@ -60,20 +70,20 @@
         justify-content: center;
         gap: 8px;
         padding: 11px 18px;
-        border-radius: 10px;
+        border-radius: 11px;
         background: #237c4d;
-        color: white;
+        color: #ffffff;
         text-decoration: none;
         font-size: 12.5px;
         font-weight: 700;
         box-shadow: 0 4px 14px rgba(35, 124, 77, 0.25);
-        transition: .2s ease;
+        transition: background .2s ease, transform .2s ease;
         white-space: nowrap;
     }
 
     .dashboard-action:hover {
         background: #1a633c;
-        color: white;
+        color: #ffffff;
         transform: translateY(-2px);
     }
 
@@ -82,7 +92,7 @@
         height: 16px;
     }
 
-    /* STATISTIK (GLASSMORPHISM REALISTIS & STATIS) */
+    /* STATISTIK (GLASSMORPHISM) */
     .stats {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -91,13 +101,13 @@
     }
 
     .stat-card {
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.54) 0%, rgba(255, 255, 255, 0.28) 100%) !important;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.42) 100%) !important;
         backdrop-filter: blur(18px) saturate(150%) !important;
         -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.38) !important;
-        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.55) !important;
+        border-radius: 16px;
         padding: 17px 18px;
-        box-shadow: 0 8px 24px rgba(22, 54, 38, 0.05) !important;
+        box-shadow: 0 8px 28px rgba(22, 54, 38, 0.06) !important;
     }
 
     .stat-top {
@@ -115,12 +125,12 @@
     }
 
     .stat-icon {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
+        border-radius: 9px;
     }
 
     .stat-icon svg {
@@ -151,7 +161,7 @@
     .stat-card strong {
         display: block;
         font-size: 26px;
-        font-weight: 750;
+        font-weight: 800;
         color: #163626;
         line-height: 1.2;
     }
@@ -162,30 +172,19 @@
         font-size: 11px;
     }
 
-    /* PANEL GLASS UMUM (UNTUK DIAGRAM & PENGAJUAN TERBARU) */
+    /* PANEL GLASS DIAGRAM PIE */
     .dashboard-panel {
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.54) 0%, rgba(255, 255, 255, 0.28) 100%) !important;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.42) 100%) !important;
         backdrop-filter: blur(18px) saturate(150%) !important;
         -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.38) !important;
+        border: 1px solid rgba(255, 255, 255, 0.55) !important;
         border-radius: 16px;
-        padding: 12px 20px 18px 20px !important;
+        padding: 16px 20px 20px !important;
         margin-bottom: 20px;
         min-width: 0;
-        box-shadow: 0 8px 24px rgba(22, 54, 38, 0.05) !important;
+        box-shadow: 0 8px 28px rgba(22, 54, 38, 0.06) !important;
         box-sizing: border-box;
         width: 100%;
-    }
-
-    .dashboard-panel .section-head {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-        margin-bottom: 14px;
-    }
-
-    .dashboard-panel .section-head h2 {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
     }
 
     .section-head {
@@ -193,21 +192,21 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-        margin-bottom: 14px;
+        margin: 0 0 14px !important;
+        padding: 0 !important;
     }
 
     .section-head h2 {
         font-size: 15.5px;
-        font-weight: 750;
+        font-weight: 800;
         color: #163626;
-        margin: 0 0 2px !important;
-        padding-top: 0 !important;
+        margin: 0 0 3px !important;
+        padding: 0 !important;
+        letter-spacing: -0.02em;
     }
 
     .section-head p {
-        font-size: 11px;
+        font-size: 11.5px;
         color: #4c6456;
         margin: 0;
     }
@@ -215,13 +214,16 @@
     .section-head a {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 5px;
+        padding: 7px 12px;
+        border-radius: 10px;
+        background: rgba(35, 124, 77, 0.11);
         color: #1f7a49;
         text-decoration: none;
         font-size: 11.5px;
         font-weight: 700;
         white-space: nowrap;
-        transition: gap 0.2s ease, color 0.2s ease;
+        transition: background 0.2s ease, gap 0.2s ease, color 0.2s ease;
     }
 
     .section-head a svg {
@@ -230,11 +232,12 @@
     }
 
     .section-head a:hover {
+        background: rgba(35, 124, 77, 0.18);
         color: #155a35;
         gap: 7px;
     }
 
-    /* KARTU DIAGRAM PIE (GLASSMORPHISM) */
+    /* KARTU DIAGRAM PIE */
     .chart-content {
         display: flex;
         align-items: center;
@@ -280,7 +283,7 @@
 
     .pie-center strong {
         font-size: 30px;
-        font-weight: 750;
+        font-weight: 800;
         color: #163626;
         line-height: 1.2;
     }
@@ -291,7 +294,6 @@
         color: #4c6456;
     }
 
-    /* TOOLTIP */
     .pie-tooltip {
         position: absolute;
         z-index: 5;
@@ -317,7 +319,6 @@
         visibility: visible;
     }
 
-    /* LEGENDA KACA SUB-ITEM */
     .chart-legend {
         min-width: 240px;
         max-width: 310px;
@@ -334,15 +335,15 @@
         gap: 15px;
         padding: 11px 14px;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.42);
-        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.48);
+        border: 1px solid rgba(255, 255, 255, 0.45);
         transition: background .2s ease, transform .2s ease;
         cursor: pointer;
     }
 
     .legend-item:hover,
     .legend-item.active {
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.78);
         transform: translateX(4px);
     }
 
@@ -392,87 +393,122 @@
         padding: 25px;
     }
 
-    /* TABEL PENGAJUAN TERBARU (SAMA PERSIS DENGAN DASHBOARD PEMINJAM) */
-    .dashboard-table-wrap {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.42) !important;
-        border: 1px solid rgba(255, 255, 255, 0.35) !important;
-        border-radius: 12px;
-        overflow-x: auto;
-        overflow-y: hidden;
+    /* GRID 2 KOLOM BERDAMPINGAN: DAFTAR PENGAJUAN TERBARU (PENDING) & JADWAL PEMINJAMAN MENDATANG */
+    .dash-tables-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        align-items: start;
     }
 
-    .dashboard-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 12px;
-        min-width: 600px;
+    .dash-table-card {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.42) 100%) !important;
+        backdrop-filter: blur(18px) saturate(150%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.55) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 28px rgba(22, 54, 38, 0.06) !important;
+        overflow: hidden;
+        min-width: 0;
     }
 
-    .dashboard-table th {
-        background: rgba(35, 124, 77, 0.14) !important;
-        color: #163626 !important;
+    .dash-table-card .section-head {
+        padding: 16px 18px !important;
+        margin: 0 !important;
+        border-bottom: 1px solid rgba(22, 54, 38, 0.09);
+        background: rgba(255, 255, 255, 0.28);
+    }
+
+    .dash-title-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .dash-badge-count {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 999px;
         font-size: 11px;
-        font-weight: 750;
-        text-align: left;
-        padding: 13px 14px;
-        border-bottom: none !important;
+        font-weight: 800;
+        background: rgba(35, 124, 77, 0.14);
+        color: #1f7a49;
     }
 
-    .dashboard-table td {
-        color: #243b2e;
+    .dash-badge-count.amber {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .dash-cell-primary {
+        display: block;
+        font-weight: 700;
+        color: #163626;
+    }
+
+    .dash-cell-sub {
+        display: block;
+        font-size: 11.5px;
         font-weight: 500;
-        padding: 13px 14px;
-        border-bottom: 1px solid rgba(22, 54, 38, 0.06);
-        vertical-align: middle;
-        transition: background 0.2s ease;
-    }
-
-    .dashboard-table tbody tr:hover td {
-        background: rgba(255, 255, 255, 0.55) !important;
-    }
-
-    .dashboard-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .dashboard-table .empty {
-        text-align: center;
-        color: #4c6456;
-        padding: 25px 10px;
+        color: #64786c;
+        margin-top: 2px;
     }
 
     /* BADGE STATUS */
     .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 10.5px;
-        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 11px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
         white-space: nowrap;
     }
 
-    .status.pending {
-        color: #b4690e;
-        background: rgba(254, 240, 213, 0.92);
+    .status.pending,
+    .status.menunggu {
+        color: #92400e;
+        background: #fef3c7;
+        border: 1px solid #fcd34d;
     }
 
-    .status.disetujui {
-        color: #157343;
-        background: rgba(220, 243, 229, 0.92);
+    .status.disetujui,
+    .status.approved {
+        color: #065f46;
+        background: #bbf7d0;
+        border: 1px solid #34d399;
     }
 
-    .status.ditolak {
-        color: #c53030;
-        background: rgba(254, 226, 226, 0.92);
+    .status.ditolak,
+    .status.rejected {
+        color: #991b1b;
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
     }
 
-    .status.dibatalkan {
+    .status.dibatalkan,
+    .status.cancelled {
         color: #475569;
-        background: rgba(226, 232, 240, 0.92);
+        background: #e2e8f0;
+        border: 1px solid #cbd5e1;
+    }
+
+    .dash-empty-state {
+        text-align: center;
+        color: #4c6456;
+        padding: 32px 14px;
+        font-size: 12.5px;
     }
 
     /* RESPONSIVE */
+    @media (max-width: 1180px) {
+        .dash-tables-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     @media (max-width: 900px) {
         .stats {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -497,7 +533,7 @@
         }
 
         .dashboard-panel {
-            padding: 12px 15px 15px 15px !important;
+            padding: 14px 15px 16px !important;
         }
 
         .chart-content {
@@ -688,55 +724,134 @@
         @endif
     </div>
 
-    {{-- PENGAJUAN TERBARU --}}
-    <div class="dashboard-panel" style="margin-bottom: 0;">
-        <div class="section-head">
-            <div>
-                <h2>Pengajuan Terbaru</h2>
-                <p>Daftar pengajuan peminjaman auditorium terbaru</p>
+    {{-- 2 TABEL BERDAMPINGAN: DAFTAR PENGAJUAN TERBARU (PENDING) & JADWAL PEMINJAMAN MENDATANG --}}
+    <div class="dash-tables-grid">
+
+        {{-- TABEL 1: DAFTAR PENGAJUAN TERBARU (KHUSUS STATUS PENDING) --}}
+        <div class="dash-table-card">
+            <div class="section-head">
+                <div>
+                    <div class="dash-title-row">
+                        <h2>Daftar Pengajuan Terbaru</h2>
+                        <span class="dash-badge-count amber">{{ $pendingBookings->count() }} Pending</span>
+                    </div>
+                    <p>Pengajuan berstatus pending yang menunggu verifikasi.</p>
+                </div>
+
+                <a href="{{ route('admin.bookings', ['status' => 'pending']) }}">
+                    Lihat semua
+                    <i data-lucide="arrow-right"></i>
+                </a>
             </div>
 
-            <a href="{{ route('admin.bookings') }}">
-                Lihat semua
-                <i data-lucide="arrow-right"></i>
-            </a>
+            <div class="sipadu-table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Peminjam</th>
+                            <th>Kegiatan</th>
+                            <th>Auditorium</th>
+                            <th>Tanggal</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($pendingBookings as $b)
+                            <tr>
+                                <td>
+                                    <span class="dash-cell-primary">{{ optional($b->user)->name ?? 'Pemohon' }}</span>
+                                </td>
+                                <td>
+                                    <span class="dash-cell-primary">{{ $b->event_name }}</span>
+                                </td>
+                                <td>{{ optional($b->auditorium)->name ?? '-' }}</td>
+                                <td>
+                                    {{ $b->booking_date ? \Carbon\Carbon::parse($b->booking_date)->format('d M Y') : '-' }}
+                                </td>
+                                <td>
+                                    <span class="status pending">
+                                        Pending
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr data-empty-row="1">
+                                <td colspan="5" class="dash-empty-state">
+                                    Tidak ada pengajuan pending saat ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="dashboard-table-wrap">
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Peminjam</th>
-                        <th>Kegiatan</th>
-                        <th>Auditorium</th>
-                        <th>Tanggal</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
+        {{-- TABEL 2: JADWAL PEMINJAMAN MENDATANG --}}
+        <div class="dash-table-card">
+            <div class="section-head">
+                <div>
+                    <div class="dash-title-row">
+                        <h2>Jadwal Peminjaman Mendatang</h2>
+                        <span class="dash-badge-count">{{ $upcomingBookings->count() }} Jadwal</span>
+                    </div>
+                    <p>Agenda penggunaan auditorium yang telah disetujui.</p>
+                </div>
 
-                <tbody>
-                    @forelse($bookings as $b)
+                <a href="{{ route('admin.bookings', ['status' => 'approved']) }}">
+                    Lihat semua
+                    <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="sipadu-table-scroll">
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ $b->user->name }}</td>
-                            <td>{{ $b->event_name }}</td>
-                            <td>{{ $b->auditorium->name }}</td>
-                            <td>{{ $b->booking_date->format('d M Y') }}</td>
-                            <td>
-                                <span class="status {{ strtolower($b->status) }}">
-                                    {{ $b->status }}
-                                </span>
-                            </td>
+                            <th>Tanggal</th>
+                            <th>Auditorium</th>
+                            <th>Kegiatan</th>
+                            <th>Peminjam</th>
+                            <th>Status</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="empty">
-                                Belum ada pengajuan.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        @forelse($upcomingBookings as $u)
+                            <tr>
+                                <td>
+                                    <span class="dash-cell-primary">
+                                        {{ $u->booking_date ? \Carbon\Carbon::parse($u->booking_date)->format('d M Y') : '-' }}
+                                    </span>
+                                    @if(!empty($u->start_time))
+                                        <span class="dash-cell-sub">
+                                            {{ substr($u->start_time, 0, 5) }}@if(!empty($u->end_time)) - {{ substr($u->end_time, 0, 5) }} WIB @endif
+                                        </span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="dash-cell-primary">{{ optional($u->auditorium)->name ?? '-' }}</span>
+                                </td>
+                                <td>{{ $u->event_name }}</td>
+                                <td>{{ optional($u->user)->name ?? 'Pemohon' }}</td>
+                                <td>
+                                    <span class="status disetujui">
+                                        Disetujui
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr data-empty-row="1">
+                                <td colspan="5" class="dash-empty-state">
+                                    Belum ada jadwal peminjaman mendatang.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     </div>
 
 </div>
