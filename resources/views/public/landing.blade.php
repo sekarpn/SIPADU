@@ -30,7 +30,7 @@
 
         .landing-shell {
             width: min(1680px, calc(100% - 80px));
-            margin: 18px auto 16px;
+            margin: 8px auto 16px;
             border-radius: 20px;
             overflow: hidden;
             background: rgba(255, 255, 255, .80);
@@ -48,10 +48,10 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(255, 255, 255, .90);
-            border: 1px solid rgba(255, 255, 255, .65);
+            background: rgba(255, 255, 255, .62);
+            border: 1px solid rgba(255, 255, 255, .48);
             border-radius: 18px;
-            box-shadow: 0 8px 28px rgba(22, 54, 38, .08);
+            box-shadow: 0 8px 28px rgba(22, 54, 38, .06);
             backdrop-filter: blur(18px) saturate(150%);
             -webkit-backdrop-filter: blur(18px) saturate(150%);
             position: fixed;
@@ -142,8 +142,8 @@
 
         .hero {
             position: relative;
-            min-height: 690px;
-            margin: 0 10px 10px;
+            min-height: 700px;
+            margin: 12px 10px 10px;
             border-radius: 26px;
             overflow: hidden;
             display: grid;
@@ -172,7 +172,7 @@
         .hero-copy {
             position: absolute;
             z-index: 5;
-            top: 50%;
+            top: 44%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: min(850px, calc(100% - 40px));
@@ -290,7 +290,7 @@
 
         .task-card {
             left: 5%;
-            bottom: -10px;
+            bottom: 90px;
             width: 280px;
             padding: 18px;
             transform: rotate(2deg);
@@ -319,7 +319,7 @@
 
         .integration-card {
             right: 5%;
-            bottom: -10px;
+            bottom: 90px;
             width: 260px;
             padding: 20px;
             transform: rotate(-3deg);
@@ -655,6 +655,27 @@
             margin: 4px 0;
         }
 
+        /* Brand footer: sejajar seperti topbar dan gunakan warna brand yang sama */
+        .footer .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            color: var(--lp-ink) !important;
+        }
+
+        .footer .brand span {
+            color: var(--lp-ink) !important;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .footer .brand img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+        }
+
         .footer-bottom {
             text-align: center;
             border-top: 1px solid var(--lp-line);
@@ -696,33 +717,24 @@
             }
 
             .hero {
-                margin: 0;
-                min-height: 620px;
+                margin: 12px 0 0;
+                min-height: 700px;
                 border-radius: 0;
                 position: relative;
                 overflow: hidden;
             }
 
             .hero-copy {
+                top: 44%;
                 width: calc(100% - 40px);
-                padding-top: 60px;
+                padding-top: 0;
             }
 
             .note,
-            .status-card {
-                display: none;
-            }
-
-            .task-card {
-                left: 18px;
-                width: 42%;
-                max-width: 230px;
-            }
-
+            .status-card,
+            .task-card,
             .integration-card {
-                right: 18px;
-                width: 42%;
-                max-width: 230px;
+                display: none;
             }
 
             .section,
