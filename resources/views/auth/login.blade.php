@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('content')
@@ -9,6 +10,20 @@
         height: 100%;
         margin: 0;
         overflow: hidden !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+
+    /* Sembunyikan scrollbar seluruh halaman */
+    * {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+
+    *::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
 
     body {
@@ -27,7 +42,7 @@
         height: 100vh;
         height: 100dvh;
         padding: clamp(12px, 2.2vw, 30px);
-        overflow: hidden;
+        overflow: hidden !important;
         background: #e9efec;
         font-family: "Plus Jakarta Sans", sans-serif;
     }
@@ -137,8 +152,7 @@
         justify-content: center;
         min-width: 0;
         min-height: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
+        overflow: hidden !important;
         padding: clamp(24px, 4vw, 62px);
         box-sizing: border-box;
         background: #fff;
@@ -203,6 +217,21 @@
         background: #fff;
         color: #172b20;
         font: 400 13px "Plus Jakarta Sans", sans-serif;
+    }
+
+    /* Sembunyikan ikon password bawaan browser */
+    .auth-form input[type="password"]::-ms-reveal,
+    .auth-form input[type="password"]::-ms-clear,
+    .auth-form input[type="password"]::-webkit-password-reveal-button,
+    .auth-form input[type="password"]::-webkit-credentials-auto-fill-button {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    .auth-form input[type="password"] {
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .auth-form input:focus {
@@ -365,7 +394,7 @@
         }
     }
 
-    /* TABLET & MOBILE: BUKA KUNCI SCROLL */
+    /* TABLET & MOBILE */
     @media (max-width: 760px) {
         html,
         body {
@@ -384,7 +413,7 @@
             height: auto;
             min-height: 100dvh;
             padding: 10px;
-            overflow: visible;
+            overflow: visible !important;
         }
 
         .auth-shell {
@@ -410,7 +439,7 @@
 
         .auth-form-panel {
             padding: 24px 20px;
-            overflow: visible;
+            overflow: visible !important;
         }
     }
 
