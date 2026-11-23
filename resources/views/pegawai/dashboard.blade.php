@@ -18,10 +18,31 @@
         min-height: 100vh;
     }
 
+    /* Cegah halaman dashboard melebar dan memunculkan scrollbar horizontal */
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: clip !important;
+    }
+
+    .app-layout {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: clip !important;
+    }
+
+    .app-layout > main,
+    .app-layout > main > .main-content,
+    .dashboard-page {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
     .dashboard-page {
         width: 100%;
-        box-sizing: border-box;
         padding: 10px 10px 35px;
+        overflow-x: clip;
     }
 
     /* HEADER */
@@ -243,16 +264,24 @@
         background: rgba(255, 255, 255, 0.42) !important;
         border: 1px solid rgba(255, 255, 255, 0.35) !important;
         border-radius: 12px;
-        overflow-x: auto;
+        overflow-x: hidden;
         overflow-y: hidden;
     }
 
     .dashboard-table {
         width: 100%;
+        min-width: 0;
+        max-width: 100%;
         height: 100%;
+        table-layout: fixed;
         border-collapse: collapse;
         font-size: 12px;
-        min-width: 480px;
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+        overflow-wrap: anywhere;
+        word-break: normal;
     }
 
     .dashboard-table th {
@@ -878,7 +907,7 @@
             <p>Temukan auditorium impian Anda untuk pengajuan peminjaman Anda.</p>
         </div>
 
-        <a class="dashboard-action" href="{{ route('pegawai.booking.create') }}">
+        <a class="dashboard-action" href="{{ route('borrower.booking.create') }}">
             <i data-lucide="plus"></i>
             Ajukan Peminjaman
         </a>
@@ -942,7 +971,7 @@
                     <p>Ringkasan pengajuan peminjaman Anda</p>
                 </div>
 
-                <a href="{{ route('pegawai.bookings') }}">
+                <a href="{{ route('borrower.bookings') }}">
                     Lihat semua
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -995,7 +1024,7 @@
                     <p>Panduan singkat peminjaman</p>
                 </div>
 
-                <a href="{{ route('pegawai.guides') }}">
+                <a href="{{ route('borrower.guides') }}">
                     Informasi lebih lanjut
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -1124,7 +1153,7 @@
 
                         <div class="auditorium-actions">
                             <a
-                                href="{{ route('pegawai.booking.create', ['auditorium' => $a->id]) }}"
+                                href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
                                 class="btn-booking"
                                 onclick="event.stopPropagation()"
                             >
@@ -1213,7 +1242,7 @@
 
                             <div class="modal-actions">
                                 <a
-                                    href="{{ route('pegawai.booking.create', ['auditorium' => $a->id]) }}"
+                                    href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
                                 >
                                     <i data-lucide="calendar-plus"></i>
                                     Ajukan Peminjaman
