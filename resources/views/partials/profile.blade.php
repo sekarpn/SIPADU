@@ -1298,6 +1298,7 @@
                                 <div class="settings-avatar {{ $photoUrl ? 'has-photo' : '' }}"
                                      id="settingsAvatarBox"
                                      data-user-name="{{ $userName }}"
+                                     data-user-initial="{{ $initial }}"
                                      data-saved-photo="{{ $photoUrl ?? '' }}"
                                      title="{{ $photoUrl ? 'Klik untuk preview foto profil' : $userName }}">
                                     <img id="settingsAvatarImg" src="{{ $photoUrl ?? '' }}" alt="Foto profil {{ $userName }}" {{ $photoUrl ? '' : 'hidden' }}>
@@ -2094,8 +2095,55 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const userDisplayName = avatarBox ? (avatarBox.dataset.userName || '') : '';
+    const userInitialText = avatarBox ? (avatarBox.dataset.userInitial || 'U') : 'U';
     const savedPhotoUrl = avatarBox && avatarBox.dataset.savedPhoto ? avatarBox.dataset.savedPhoto : null;
     let currentPhotoUrl = savedPhotoUrl;
+
+    /* SINKRONKAN AVATAR DI TOPBAR JIKA GAMBARNYA BROKEN ATAU BELUM TERMUAT */
+    function syncTopbarAvatar(src) {
+        document.querySelectorAll('header img, nav img, [class*="topbar"] img, [class*="avatar"] img').forEach(function (img) {
+            if (img === avatarImg || img === modalPhotoImg) return;
+            const altText = (img.getAttribute('alt') || '').trim();
+            const imgSrc = (img.getAttribute('src') || '').trim();
+            const isUserAvatar =
+                img.hasAttribute('data-topbar-avatar-img') ||
+                (userDisplayName && altText.toLowerCase() === userDisplayName.toLowerCase()) ||
+                imgSrc.includes('/storage/') ||
+                imgSrc.includes('profile_photo');
+
+            if (!isUserAvatar) return;
+
+            const parent = img.parentElement;
+            if (src) {
+                img.src = src;
+                img.style.display = 'block';
+                img.hidden = false;
+                if (parent) {
+                    const fallbackSpan = parent.querySelector('span');
+                    if (fallbackSpan) fallbackSpan.style.display = 'none';
+                }
+            } else {
+                img.style.display = 'none';
+                img.hidden = true;
+                if (parent) {
+                    let fallbackSpan = parent.querySelector('span');
+                    if (!fallbackSpan) {
+                        fallbackSpan = document.createElement('span');
+                        fallbackSpan.textContent = userInitialText;
+                        parent.appendChild(fallbackSpan);
+                    }
+                    fallbackSpan.style.display = 'flex';
+                    fallbackSpan.style.alignItems = 'center';
+                    fallbackSpan.style.justifyContent = 'center';
+                    fallbackSpan.style.width = '100%';
+                    fallbackSpan.style.height = '100%';
+                }
+            }
+        });
+    }
+
+    /* SINKRONISASI AWAL SAAT HALAMAN DIMUAT */
+    syncTopbarAvatar(savedPhotoUrl);
 
     /* STATE UNTUK EDITOR ZOOM & POSISI FOTO */
     let rawCropImage = null;
@@ -2171,6 +2219,7 @@ document.addEventListener('DOMContentLoaded', function () {
         avatarImg.addEventListener('error', function () {
             if (!avatarImg.getAttribute('src')) return;
             updatePhotoPreview(null, false);
+            syncTopbarAvatar(null);
         });
     }
 
