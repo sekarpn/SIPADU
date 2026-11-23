@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
@@ -204,6 +203,7 @@ class BookingController extends Controller
             'approved' => Booking::where('status', 'Disetujui')->count(),
             'rejected' => Booking::where('status', 'Ditolak')->count(),
             'revision' => Booking::where('status', 'Perlu Revisi')->count(),
+            'cancelled' => Booking::where('status', 'Dibatalkan')->count(),
             'total' => Booking::count(),
         ];
 
@@ -227,15 +227,20 @@ class BookingController extends Controller
             'File surat peminjaman tidak ditemukan.'
         );
 
-        $filePath = Storage::disk('local')->path($booking->surat_path);
+        // Kirim file sebagai response PDF inline agar dapat ditampilkan di iframe
+        // pada halaman Kelola Peminjaman, bukan langsung diunduh.
+        $disk = Storage::disk('local');
 
-        return Response::file(
-            $filePath,
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        return $disk->response(
+            $booking->surat_path,
+            'Surat-Peminjaman-' . $booking->id . '.pdf',
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="Surat-Peminjaman-' . $booking->id . '.pdf"',
                 'X-Content-Type-Options' => 'nosniff',
-            ]
+                'Cache-Control' => 'private, max-age=0, must-revalidate',
+            ],
+            'inline'
         );
     }
 

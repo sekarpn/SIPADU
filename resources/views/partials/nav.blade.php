@@ -337,6 +337,7 @@
         stroke: currentColor !important;
     }
 
+
     /* COLLAPSED SIDEBAR */
     .app-layout.sidebar-closed .sidebar,
     html.sipadu-sidebar-closed .app-layout .sidebar {
@@ -677,10 +678,7 @@
 </aside>
 
 {{-- LUCIDE ICON --}}
-<script
-    src="https://unpkg.com/lucide@latest"
-    onload="if (window.lucide) { window.lucide.createIcons(); }"
-></script>
+<script src="https://unpkg.com/lucide@latest" onload="if (window.lucide) { window.lucide.createIcons(); }"></script>
 
 <script>
 (function () {
