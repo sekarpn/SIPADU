@@ -256,8 +256,17 @@ html:not(.sidebar-ready) .app-layout > main {
     justify-content: center;
     font-size: 11.5px;
     font-weight: 800;
+    overflow: hidden;
+    flex-shrink: 0;
     box-shadow: 0 3px 10px rgba(35,124,77,.25);
     border: 1px solid rgba(255,255,255,.45) !important;
+}
+
+.topbar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .topbar-chevron {
@@ -833,6 +842,7 @@ html.page-ready .app-layout > main > .main-content {
                         $profileRoute = $topbarUser->role === 'admin'
                             ? route('admin.profile')
                             : ($topbarUser->role === 'pegawai' ? route('pegawai.profile') : route('borrower.profile'));
+                        $topbarPhotoPath = data_get($topbarUser, 'profile_photo_path');
                     @endphp
 
                     <span class="topbar-date">
@@ -852,7 +862,14 @@ html.page-ready .app-layout > main > .main-content {
                         </span>
 
                         <span class="topbar-avatar">
-                            {{ strtoupper(substr($topbarUser->name, 0, 2)) }}
+                            @if(!empty($topbarPhotoPath))
+                                <img
+                                    src="{{ asset('storage/' . $topbarPhotoPath) }}"
+                                    alt="{{ $topbarUser->name }}"
+                                >
+                            @else
+                                {{ strtoupper(substr($topbarUser->name, 0, 2)) }}
+                            @endif
                         </span>
 
                         <i data-lucide="chevron-down" class="topbar-chevron"></i>

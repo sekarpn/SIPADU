@@ -15,6 +15,7 @@ class User extends Authenticatable
         'email',
         'nim_nip',
         'phone',
+        'profile_photo_path',
         'password',
         'role',
         'faculty',
@@ -38,6 +39,13 @@ class User extends Authenticatable
             'email_notifications' => 'boolean',
             'system_notifications' => 'boolean',
         ];
+    }
+
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        return $this->profile_photo_path
+            ? asset('storage/' . $this->profile_photo_path)
+            : null;
     }
 
     public function bookings()
