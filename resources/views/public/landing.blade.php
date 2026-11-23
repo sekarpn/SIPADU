@@ -15,23 +15,25 @@
             --lp-green: #2f7d58;
             --lp-mint: #eaf4ef;
             --lp-line: rgba(17, 47, 38, .10);
+            --nav-offset: clamp(78px, 9.5vh, 96px);
         }
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 110px;
+            scroll-padding-top: var(--nav-offset);
         }
 
         body {
             background: linear-gradient(135deg, #eef2ef, #e5ebe7) !important;
             color: var(--lp-ink);
-            padding-top: 106px;
+            padding-top: var(--nav-offset);
+            overflow-x: hidden;
         }
 
         .landing-shell {
-            width: min(1680px, calc(100% - 80px));
-            margin: 18px auto 16px;
-            border-radius: 20px;
+            width: min(1480px, calc(100% - clamp(24px, 4.5vw, 72px)));
+            margin: 6px auto 20px;
+            border-radius: clamp(16px, 1.8vw, 24px);
             overflow: hidden;
             background: rgba(255, 255, 255, .80);
             border: 1px solid rgba(255, 255, 255, .92);
@@ -39,19 +41,19 @@
             backdrop-filter: blur(18px);
         }
 
-        /* TOPBAR */
+        /* TOPBAR FLEKSIBEL */
         .lnav {
-            width: min(1450px, calc(100% - 120px));
-            min-height: 76px;
-            padding: 0 44px;
+            width: min(1360px, calc(100% - clamp(32px, 6.5vw, 110px)));
+            min-height: clamp(62px, 7.5vh, 72px);
+            padding: 0 clamp(18px, 3vw, 40px);
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(255, 255, 255, .90);
-            border: 1px solid rgba(255, 255, 255, .65);
+            background: rgba(255, 255, 255, .72);
+            border: 1px solid rgba(255, 255, 255, .55);
             border-radius: 18px;
-            box-shadow: 0 8px 28px rgba(22, 54, 38, .08);
+            box-shadow: 0 8px 28px rgba(22, 54, 38, .06);
             backdrop-filter: blur(18px) saturate(150%);
             -webkit-backdrop-filter: blur(18px) saturate(150%);
             position: fixed;
@@ -73,22 +75,22 @@
         }
 
         .brand img {
-            width: 34px;
-            height: 34px;
+            width: clamp(28px, 2.4vw, 34px);
+            height: clamp(28px, 2.4vw, 34px);
             object-fit: contain;
         }
 
         .brand span {
-            font-size: 18px;
+            font-size: clamp(16px, 1.3vw, 18px);
         }
 
         .lnav-links {
             display: flex;
-            gap: 32px;
+            gap: clamp(18px, 2.4vw, 32px);
         }
 
         .lnav-links a {
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 700;
             color: #31413c;
             text-decoration: none;
@@ -111,7 +113,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 10px;
-            padding: 10px 18px;
+            padding: 9px 18px;
             text-decoration: none;
             font-size: 12px;
             font-weight: 800;
@@ -140,19 +142,23 @@
             box-shadow: none;
         }
 
+        /* HERO: PAS 1 LAYAR DI SEMUA RESOLUSI LAPTOP */
         .hero {
             position: relative;
-            min-height: 690px;
-            margin: 0 10px 10px;
-            border-radius: 26px;
+            min-height: clamp(500px, calc(100svh - var(--nav-offset) - 24px), 740px);
+            margin: 10px;
+            padding: clamp(44px, 6vh, 72px) clamp(20px, 4vw, 48px);
+            border-radius: 22px;
             overflow: hidden;
-            display: grid;
-            place-items: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            box-sizing: border-box;
             background: radial-gradient(
-                circle at 50% 34%,
+                circle at 50% 42%,
                 #fff 0%,
-                rgba(255, 255, 255, .92) 34%,
+                rgba(255, 255, 255, .92) 38%,
                 rgba(239, 246, 242, .82) 100%
             );
         }
@@ -167,27 +173,25 @@
             );
             background-size: 7px 7px;
             opacity: .34;
+            pointer-events: none;
         }
 
+        /* POSISI RELATIVE AGAR TIDAK PERNAH TERPOTONG DI LAYAR PENDEK */
         .hero-copy {
-            position: absolute;
+            position: relative;
             z-index: 5;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: min(850px, calc(100% - 40px));
-            max-width: 850px;
-            padding: 0;
-            margin: 0;
+            width: min(740px, 60vw);
+            max-width: 740px;
+            margin: 0 auto;
             text-align: center;
             box-sizing: border-box;
         }
 
         .eyebrow {
             display: inline-flex;
-            padding: 7px 12px;
+            padding: 7px 13px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, .76);
+            background: rgba(255, 255, 255, .82);
             border: 1px solid var(--lp-line);
             color: var(--lp-green);
             font-size: 10px;
@@ -198,86 +202,91 @@
 
         .hero h1 {
             text-align: center;
-            margin: 24px auto 20px;
-            max-width: 850px;
-            font-size: clamp(48px, 5.5vw, 76px);
-            line-height: 1.05;
+            margin: clamp(16px, 2.2vh, 24px) auto clamp(14px, 2vh, 20px);
+            font-size: clamp(34px, 4.1vw, 62px);
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+            text-wrap: balance;
         }
 
         .hero h1 .soft {
             display: block;
             color: #9ca4a1;
             font-weight: 500;
+            margin-top: 4px;
         }
 
         .hero p {
-            max-width: 590px;
+            max-width: min(560px, 92%);
             margin: 0 auto;
             color: var(--lp-muted);
-            font-size: 14px;
-            line-height: 1.75;
+            font-size: clamp(12.5px, 1.05vw, 14.5px);
+            line-height: 1.7;
         }
 
         .hero-actions {
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin-top: 28px;
+            margin-top: clamp(20px, 3vh, 28px);
         }
 
         .hero-actions .lbtn {
-            padding: 13px 22px;
+            padding: 12px 22px;
         }
 
+        /* FLOATING CARDS: UKURAN & JARAK PROPORSIONAL DI SEMUA LAPTOP */
         .float-card {
             position: absolute;
-            z-index: 5;
-            background: rgba(255, 255, 255, .70);
+            z-index: 4;
+            background: rgba(255, 255, 255, .78);
             border: 1px solid rgba(255, 255, 255, .95);
-            box-shadow: 0 22px 50px rgba(24, 50, 42, .13);
+            box-shadow: 0 18px 42px rgba(24, 50, 42, .11);
             backdrop-filter: blur(16px);
-            border-radius: 20px;
+            border-radius: 18px;
             text-align: left;
+            transition: transform .3s ease;
         }
 
         .note {
-            left: 4%;
-            top: 13%;
-            width: 230px;
-            padding: 20px;
-            transform: rotate(-5deg);
+            left: clamp(16px, 2.6vw, 44px);
+            top: clamp(24px, 8%, 68px);
+            width: clamp(185px, 15.5vw, 230px);
+            padding: clamp(14px, 1.4vw, 20px);
+            transform: rotate(-4deg);
         }
 
         .note b {
-            font-size: 13px;
+            font-size: clamp(11.5px, 0.95vw, 13px);
         }
 
         .note p {
-            font-size: 11px;
-            line-height: 1.6;
-            margin: 10px 0 0;
+            font-size: clamp(10px, 0.82vw, 11px);
+            line-height: 1.55;
+            margin: 8px 0 0;
             color: var(--lp-muted);
+            max-width: 100%;
         }
 
         .status-card {
-            right: 4%;
-            top: 13%;
-            width: 230px;
-            padding: 18px;
-            transform: rotate(5deg);
+            right: clamp(16px, 2.6vw, 44px);
+            top: clamp(24px, 8%, 68px);
+            width: clamp(185px, 15.5vw, 230px);
+            padding: clamp(14px, 1.3vw, 18px);
+            transform: rotate(4deg);
         }
 
         .status-card strong {
             display: block;
-            font-size: 12px;
-            margin-bottom: 10px;
+            font-size: clamp(11px, 0.9vw, 12px);
+            margin-bottom: 8px;
         }
 
         .status-row {
-            padding: 10px;
-            border-radius: 11px;
-            background: rgba(255, 255, 255, .68);
-            margin-top: 7px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .75);
+            margin-top: 6px;
             font-size: 10px;
             color: var(--lp-muted);
         }
@@ -285,27 +294,27 @@
         .status-row b {
             display: block;
             color: var(--lp-ink);
-            font-size: 11px;
+            font-size: 10.5px;
         }
 
         .task-card {
-            left: 5%;
-            bottom: -10px;
-            width: 280px;
-            padding: 18px;
+            left: clamp(20px, 3.2vw, 56px);
+            bottom: clamp(24px, 8%, 68px);
+            width: clamp(205px, 17.5vw, 265px);
+            padding: clamp(14px, 1.3vw, 18px);
             transform: rotate(2deg);
         }
 
         .task-card h4 {
-            margin: 0 0 12px;
-            font-size: 12px;
+            margin: 0 0 10px;
+            font-size: clamp(11px, 0.9vw, 12px);
         }
 
         .task {
-            padding: 10px;
+            padding: 8px 10px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, .78);
-            margin: 7px 0;
+            background: rgba(255, 255, 255, .82);
+            margin: 6px 0;
             font-size: 10px;
         }
 
@@ -314,27 +323,27 @@
             height: 5px;
             border-radius: 99px;
             background: linear-gradient(90deg, #2e9b73 62%, #dfe8e3 62%);
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .integration-card {
-            right: 5%;
-            bottom: -10px;
-            width: 260px;
-            padding: 20px;
+            right: clamp(20px, 3.2vw, 56px);
+            bottom: clamp(24px, 8%, 68px);
+            width: clamp(195px, 16.5vw, 245px);
+            padding: clamp(14px, 1.4vw, 20px);
             transform: rotate(-3deg);
         }
 
         .bubbles {
             display: flex;
             gap: 8px;
-            margin-top: 14px;
+            margin-top: 12px;
         }
 
         .bubble {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
+            width: clamp(34px, 2.8vw, 42px);
+            height: clamp(34px, 2.8vw, 42px);
+            border-radius: 11px;
             background: #fff;
             display: grid;
             place-items: center;
@@ -343,14 +352,15 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, .06);
         }
 
+        /* SECTIONS BAWAH */
         .section {
-            padding: 90px 70px;
-            scroll-margin-top: 110px;
+            padding: clamp(56px, 7vw, 90px) clamp(24px, 5vw, 70px);
+            scroll-margin-top: var(--nav-offset);
         }
 
         .section#alur {
-            padding-top: 76px;
-            padding-bottom: 76px;
+            padding-top: clamp(52px, 6vw, 76px);
+            padding-bottom: clamp(52px, 6vw, 76px);
         }
 
         .section-title {
@@ -360,9 +370,9 @@
         }
 
         .section-title h2 {
-            font-size: clamp(32px, 4vw, 50px);
-            line-height: 1.08;
-            letter-spacing: -.055em;
+            font-size: clamp(28px, 3.4vw, 48px);
+            line-height: 1.1;
+            letter-spacing: -.045em;
             margin: 14px 0;
         }
 
@@ -419,10 +429,10 @@
         }
 
         .dark-section {
-            padding: 78px 70px;
+            padding: clamp(56px, 6.5vw, 78px) clamp(24px, 5vw, 70px);
             background: linear-gradient(135deg, #0d3028, #153f34);
             color: #fff;
-            scroll-margin-top: 110px;
+            scroll-margin-top: var(--nav-offset);
         }
 
         .dark-section .eyebrow {
@@ -433,9 +443,9 @@
 
         .dark-section h2 {
             max-width: 680px;
-            font-size: clamp(34px, 4vw, 48px);
-            line-height: 1.08;
-            letter-spacing: -.05em;
+            font-size: clamp(28px, 3.5vw, 46px);
+            line-height: 1.1;
+            letter-spacing: -.045em;
             margin: 16px 0 0;
         }
 
@@ -491,7 +501,7 @@
         }
 
         .panduan-content > div {
-            padding: 30px;
+            padding: clamp(20px, 2.4vw, 30px);
             background: #ffffff;
             border: 1px solid rgba(17, 47, 38, .09);
             border-radius: 22px;
@@ -593,8 +603,8 @@
         }
 
         .cta {
-            margin: 0 70px 60px;
-            padding: 52px;
+            margin: 0 clamp(24px, 5vw, 70px) 60px;
+            padding: clamp(32px, 4vw, 52px);
             border-radius: 24px;
             background: linear-gradient(135deg, #0d3028, #1c5947);
             color: #fff;
@@ -602,13 +612,13 @@
             align-items: center;
             justify-content: space-between;
             gap: 28px;
-            scroll-margin-top: 110px;
+            scroll-margin-top: var(--nav-offset);
         }
 
         .cta h2 {
-            font-size: clamp(30px, 3vw, 42px);
+            font-size: clamp(26px, 2.8vw, 40px);
             line-height: 1.1;
-            letter-spacing: -.05em;
+            letter-spacing: -.045em;
             margin: 12px 0;
         }
 
@@ -626,7 +636,7 @@
         }
 
         .footer {
-            padding: 52px 70px 25px;
+            padding: 52px clamp(24px, 5vw, 70px) 25px;
             background: #edf3ef;
             border-top: 1px solid var(--lp-line);
         }
@@ -655,6 +665,26 @@
             margin: 4px 0;
         }
 
+        .footer .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            color: var(--lp-ink) !important;
+        }
+
+        .footer .brand span {
+            color: var(--lp-ink) !important;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .footer .brand img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+        }
+
         .footer-bottom {
             text-align: center;
             border-top: 1px solid var(--lp-line);
@@ -675,59 +705,55 @@
             transform: none;
         }
 
-        @media (max-width: 900px) {
+        /* PENYESUAIAN LAPTOP LAYAR KECIL / SPLIT WINDOW (<= 1160px) */
+        @media (max-width: 1160px) {
+            .hero-copy {
+                width: min(640px, 66vw);
+            }
+
+            .note,
+            .status-card,
+            .task-card,
+            .integration-card {
+                width: 175px;
+                padding: 13px;
+            }
+        }
+
+        /* TABLET & WINDOW SEMPIT (<= 940px) */
+        @media (max-width: 940px) {
             .lnav {
                 width: calc(100% - 24px);
-                min-height: 68px;
+                min-height: 64px;
                 padding: 0 20px;
-                margin: 0;
                 top: 8px;
-                left: 50%;
-                transform: translateX(-50%);
-                position: fixed;
             }
 
             .lnav-links {
                 display: none;
             }
 
-            .lnav-actions .login {
-                display: inline-flex;
-            }
-
             .hero {
-                margin: 0;
-                min-height: 620px;
+                margin: 8px 0 0;
+                min-height: auto;
+                padding: 56px 24px;
                 border-radius: 0;
-                position: relative;
-                overflow: hidden;
             }
 
             .hero-copy {
-                width: calc(100% - 40px);
-                padding-top: 60px;
+                width: 100%;
             }
 
             .note,
-            .status-card {
-                display: none;
-            }
-
-            .task-card {
-                left: 18px;
-                width: 42%;
-                max-width: 230px;
-            }
-
+            .status-card,
+            .task-card,
             .integration-card {
-                right: 18px;
-                width: 42%;
-                max-width: 230px;
+                display: none;
             }
 
             .section,
             .dark-section {
-                padding: 68px 24px;
+                padding: 64px 24px;
             }
 
             .feature-grid,
@@ -763,20 +789,12 @@
             }
 
             .hero {
-                min-height: 570px;
-            }
-
-            .hero-copy {
-                width: calc(100% - 36px);
+                padding: 44px 18px;
             }
 
             .hero h1 {
-                font-size: clamp(30px, 8vw, 42px);
+                font-size: clamp(28px, 8vw, 40px);
                 line-height: 1.12;
-            }
-
-            .hero p {
-                font-size: 13px;
             }
 
             .hero-actions {
@@ -785,11 +803,6 @@
 
             .hero-actions .lbtn {
                 width: 100%;
-            }
-
-            .task-card,
-            .integration-card {
-                display: none;
             }
 
             .section,

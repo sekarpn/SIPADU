@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Auditorium;
 use App\Models\SiteContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -70,6 +71,8 @@ class DashboardController extends Controller
             'study_program' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
             'employee_unit' => $user->role === 'pegawai' ? 'required|string|max:150' : 'nullable|string|max:150',
             'position' => $user->role === 'pegawai' ? 'required|string|max:150' : 'nullable|string|max:150',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_profile_photo' => 'nullable|boolean',
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -78,11 +81,28 @@ class DashboardController extends Controller
             'nim_nip.required' => 'NIM atau NIP wajib diisi.',
             'nim_nip.unique' => 'NIM atau NIP sudah digunakan akun lain.',
             'phone.max' => 'Nomor telepon maksimal 20 karakter.',
+            'profile_photo.image' => 'File foto profil harus berupa gambar.',
+            'profile_photo.mimes' => 'Format foto profil harus JPG, JPEG, PNG, atau WEBP.',
+            'profile_photo.max' => 'Ukuran foto profil maksimal 2 MB.',
         ]);
+
+        if ($r->boolean('remove_profile_photo') && $user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+            $data['profile_photo_path'] = null;
+        }
+
+        if ($r->hasFile('profile_photo')) {
+            if ($user->profile_photo_path) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+            $data['profile_photo_path'] = $r->file('profile_photo')->store('profile-photos', 'public');
+        }
+
+        unset($data['profile_photo'], $data['remove_profile_photo']);
 
         $user->update($data);
 
-        return back()->with('success', 'Informasi profil berhasil diperbarui.');
+        return back()->with('success', 'Informasi dan foto profil berhasil diperbarui.');
     }
 
     public function updateNotificationPreferences(Request $r)

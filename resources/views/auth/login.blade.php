@@ -525,7 +525,7 @@
             </div>
 
             <div class="auth-art-copy">
-                <p class="eyebrow">UPN VETERAN JAKARTA</p>
+                <p class="eyebrow">UPN "VETERAN" JAKARTA</p>
 
                 <h1>Layanan peminjaman auditorium dalam satu portal.</h1>
 

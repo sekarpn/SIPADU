@@ -1893,16 +1893,39 @@ body.bp-drawer-open {
 
         overlay.classList.add('is-open');
         panel.classList.add('is-open');
-        document.body.classList.add('bp-drawer-open');
+
+        // Kunci scroll tanpa menggeser layout saat scrollbar halaman menghilang.
+        const pageBody = document.body;
+        if (!pageBody.classList.contains('bp-drawer-open')) {
+            pageBody.dataset.bpOriginalPaddingRight = pageBody.style.paddingRight;
+            const scrollbarWidth = Math.max(
+                0,
+                window.innerWidth - document.documentElement.clientWidth
+            );
+            const currentPaddingRight = parseFloat(
+                window.getComputedStyle(pageBody).paddingRight
+            ) || 0;
+
+            pageBody.style.paddingRight =
+                (currentPaddingRight + scrollbarWidth) + 'px';
+            pageBody.classList.add('bp-drawer-open');
+        }
     }
 
     function closeBookingDrawer() {
         const overlay = document.getElementById('bookingOverlay');
         const panel = document.getElementById('bookingPanel');
+        const pageBody = document.body;
 
         overlay?.classList.remove('is-open');
         panel?.classList.remove('is-open');
-        document.body.classList.remove('bp-drawer-open');
+
+        if (pageBody.classList.contains('bp-drawer-open')) {
+            pageBody.classList.remove('bp-drawer-open');
+            pageBody.style.paddingRight =
+                pageBody.dataset.bpOriginalPaddingRight || '';
+            delete pageBody.dataset.bpOriginalPaddingRight;
+        }
     }
 
     function openPdfPreview(url) {
