@@ -70,6 +70,7 @@ Route::middleware(['auth', 'role:admin'])
 
         // PENGELOLAAN PENGAJUAN
         Route::get('/pengajuan', [BookingController::class, 'adminIndex'])->name('bookings');
+        Route::get('/pengajuan/export', [BookingController::class, 'adminExport'])->name('bookings.export');
 
         // DOWNLOAD SURAT PEMINJAMAN
         Route::get('/pengajuan/{booking}/surat', [BookingController::class, 'downloadLetter'])

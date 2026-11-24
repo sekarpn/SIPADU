@@ -7,9 +7,9 @@
     try {
         var root = document.documentElement;
 
-        if (window.matchMedia('(max-width: 900px)').matches) {
+        if (window.matchMedia('(max-width: 640px)').matches) {
             root.classList.add('sipadu-mobile');
-        } else if (localStorage.getItem('sipadu-sidebar-state') === 'closed') {
+        } else if (localStorage.getItem('sipadu-sidebar-state') === 'closed' || window.innerWidth <= 1024) {
             root.classList.add('sipadu-sidebar-closed');
         }
     } catch (e) {}
@@ -200,7 +200,7 @@ html:not(.sidebar-ready) .app-layout > main {
     height: 18px;
 }
 
-/* TOPBAR RIGHT */
+/* TOPBAR RIGHT & DROPDOWN PROFIL + LOGOUT */
 .topbar-right {
     margin-left: auto;
     display: flex;
@@ -216,19 +216,31 @@ html:not(.sidebar-ready) .app-layout > main {
     letter-spacing: .2px;
 }
 
+.topbar-profile-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
 .topbar-user {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none;
+    cursor: pointer;
     text-decoration: none !important;
     color: #163626 !important;
-    padding: 3px 6px 3px 3px;
+    padding: 4px 8px 4px 6px;
     border-radius: 999px;
     transition: background .2s ease;
 }
 
-.topbar-user:hover {
-    background: rgba(255,255,255,.45);
+.topbar-user:hover,
+.topbar-profile-dropdown.open .topbar-user {
+    background: rgba(255,255,255,.52) !important;
 }
 
 .topbar-user-info {
@@ -273,6 +285,127 @@ html:not(.sidebar-ready) .app-layout > main {
     width: 14px;
     height: 14px;
     color: #324a3c;
+    transition: transform .2s ease;
+}
+
+.topbar-profile-dropdown.open .topbar-chevron {
+    transform: rotate(180deg);
+}
+
+.topbar-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 225px;
+    padding: 8px;
+    border-radius: 15px;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e2ece6;
+    box-shadow: 0 12px 32px rgba(22, 54, 38, 0.14);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(.98);
+    transform-origin: top right;
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+    z-index: 100;
+}
+
+.topbar-profile-dropdown.open .topbar-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.dropdown-user-header {
+    padding: 8px 10px 10px;
+    border-bottom: 1px solid #edf2ef;
+    margin-bottom: 6px;
+}
+
+.dropdown-user-header strong {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 750;
+    color: #163626;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-user-header small {
+    display: block;
+    font-size: 11px;
+    color: #64786c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border: none !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    color: #163626 !important;
+    font-size: 12.5px;
+    font-weight: 650;
+    text-decoration: none !important;
+    cursor: pointer;
+    text-align: left;
+    transition: background .18s ease, color .18s ease;
+    box-sizing: border-box;
+}
+
+.dropdown-item svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #237c4d;
+    transition: color .18s ease;
+}
+
+.dropdown-item:hover {
+    background: #f2f7f4 !important;
+    background-color: #f2f7f4 !important;
+    color: #1f7a49 !important;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #edf2ef;
+    margin: 6px 0;
+}
+
+/* LOGOUT: TEKS DEFAULT SAMA SEPERTI PROFIL AKUN, IKON MERAH, HOVER MERAH */
+.topbar-dropdown-menu a.dropdown-item.logout-item {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #163626 !important;
+}
+
+.topbar-dropdown-menu a.dropdown-item.logout-item svg {
+    color: #dc2626 !important;
+    stroke: #dc2626 !important;
+}
+
+.topbar-dropdown-menu a.dropdown-item.logout-item:hover {
+    background: #fef2f2 !important;
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+
+.topbar-dropdown-menu a.dropdown-item.logout-item:hover svg {
+    color: #b91c1c !important;
+    stroke: #b91c1c !important;
 }
 
 /* PAGE CONTENT */
@@ -524,6 +657,7 @@ html.page-ready .app-layout > main > .main-content {
 /* GAYA TABEL GLASS SERAGAM DI SELURUH HALAMAN */
 .app-layout > main > .main-content table:not([class*="fc-"]) {
     width: 100% !important;
+    table-layout: auto !important;
     border-collapse: collapse !important;
     min-width: 780px;
     font-size: 13px !important;
@@ -574,9 +708,16 @@ html.page-ready .app-layout > main > .main-content {
     font-size: 12.5px !important;
     line-height: 1.5 !important;
     color: #163626 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
     background: transparent !important;
     background-color: transparent !important;
     transition: background .18s ease !important;
+}
+
+.app-layout > main > .main-content table:not([class*="fc-"]) td > * {
+    max-width: 100%;
+    white-space: normal !important;
 }
 
 .app-layout > main > .main-content table:not([class*="fc-"]) tbody tr:hover td {
@@ -734,8 +875,24 @@ html.page-ready .app-layout > main > .main-content {
     height: 16px;
 }
 
-/* MOBILE */
-@media (max-width: 900px) {
+/* PENYESUAIAN JARAK HALAMAN SAAT LAYAR DIBAGI DUA (SPLIT SCREEN) */
+@media (max-width: 1024px) {
+    .app-layout > main > .main-content {
+        padding: 0 18px 24px !important;
+    }
+
+    .app-layout > main > .topbar {
+        width: calc(100% - 24px) !important;
+        padding: 10px 16px !important;
+    }
+
+    .topbar-date {
+        display: none !important;
+    }
+}
+
+/* MOBILE (HANYA DI BAWAH 640px, BUKAN SAAT LAYAR LAPTOP DIBAGI DUA) */
+@media (max-width: 640px) {
     html,
     body {
         overflow-x: hidden !important;
@@ -807,16 +964,10 @@ html.page-ready .app-layout > main > .main-content {
         max-width: 100% !important;
     }
 
-    .topbar-date {
-        display: none !important;
-    }
-
     .topbar-right {
         gap: 10px !important;
     }
-}
 
-@media (max-width: 640px) {
     .app-layout > main > .main-content .sipadu-underline-tabs,
     .app-layout > main > .main-content .up-tabs,
     .app-layout > main > .main-content .bp-tabs,
@@ -915,31 +1066,64 @@ html.page-ready .app-layout > main > .main-content {
                         {{ now()->format('d/m/Y') }}
                     </span>
 
-                    <a
-                        href="{{ $profileRoute }}"
-                        class="topbar-user"
-                        title="Profil Akun ({{ $topbarUser->name }})"
-                    >
-                        <span class="topbar-user-info">
-                            <strong>{{ $topbarUser->name }}</strong>
-                            <small>
-                                {{ $topbarUser->role === 'admin' ? 'Administrator' : ($topbarUser->role === 'pegawai' ? 'Dosen & Tendik' : 'Mahasiswa') }}
-                            </small>
-                        </span>
+                    <div class="topbar-profile-dropdown" id="topbarProfileDropdown">
+                        <button
+                            type="button"
+                            class="topbar-user"
+                            id="topbarProfileBtn"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            title="Menu Akun ({{ $topbarUser->name }})"
+                        >
+                            <span class="topbar-user-info">
+                                <strong>{{ $topbarUser->name }}</strong>
+                                <small>
+                                    {{ $topbarUser->role === 'admin' ? 'Administrator' : ($topbarUser->role === 'pegawai' ? 'Dosen & Tendik' : 'Mahasiswa') }}
+                                </small>
+                            </span>
 
-                        <span class="topbar-avatar">
-                            @if(!empty($topbarPhotoPath))
-                                <img
-                                    src="{{ asset('storage/' . $topbarPhotoPath) }}"
-                                    alt="{{ $topbarUser->name }}"
-                                >
-                            @else
-                                {{ strtoupper(substr($topbarUser->name, 0, 2)) }}
-                            @endif
-                        </span>
+                            <span class="topbar-avatar">
+                                @if(!empty($topbarPhotoPath))
+                                    <img
+                                        src="{{ asset('storage/' . $topbarPhotoPath) }}"
+                                        alt="{{ $topbarUser->name }}"
+                                    >
+                                @else
+                                    {{ strtoupper(substr($topbarUser->name, 0, 2)) }}
+                                @endif
+                            </span>
 
-                        <i data-lucide="chevron-down" class="topbar-chevron"></i>
-                    </a>
+                            <i data-lucide="chevron-down" class="topbar-chevron"></i>
+                        </button>
+
+                        <div class="topbar-dropdown-menu" role="menu">
+                            <div class="dropdown-user-header">
+                                <strong>{{ $topbarUser->name }}</strong>
+                                <small>{{ $topbarUser->email }}</small>
+                            </div>
+
+                            <a href="{{ $profileRoute }}" class="dropdown-item" role="menuitem">
+                                <i data-lucide="user-round"></i>
+                                <span>Profil Akun</span>
+                            </a>
+
+                            <div class="dropdown-divider"></div>
+
+                            <a
+                                href="{{ route('logout') }}"
+                                class="dropdown-item logout-item"
+                                role="menuitem"
+                                onclick="event.preventDefault(); document.getElementById('topbar-logout-form').submit();"
+                            >
+                                <i data-lucide="log-out"></i>
+                                <span>Logout</span>
+                            </a>
+
+                            <form id="topbar-logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
+                                @csrf
+                            </form>
+                        </div>
+                    </div>
                 @endauth
             </div>
         </div>
@@ -959,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!layout || !toggle) return;
 
-    const mobile = () => window.matchMedia('(max-width: 900px)').matches;
+    const mobile = () => window.matchMedia('(max-width: 640px)').matches;
 
     function getSavedState() {
         try {
@@ -1020,7 +1204,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             document.documentElement.classList.remove('sipadu-mobile');
 
-            const open = getSavedState() !== 'closed';
+            const isHalfScreen = window.innerWidth <= 1024;
+            const saved = getSavedState();
+            const open = saved === 'closed' ? false : !isHalfScreen;
 
             desktopOpen(open, false);
         }
@@ -1047,9 +1233,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    /* DROPDOWN PROFIL & LOGOUT DI TOPBAR */
+    const profileDropdown = document.getElementById('topbarProfileDropdown');
+    const profileBtn = document.getElementById('topbarProfileBtn');
+
+    if (profileDropdown && profileBtn) {
+        profileBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = profileDropdown.classList.toggle('open');
+            profileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('open');
+                profileBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && mobile()) {
-            mobileOpen(false);
+        if (e.key === 'Escape') {
+            if (mobile()) {
+                mobileOpen(false);
+            }
+            if (profileDropdown && profileDropdown.classList.contains('open')) {
+                profileDropdown.classList.remove('open');
+                profileBtn.setAttribute('aria-expanded', 'false');
+            }
         }
     });
 
@@ -1071,190 +1282,117 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* PAGINASI, GLASS CARD & SCROLL HORIZONTAL OTOMATIS UNTUK SEMUA TABEL */
     function initTablePagination(table) {
-        if (!table || table.dataset.sipaduPaginated === '1' || table.dataset.noPaginate === '1') return;
+        if (!table || table.dataset.sipaduPaginated === '1' || table.dataset.noPagination === '1' || table.closest('[class*="fc-"]')) return;
         const tbody = table.querySelector('tbody');
         if (!tbody) return;
 
+        const allRows = Array.from(tbody.querySelectorAll('tr'));
+        const dataRows = allRows.filter(function (tr) {
+            return !(tr.children.length === 1 && tr.children[0].hasAttribute('colspan'));
+        });
+
         table.dataset.sipaduPaginated = '1';
 
+        let card = table.closest('.sipadu-glass-card, [class*="-card"], .table-wrap, .dashboard-table-wrap, .panel');
         let scrollWrap = table.parentElement;
-        if (!scrollWrap || getComputedStyle(scrollWrap).overflowX === 'visible') {
+
+        if (!scrollWrap || (!scrollWrap.classList.contains('sipadu-table-scroll') && !scrollWrap.classList.contains('table-wrap') && !scrollWrap.classList.contains('dashboard-table-wrap'))) {
             const wrapper = document.createElement('div');
             wrapper.className = 'sipadu-table-scroll';
             table.parentNode.insertBefore(wrapper, table);
             wrapper.appendChild(table);
             scrollWrap = wrapper;
         } else {
-            scrollWrap.style.webkitOverflowScrolling = 'touch';
+            scrollWrap.classList.add('sipadu-table-scroll');
         }
 
-        let cardContainer = scrollWrap.parentElement;
-        if (cardContainer && !cardContainer.classList.contains('main-content')) {
-            cardContainer.classList.add('sipadu-glass-card');
+        if (!card) {
+            card = document.createElement('div');
+            card.className = 'sipadu-glass-card';
+            scrollWrap.parentNode.insertBefore(card, scrollWrap);
+            card.appendChild(scrollWrap);
         } else {
-            const glassBox = document.createElement('div');
-            glassBox.className = 'sipadu-glass-card';
-            scrollWrap.parentNode.insertBefore(glassBox, scrollWrap);
-            glassBox.appendChild(scrollWrap);
-            cardContainer = glassBox;
+            card.classList.add('sipadu-glass-card');
         }
 
-        /* 1. TOP BAR: Dropdown "Tampilkan [10 v] data" di atas tabel */
+        if (dataRows.length === 0) return;
+
+        let pageSize = 10;
+        let currentPage = 1;
+
         const topBar = document.createElement('div');
         topBar.className = 'sipadu-table-top';
         topBar.innerHTML =
-            '<label class="sipadu-pager-size">' +
-                '<span>Tampilkan</span>' +
-                '<select class="sipadu-pager-select" aria-label="Jumlah data per halaman">' +
-                    '<option value="10" selected>10</option>' +
-                    '<option value="25">25</option>' +
-                    '<option value="50">50</option>' +
-                    '<option value="100">100</option>' +
-                '</select>' +
-                '<span>data</span>' +
-            '</label>';
+            '<label class="sipadu-pager-size">Tampilkan ' +
+            '<select class="sipadu-pager-select" aria-label="Jumlah data per halaman">' +
+            '<option value="5">5</option>' +
+            '<option value="10" selected>10</option>' +
+            '<option value="25">25</option>' +
+            '<option value="50">50</option>' +
+            '</select> data</label>';
 
-        scrollWrap.insertAdjacentElement('beforebegin', topBar);
-
-        /* 2. BOTTOM BAR: jumlah data + tombol navigasi halaman */
-        const pagerBar = document.createElement('div');
-        pagerBar.className = 'sipadu-pager-bar';
-        pagerBar.innerHTML =
+        const bottomBar = document.createElement('div');
+        bottomBar.className = 'sipadu-pager-bar';
+        bottomBar.innerHTML =
             '<span class="sipadu-pager-info"></span>' +
-            '<div class="sipadu-pager-nav" aria-label="Navigasi halaman tabel">' +
-                '<button type="button" class="sipadu-page-btn sipadu-page-prev" aria-label="Halaman sebelumnya" title="Halaman sebelumnya"><i data-lucide="chevron-left"></i></button>' +
-                '<span class="sipadu-page-indicator" aria-live="polite">1</span>' +
-                '<button type="button" class="sipadu-page-btn sipadu-page-next" aria-label="Halaman berikutnya" title="Halaman berikutnya"><i data-lucide="chevron-right"></i></button>' +
+            '<div class="sipadu-pager-nav">' +
+            '<button type="button" class="sipadu-page-btn" data-dir="prev" aria-label="Halaman sebelumnya"><i data-lucide="chevron-left"></i></button>' +
+            '<span class="sipadu-page-indicator">1</span>' +
+            '<button type="button" class="sipadu-page-btn" data-dir="next" aria-label="Halaman berikutnya"><i data-lucide="chevron-right"></i></button>' +
             '</div>';
 
-        const existingPagination = cardContainer.querySelector('.up-pagination, .bp-pagination, [class*="-pagination"]');
-        if (existingPagination) {
-            existingPagination.innerHTML = '';
-            existingPagination.style.padding = '0';
-            existingPagination.style.borderTop = '0';
-            existingPagination.style.background = 'transparent';
-            existingPagination.appendChild(pagerBar);
-        } else {
-            scrollWrap.insertAdjacentElement('afterend', pagerBar);
-            const nextEl = pagerBar.nextElementSibling;
-            if (nextEl && (nextEl.matches('nav[role="navigation"]') || nextEl.classList.contains('pagination'))) {
-                nextEl.style.display = 'none';
-            }
-        }
+        scrollWrap.parentNode.insertBefore(topBar, scrollWrap);
+        scrollWrap.parentNode.insertBefore(bottomBar, scrollWrap.nextSibling);
 
-        /* 3. TOMBOL GESER TABEL: TERPISAH DARI PAGINATION HALAMAN */
-        const scrollFooter = document.createElement('div');
-        scrollFooter.className = 'sipadu-table-scroll-footer';
-        scrollFooter.innerHTML =
-            '<div class="sipadu-table-scroll-controls" aria-label="Tombol geser tabel secara horizontal">' +
-                '<button type="button" class="sipadu-table-scroll-btn sipadu-scroll-left" aria-label="Geser tabel ke kiri" title="Geser tabel ke kiri"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
-                '<button type="button" class="sipadu-table-scroll-btn sipadu-scroll-right" aria-label="Geser tabel ke kanan" title="Geser tabel ke kanan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
-            '</div>';
-        cardContainer.appendChild(scrollFooter);
+        const select = topBar.querySelector('.sipadu-pager-select');
+        const info = bottomBar.querySelector('.sipadu-pager-info');
+        const indicator = bottomBar.querySelector('.sipadu-page-indicator');
+        const prevBtn = bottomBar.querySelector('[data-dir="prev"]');
+        const nextBtn = bottomBar.querySelector('[data-dir="next"]');
 
-        const perPageSelect = topBar.querySelector('.sipadu-pager-select');
-        const infoEl = pagerBar.querySelector('.sipadu-pager-info');
-        const pageIndicator = pagerBar.querySelector('.sipadu-page-indicator');
-        const pagePrevButton = pagerBar.querySelector('.sipadu-page-prev');
-        const pageNextButton = pagerBar.querySelector('.sipadu-page-next');
-        const scrollLeftButton = scrollFooter.querySelector('.sipadu-scroll-left');
-        const scrollRightButton = scrollFooter.querySelector('.sipadu-scroll-right');
-
-        function syncTableScrollButtons() {
-            const maxScroll = Math.max(0, scrollWrap.scrollWidth - scrollWrap.clientWidth);
-            const canScroll = maxScroll > 2;
-            scrollLeftButton.disabled = !canScroll || scrollWrap.scrollLeft <= 2;
-            scrollRightButton.disabled = !canScroll || scrollWrap.scrollLeft >= maxScroll - 2;
-            scrollFooter.style.display = canScroll ? 'flex' : 'none';
-        }
-
-        scrollLeftButton.addEventListener('click', function () {
-            scrollWrap.scrollBy({ left: -Math.max(240, scrollWrap.clientWidth * 0.7), behavior: 'smooth' });
-        });
-        scrollRightButton.addEventListener('click', function () {
-            scrollWrap.scrollBy({ left: Math.max(240, scrollWrap.clientWidth * 0.7), behavior: 'smooth' });
-        });
-        scrollWrap.addEventListener('scroll', syncTableScrollButtons, { passive: true });
-        window.addEventListener('resize', syncTableScrollButtons);
-
-        let currentPage = 1;
-        let perPage = parseInt(perPageSelect.value, 10) || 10;
-
-        function getDataRows() {
-            return Array.from(tbody.querySelectorAll('tr')).filter(function (tr) {
-                if (tr.dataset.emptyRow === '1') return false;
-                if (tr.id === 'userFilterEmptyRow') return false;
-                if (tr.querySelector('td[colspan]')) return false;
-                return true;
-            });
-        }
-
-        function render() {
-            const allRows = getDataRows();
-            const activeRows = allRows.filter(function (tr) {
-                return tr.dataset.filterHidden !== '1';
-            });
-
-            const totalItems = activeRows.length;
-            const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+        function renderPage() {
+            const total = dataRows.length;
+            const totalPages = Math.max(1, Math.ceil(total / pageSize));
             if (currentPage > totalPages) currentPage = totalPages;
-            if (currentPage < 1) currentPage = 1;
 
-            const startIdx = (currentPage - 1) * perPage;
-            const endIdx = Math.min(startIdx + perPage, totalItems);
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, total);
 
-            allRows.forEach(function (tr) {
-                if (tr.dataset.filterHidden === '1') {
-                    tr.style.display = 'none';
-                }
+            dataRows.forEach(function (row, idx) {
+                row.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
             });
 
-            activeRows.forEach(function (tr, idx) {
-                tr.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
-            });
-
-            const fromNum = totalItems === 0 ? 0 : startIdx + 1;
-            const toNum = totalItems === 0 ? 0 : endIdx;
-            infoEl.textContent = 'Menampilkan ' + fromNum + ' - ' + toNum + ' dari ' + totalItems + ' data';
-
-            pageIndicator.textContent = String(currentPage);
-            pagePrevButton.disabled = currentPage <= 1 || totalItems === 0;
-            pageNextButton.disabled = currentPage >= totalPages || totalItems === 0;
-            syncTableScrollButtons();
+            info.textContent = 'Menampilkan ' + (startIdx + 1) + ' - ' + endIdx + ' dari ' + total + ' data';
+            indicator.textContent = currentPage;
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
         }
 
-        pagePrevButton.addEventListener('click', function () {
-            if (currentPage > 1) {
-                currentPage -= 1;
-                render();
-            }
-        });
-
-        pageNextButton.addEventListener('click', function () {
-            const totalPages = Math.max(1, Math.ceil(getDataRows().filter(function (tr) {
-                return tr.dataset.filterHidden !== '1';
-            }).length / perPage));
-            if (currentPage < totalPages) {
-                currentPage += 1;
-                render();
-            }
-        });
-
-        perPageSelect.addEventListener('change', function () {
-            perPage = parseInt(this.value, 10) || 10;
+        select.addEventListener('change', function () {
+            pageSize = parseInt(this.value, 10) || 10;
             currentPage = 1;
-            render();
+            renderPage();
         });
 
-        table.sipaduRefreshPagination = function (resetPage) {
-            if (resetPage) currentPage = 1;
-            render();
-        };
+        prevBtn.addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+            }
+        });
 
-        render();
+        nextBtn.addEventListener('click', function () {
+            const totalPages = Math.max(1, Math.ceil(dataRows.length / pageSize));
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPage();
+            }
+        });
+
+        renderPage();
     }
 
-    document.querySelectorAll('.main-content table:not([class*="fc-"])').forEach(initTablePagination);
+    document.querySelectorAll('.main-content table').forEach(initTablePagination);
 
     if (window.lucide) {
         window.lucide.createIcons();

@@ -212,6 +212,116 @@ class BookingController extends Controller
         return view('admin.bookings', compact('bookings', 'stats', 'auditoriums', 'extraDrawerBookings'));
     }
 
+    // Export data peminjaman ke CSV/Excel oleh admin
+    public function adminExport(Request $request)
+    {
+        abort_unless(Auth::check() && Auth::user()->role === 'admin', 403);
+
+        $query = Booking::with(['user', 'auditorium'])->latest();
+
+        if ($request->filled('q')) {
+            $term = trim($request->q);
+
+            $query->where(function ($q) use ($term) {
+                $q->where('event_name', 'like', "%{$term}%")
+                    ->orWhere('organization', 'like', "%{$term}%")
+                    ->orWhereHas('user', fn ($user) => $user->where('name', 'like', "%{$term}%"));
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('auditorium')) {
+            $query->where('auditorium_id', $request->auditorium);
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('booking_date', $request->date);
+        }
+
+        $bookings = $query->get();
+        $filename = 'Data-Peminjaman-Auditorium-' . now()->format('Y-m-d_H-i') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($bookings) {
+            $file = fopen('php://output', 'w');
+            // UTF-8 BOM agar kolom otomatis rapi saat dibuka langsung di Excel
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($file, [
+                'No',
+                'Nama Pemohon',
+                'NIM / NIP',
+                'Role',
+                'Fakultas / Unit',
+                'Prodi / Jabatan',
+                'Organisasi / Instansi',
+                'Auditorium',
+                'Nama Kegiatan',
+                'Deskripsi Kegiatan',
+                'Penanggung Jawab (PIC)',
+                'No. HP PIC',
+                'Tanggal Peminjaman',
+                'Waktu Mulai',
+                'Waktu Selesai',
+                'Status',
+                'Catatan Admin',
+                'Tanggal Pengajuan',
+            ], ';');
+
+            foreach ($bookings as $index => $item) {
+                $roleLabel = match ($item->applicant_role ?? $item->user->role ?? '') {
+                    'mahasiswa' => 'Mahasiswa',
+                    'pegawai' => 'Dosen & Tendik',
+                    'admin' => 'Administrator',
+                    default => '-',
+                };
+
+                $fakultasUnit = $item->applicant_faculty ?: ($item->applicant_unit ?: '-');
+                $prodiJabatan = $item->applicant_program ?: ($item->applicant_position ?: '-');
+
+                $bookingDate = $item->booking_date
+                    ? \Carbon\Carbon::parse($item->booking_date)->format('d/m/Y')
+                    : '-';
+
+                $createdAt = $item->created_at
+                    ? $item->created_at->format('d/m/Y H:i')
+                    : '-';
+
+                fputcsv($file, [
+                    $index + 1,
+                    $item->user->name ?? '-',
+                    $item->applicant_identifier ?? $item->user->nim_nip ?? '-',
+                    $roleLabel,
+                    $fakultasUnit,
+                    $prodiJabatan,
+                    $item->organization ?? '-',
+                    $item->auditorium->name ?? '-',
+                    $item->event_name ?? '-',
+                    $item->event_description ?? '-',
+                    $item->pic_name ?? '-',
+                    $item->pic_phone ?? '-',
+                    $bookingDate,
+                    substr((string) $item->start_time, 0, 5),
+                    substr((string) $item->end_time, 0, 5),
+                    $item->status ?? '-',
+                    $item->admin_note ?? '-',
+                    $createdAt,
+                ], ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     // Download surat peminjaman oleh admin
     public function downloadLetter(Booking $booking)
     {
