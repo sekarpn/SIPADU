@@ -145,7 +145,7 @@
 
     /* FORM REGISTRASI */
     .auth-form {
-        width: min(410px, 100%);
+        width: min(440px, 100%);
         max-height: none;
         margin: 0 auto;
         flex-shrink: 0;
@@ -205,6 +205,22 @@
         background: #fff;
         color: #172b20;
         font: 400 12px "Plus Jakarta Sans", sans-serif;
+    }
+
+    /* Sembunyikan ikon password bawaan browser */
+    .auth-form input[type="password"]::-ms-reveal,
+    .auth-form input[type="password"]::-ms-clear,
+    .auth-form input[type="password"]::-webkit-password-reveal-button,
+    .auth-form input[type="password"]::-webkit-credentials-auto-fill-button {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    /* Samakan tampilan input password di berbagai browser */
+    .auth-form input[type="password"] {
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .auth-form input:focus {
@@ -295,45 +311,73 @@
         max-width: min(520px, 90vw);
     }
 
-    /* LAPTOP DENGAN LAYAR PENDEK */
-    @media (max-height: 760px) and (min-width: 761px) {
-        .auth-page {
-            align-items: flex-start;
-            overflow-y: auto;
-        }
+    /* LAPTOP DAN DESKTOP DENGAN TINGGI LAYAR TERBATAS */
+    @media (max-height: 850px) and (min-width: 761px) {
 
-        .auth-shell {
-            height: auto;
-            min-height: calc(100dvh - 2 * clamp(12px, 2.2vw, 30px));
-            max-height: none;
-        }
-
-        .auth-form-panel {
-            padding-top: 22px;
-            padding-bottom: 22px;
-        }
-
-        .auth-intro {
-            margin-bottom: 12px;
-        }
-
-        .auth-form form > label {
-            margin-bottom: 5px;
-        }
-
-        .auth-form input:not([type=checkbox]) {
-            height: 38px;
-            margin-bottom: 10px;
-        }
-
-        .password-field {
-            margin-bottom: 10px;
-        }
-
-        .password-toggle {
-            top: 3px;
-        }
+    .auth-page {
+        position: fixed;
+        inset: 0;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        padding: clamp(12px, 2.2vw, 30px);
+        overflow: hidden;
     }
+
+    .auth-shell {
+        height: 100%;
+        min-height: 0;
+        max-height: 900px;
+    }
+
+    .auth-form-panel {
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .auth-form .back {
+        margin-bottom: 8px;
+    }
+
+    .auth-form h2 {
+        margin-bottom: 5px;
+        font-size: 26px;
+    }
+
+    .auth-intro {
+        margin-bottom: 12px;
+    }
+
+    .auth-form form > label {
+        margin-bottom: 5px;
+    }
+
+    .auth-form input:not([type=checkbox]) {
+        height: 37px;
+        margin-bottom: 9px;
+    }
+
+    .password-field {
+        margin-bottom: 9px;
+    }
+
+    .password-toggle {
+        top: 2px;
+    }
+
+    .btn.wide {
+        min-height: 39px;
+        margin-top: 0;
+    }
+
+    .auth-switch {
+        margin-top: 10px;
+    }
+}
 
     /* TABLET DAN MOBILE */
     @media (max-width: 760px) {
@@ -386,7 +430,7 @@
         }
 
         .auth-form {
-            width: min(410px, 100%);
+            width: min(440px, 100%);
             transform: none;
         }
     }
@@ -438,7 +482,7 @@
 
         .auth-form {
             width: 100%;
-            max-width: 410px;
+            max-width: 440px;
             margin: 0 auto;
         }
 
