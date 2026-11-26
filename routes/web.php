@@ -6,10 +6,12 @@ use App\Http\Controllers\{
     PublicController,
     DashboardController,
     BookingController,
-    AdminController
+    AdminController,
+    ChatbotController
 };
 
 Route::get('/', [PublicController::class, 'landing'])->name('landing');
+Route::post('/chatbot/reply', [ChatbotController::class, 'reply'])->name('chatbot.reply');
 
 // AUTH
 Route::middleware('guest')->group(function () {
