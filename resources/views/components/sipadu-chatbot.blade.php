@@ -185,15 +185,15 @@
         to { transform: scale(1.5); opacity: 1; }
     }
 
-    /* JENDELA POPUP CHATBOT MINIMALIS SOLID (DRAGGABLE LEWAT HEADER) */
+    /* JENDELA POPUP CHATBOT MINIMALIS SOLID (MENGIKUTI POSISI WIDGET) */
     .sipadu-bot-window {
         position: fixed;
         right: 24px;
-        bottom: 88px;
+        bottom: 96px;
         z-index: 99985;
         width: min(390px, calc(100vw - 32px));
         height: 520px;
-        max-height: calc(100vh - 116px);
+        max-height: calc(100vh - 124px);
         display: none;
         flex-direction: column;
         border-radius: 18px;
@@ -486,7 +486,7 @@
         }
         .sipadu-bot-window {
             right: 16px;
-            bottom: 78px;
+            bottom: 84px;
             width: calc(100vw - 32px);
         }
     }
@@ -519,9 +519,9 @@
     <span>Tanya SIPADU</span>
 </button>
 
-{{-- JENDELA CHATBOT MINIMALIS (BISA DIGESER LEWAT HEADER) --}}
+{{-- JENDELA CHATBOT MINIMALIS (OTOMATIS MENGIKUTI TOMBOL ROBOT) --}}
 <div class="sipadu-bot-window" id="sipaduBotWindow" role="dialog" aria-label="Asisten Virtual SIPADU">
-    <div class="sipadu-bot-header" id="sipaduBotHeader" title="Tahan & geser untuk memindahkan jendela">
+    <div class="sipadu-bot-header" id="sipaduBotHeader" title="Tahan & geser untuk memindahkan widget">
         <div class="sipadu-bot-header-info">
             <div class="sipadu-bot-avatar">
                 <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
@@ -580,11 +580,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const STORAGE_KEY_HISTORY = 'sipadu_bot_history_v2';
     const STORAGE_KEY_OPEN = 'sipadu_bot_open_v2';
-    const STORAGE_KEY_POS_LAUNCHER = 'sipadu_bot_pos_launcher_v1';
-    const STORAGE_KEY_POS_WINDOW = 'sipadu_bot_pos_window_v1';
+    const STORAGE_KEY_POS_LAUNCHER = 'sipadu_bot_pos_launcher_v2';
 
     /* ==========================================================
-       FITUR DRAGGABLE (GESER BEBAS + BATAS LAYAR + SIMPAN POSISI)
+       SINKRONISASI POSISI KOTAK CHAT MENGIKUTI TOMBOL ROBOT
        ========================================================== */
     function clampPosition(left, top, el) {
         const margin = 12;
@@ -596,22 +595,84 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function applySavedPosition(el, storageKey) {
+    function syncWindowToLauncher() {
+        if (!win.classList.contains('is-open')) return;
+
+        const rect = launcher.getBoundingClientRect();
+        const gap = 12;
+        const winWidth = win.offsetWidth;
+        const winHeight = win.offsetHeight;
+
+        win.style.right = 'auto';
+        win.style.bottom = 'auto';
+
+        // Sejajarkan sisi kanan kotak chat dengan sisi kanan tombol robot (atau sisi kiri jika terlalu mepet kiri)
+        let targetLeft = rect.right - winWidth;
+        if (targetLeft < 12) {
+            targetLeft = rect.left;
+        }
+
+        // Tempatkan di atas tombol robot; jika ruang atas tidak cukup, letakkan di bawah tombol robot
+        let targetTop = rect.top - winHeight - gap;
+        if (targetTop < 12) {
+            const spaceBelow = window.innerHeight - rect.bottom - gap - 12;
+            if (spaceBelow >= winHeight || rect.top < (window.innerHeight - rect.bottom)) {
+                targetTop = rect.bottom + gap;
+            }
+        }
+
+        const clamped = clampPosition(targetLeft, targetTop, win);
+        win.style.left = clamped.left + 'px';
+        win.style.top = clamped.top + 'px';
+    }
+
+    function syncLauncherToWindow() {
+        const winRect = win.getBoundingClientRect();
+        const launcherRect = launcher.getBoundingClientRect();
+        const gap = 12;
+
+        launcher.style.right = 'auto';
+        launcher.style.bottom = 'auto';
+
+        let targetLeft = winRect.right - launcherRect.width;
+        let targetTop = winRect.bottom + gap;
+
+        // Jika kotak chat digeser terlalu ke bawah, pindahkan tombol robot ke atas kotak chat
+        if (targetTop + launcherRect.height > window.innerHeight - 12) {
+            targetTop = winRect.top - launcherRect.height - gap;
+        }
+
+        const clamped = clampPosition(targetLeft, targetTop, launcher);
+        launcher.style.left = clamped.left + 'px';
+        launcher.style.top = clamped.top + 'px';
+    }
+
+    function saveLauncherPosition() {
+        const rect = launcher.getBoundingClientRect();
         try {
-            const raw = sessionStorage.getItem(storageKey);
+            sessionStorage.setItem(STORAGE_KEY_POS_LAUNCHER, JSON.stringify({
+                left: rect.left,
+                top: rect.top,
+            }));
+        } catch (e) {}
+    }
+
+    function applySavedPosition() {
+        try {
+            const raw = sessionStorage.getItem(STORAGE_KEY_POS_LAUNCHER);
             if (!raw) return;
             const pos = JSON.parse(raw);
             if (typeof pos.left === 'number' && typeof pos.top === 'number') {
-                el.style.right = 'auto';
-                el.style.bottom = 'auto';
-                const clamped = clampPosition(pos.left, pos.top, el);
-                el.style.left = clamped.left + 'px';
-                el.style.top = clamped.top + 'px';
+                launcher.style.right = 'auto';
+                launcher.style.bottom = 'auto';
+                const clamped = clampPosition(pos.left, pos.top, launcher);
+                launcher.style.left = clamped.left + 'px';
+                launcher.style.top = clamped.top + 'px';
             }
         } catch (e) {}
     }
 
-    function makeDraggable(targetEl, handleEl, storageKey, onClickCallback) {
+    function makeSyncedDraggable(dragTarget, handleEl, isWindowDrag, onClickCallback) {
         let isPointerDown = false;
         let hasMoved = false;
         let startX = 0;
@@ -621,16 +682,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         handleEl.addEventListener('pointerdown', function (e) {
             if (e.button !== 0 && e.pointerType === 'mouse') return;
-            if (e.target.closest('button, a, input')) {
-                if (handleEl !== targetEl) return;
-            }
+            if (e.target.closest('button, a, input') && handleEl !== dragTarget) return;
 
             isPointerDown = true;
             hasMoved = false;
             startX = e.clientX;
             startY = e.clientY;
 
-            const rect = targetEl.getBoundingClientRect();
+            const rect = dragTarget.getBoundingClientRect();
             origLeft = rect.left;
             origTop = rect.top;
 
@@ -644,35 +703,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!hasMoved && Math.hypot(dx, dy) > 5) {
                 hasMoved = true;
-                targetEl.classList.add('is-dragging');
-                targetEl.style.right = 'auto';
-                targetEl.style.bottom = 'auto';
+                dragTarget.classList.add('is-dragging');
+                dragTarget.style.right = 'auto';
+                dragTarget.style.bottom = 'auto';
             }
 
             if (hasMoved) {
-                const clamped = clampPosition(origLeft + dx, origTop + dy, targetEl);
-                targetEl.style.left = clamped.left + 'px';
-                targetEl.style.top = clamped.top + 'px';
+                const clamped = clampPosition(origLeft + dx, origTop + dy, dragTarget);
+                dragTarget.style.left = clamped.left + 'px';
+                dragTarget.style.top = clamped.top + 'px';
+
+                // Ikutkan pasangan elemennya secara real-time
+                if (isWindowDrag) {
+                    syncLauncherToWindow();
+                } else {
+                    syncWindowToLauncher();
+                }
             }
         });
 
         function finishDrag(e) {
             if (!isPointerDown) return;
             isPointerDown = false;
-            targetEl.classList.remove('is-dragging');
+            dragTarget.classList.remove('is-dragging');
 
             try {
                 handleEl.releasePointerCapture(e.pointerId);
             } catch (err) {}
 
             if (hasMoved) {
-                const rect = targetEl.getBoundingClientRect();
-                try {
-                    sessionStorage.setItem(storageKey, JSON.stringify({
-                        left: rect.left,
-                        top: rect.top,
-                    }));
-                } catch (err) {}
+                saveLauncherPosition();
             } else if (typeof onClickCallback === 'function') {
                 onClickCallback();
             }
@@ -682,40 +742,17 @@ document.addEventListener('DOMContentLoaded', function () {
         handleEl.addEventListener('pointercancel', finishDrag);
     }
 
-    function positionWindowNearLauncher() {
-        if (sessionStorage.getItem(STORAGE_KEY_POS_WINDOW)) {
-            applySavedPosition(win, STORAGE_KEY_POS_WINDOW);
-            return;
-        }
-        const rect = launcher.getBoundingClientRect();
-        win.style.right = 'auto';
-        win.style.bottom = 'auto';
-        const desiredLeft = rect.right - win.offsetWidth;
-        const desiredTop = rect.top - win.offsetHeight - 12;
-        const clamped = clampPosition(
-            desiredLeft < 12 ? rect.left : desiredLeft,
-            desiredTop < 12 ? rect.bottom + 12 : desiredTop,
-            win
-        );
-        win.style.left = clamped.left + 'px';
-        win.style.top = clamped.top + 'px';
-    }
-
-    applySavedPosition(launcher, STORAGE_KEY_POS_LAUNCHER);
-    makeDraggable(launcher, launcher, STORAGE_KEY_POS_LAUNCHER, () => toggleChat());
-    makeDraggable(win, headerHandle, STORAGE_KEY_POS_WINDOW, null);
+    applySavedPosition();
+    makeSyncedDraggable(launcher, launcher, false, () => toggleChat());
+    makeSyncedDraggable(win, headerHandle, true, null);
 
     window.addEventListener('resize', function () {
         if (launcher.style.left) {
-            const c1 = clampPosition(parseFloat(launcher.style.left), parseFloat(launcher.style.top), launcher);
-            launcher.style.left = c1.left + 'px';
-            launcher.style.top = c1.top + 'px';
+            const c = clampPosition(parseFloat(launcher.style.left), parseFloat(launcher.style.top), launcher);
+            launcher.style.left = c.left + 'px';
+            launcher.style.top = c.top + 'px';
         }
-        if (win.classList.contains('is-open') && win.style.left) {
-            const c2 = clampPosition(parseFloat(win.style.left), parseFloat(win.style.top), win);
-            win.style.left = c2.left + 'px';
-            win.style.top = c2.top + 'px';
-        }
+        syncWindowToLauncher();
     });
 
     /* ==========================================================
@@ -885,7 +922,7 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.setItem(STORAGE_KEY_OPEN, shouldOpen ? '1' : '0');
 
         if (shouldOpen) {
-            positionWindowNearLauncher();
+            syncWindowToLauncher();
             if (messagesBox.innerHTML.trim() === '') {
                 sendBotPayload({ message: 'halo' });
             }
@@ -901,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (sessionStorage.getItem(STORAGE_KEY_OPEN) === '1') {
         win.classList.add('is-open');
-        positionWindowNearLauncher();
+        syncWindowToLauncher();
     }
 
     closeBtn?.addEventListener('click', () => toggleChat(false));
