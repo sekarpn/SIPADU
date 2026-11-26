@@ -543,7 +543,7 @@
                 title="Profil"
             >
                 <i data-lucide="user"></i>
-                <span>Profil</span>
+                <span>Profil Saya</span>
             </a>
 
             <a
