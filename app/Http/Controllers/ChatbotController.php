@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Auditorium;
 use App\Models\SiteContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -271,7 +272,7 @@ class ChatbotController extends Controller
     private function resolveBookingUrl(int $auditoriumId, string $date): string
     {
         $params = ['auditorium_id' => $auditoriumId, 'date' => $date];
-        $role = auth()->user()->role ?? null;
+        $role = Auth::check() ? (Auth::user()->role ?? null) : null;
 
         if ($role === 'pegawai') {
             return route('pegawai.booking.create', $params);

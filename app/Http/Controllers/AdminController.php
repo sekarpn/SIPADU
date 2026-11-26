@@ -51,36 +51,99 @@ class AdminController extends Controller
 
     public function saveAuditorium(Request $r, ?Auditorium $auditorium = null)
     {
+        // Normalisasi format waktu ke H:i (antisipasi nilai TIME H:i:s dari database saat edit)
+        if ($r->filled('jam_mulai')) {
+            $r->merge(['jam_mulai' => substr((string) $r->jam_mulai, 0, 5)]);
+        }
+        if ($r->filled('jam_selesai')) {
+            $r->merge(['jam_selesai' => substr((string) $r->jam_selesai, 0, 5)]);
+        }
+
         $data = $r->validate([
             'name' => 'required|string|max:255',
+            'lokasi_kampus' => 'required|in:UPNVJ Kampus Pondok Labu,UPNVJ Kampus Limo',
+            'lokasi_gedung' => 'nullable|string|max:500',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             'location' => 'nullable|string|max:255',
             'capacity' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
             'facilities' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'string',
+        ], [
+            'lokasi_kampus.required' => 'Lokasi kampus wajib dipilih.',
+            'lokasi_kampus.in' => 'Lokasi kampus harus UPNVJ Kampus Pondok Labu atau UPNVJ Kampus Limo.',
+            'jam_mulai.required' => 'Jam mulai operasional wajib diisi.',
+            'jam_mulai.date_format' => 'Format jam mulai tidak valid.',
+            'jam_selesai.required' => 'Jam selesai operasional wajib diisi.',
+            'jam_selesai.date_format' => 'Format jam selesai tidak valid.',
+            'jam_selesai.after' => 'Jam selesai harus lebih akhir dari jam mulai.',
+            'images.*.image' => 'Semua file yang diunggah harus berupa gambar.',
+            'images.*.mimes' => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
+            'images.*.max' => 'Ukuran setiap foto maksimal 2 MB.',
         ]);
 
-        $data['facilities'] = array_filter(
+        // Fallback agar halaman lama yang masih membaca kolom `location` tetap terisi
+        if (empty($data['location'])) {
+            $data['location'] = trim(
+                $data['lokasi_kampus'] . (!empty($data['lokasi_gedung']) ? ' - ' . $data['lokasi_gedung'] : '')
+            );
+        }
+
+        $data['facilities'] = array_values(array_filter(
             array_map('trim', explode(',', $data['facilities'] ?? ''))
-        );
+        ));
 
         $data['is_active'] = $r->has('is_active')
             ? $r->boolean('is_active')
             : ($auditorium?->is_active ?? true);
 
-        // Simpan foto auditorium jika admin mengunggah foto baru
-        if ($r->hasFile('image')) {
-
-            // Hapus foto lama jika sedang mengedit auditorium
-            if ($auditorium && $auditorium->image_path) {
-                Storage::disk('public')->delete($auditorium->image_path);
+        // Ambil daftar foto lama jika sedang mengedit auditorium
+        $currentImages = [];
+        if ($auditorium) {
+            $rawImages = $auditorium->images;
+            if (is_string($rawImages)) {
+                $decoded = json_decode($rawImages, true);
+                $rawImages = is_array($decoded) ? $decoded : [];
             }
 
-            // Simpan foto baru ke storage/app/public/auditoriums
-            $data['image_path'] = $r->file('image')->store('auditoriums', 'public');
+            $currentImages = array_values(array_filter(
+                is_array($rawImages) ? $rawImages : [],
+                fn ($p) => is_string($p) && trim($p) !== ''
+            ));
+
+            if (empty($currentImages) && is_string($auditorium->image_path) && trim($auditorium->image_path) !== '') {
+                $currentImages[] = trim($auditorium->image_path);
+            }
         }
 
-        unset($data['image']);
+        // Hapus foto lama yang ditandai hapus oleh admin saat edit
+        $removeImages = $r->input('remove_images', []);
+        if (!empty($removeImages) && is_array($removeImages)) {
+            foreach ($removeImages as $removedPath) {
+                if (in_array($removedPath, $currentImages, true)) {
+                    Storage::disk('public')->delete($removedPath);
+                }
+            }
+            $currentImages = array_values(array_diff($currentImages, $removeImages));
+        }
+
+        // Simpan foto-foto baru ke storage/app/public/auditoriums
+        if ($r->hasFile('images')) {
+            foreach ($r->file('images') as $file) {
+                if ($file && $file->isValid()) {
+                    $currentImages[] = $file->store('auditoriums', 'public');
+                }
+            }
+        }
+
+        $data['images'] = array_values($currentImages);
+        $data['image_path'] = $currentImages[0] ?? null;
+
+        unset($data['remove_images']);
 
         Auditorium::updateOrCreate(
             ['id' => $auditorium?->id],
@@ -101,8 +164,23 @@ class AdminController extends Controller
 
     public function deleteAuditorium(Auditorium $auditorium)
     {
-        if ($auditorium->image_path) {
-            Storage::disk('public')->delete($auditorium->image_path);
+        $rawImages = $auditorium->images;
+        if (is_string($rawImages)) {
+            $decoded = json_decode($rawImages, true);
+            $rawImages = is_array($decoded) ? $decoded : [];
+        }
+
+        $paths = array_values(array_filter(
+            is_array($rawImages) ? $rawImages : [],
+            fn ($p) => is_string($p) && trim($p) !== ''
+        ));
+
+        if (is_string($auditorium->image_path) && trim($auditorium->image_path) !== '') {
+            $paths[] = trim($auditorium->image_path);
+        }
+
+        foreach (array_unique($paths) as $path) {
+            Storage::disk('public')->delete($path);
         }
 
         $auditorium->delete();
@@ -135,13 +213,16 @@ class AdminController extends Controller
             'role' => 'required|in:mahasiswa,pegawai,admin',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
         User::create($data);
+
         return redirect()->route('admin.users')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
     public function showUser(User $user)
     {
         $user->loadCount('bookings');
+
         return view('admin.users-show', compact('user'));
     }
 
@@ -154,14 +235,19 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required','email','max:255',Rule::unique('users','email')->ignore($user->id)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'phone' => 'nullable|string|max:30',
-            'nim_nip' => ['nullable','string','max:50',Rule::unique('users','nim_nip')->ignore($user->id)],
+            'nim_nip' => ['nullable', 'string|max:50', Rule::unique('users', 'nim_nip')->ignore($user->id)],
             'role' => 'required|in:mahasiswa,pegawai,admin',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
-        if (empty($data['password'])) unset($data['password']);
+
+        if (empty($data['password'])) {
+            unset($data['password']);
+        }
+
         $user->update($data);
+
         return redirect()->route('admin.users')->with('success', 'Data pengguna berhasil diperbarui.');
     }
 
@@ -170,10 +256,13 @@ class AdminController extends Controller
         if ((string) $user->getAuthIdentifier() === (string) \Illuminate\Support\Facades\Auth::id()) {
             return back()->with('error', 'Akun admin yang sedang digunakan tidak dapat dihapus.');
         }
+
         if ($user->bookings()->exists()) {
             return back()->with('error', 'Pengguna tidak dapat dihapus karena masih memiliki riwayat peminjaman.');
         }
+
         $user->delete();
+
         return redirect()->route('admin.users')->with('success', 'Pengguna berhasil dihapus.');
     }
 }
