@@ -447,6 +447,37 @@ html.page-ready .app-layout > main > .main-content {
     margin-top: 10px !important;
 }
 
+/* =====================================================================
+   POP-UP LENGKAPI DATA PROFIL (ANTI-GLITCH & BLUR SAMA DENGAN AUDITORIUM)
+   ===================================================================== */
+.sipadu-profile-modal-host {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    z-index: 9998 !important;
+    zoom: 1 !important;
+    background: rgba(12, 28, 19, 0.36) !important;
+    background-color: rgba(12, 28, 19, 0.36) !important;
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    will-change: opacity !important;
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif !important;
+}
+
+.sipadu-profile-modal-host > div,
+.sipadu-profile-modal-host > form,
+.sipadu-profile-modal-host [class*="modal-box"],
+.sipadu-profile-modal-host [class*="modal-card"],
+.sipadu-profile-modal-host [class*="modal-content"],
+.sipadu-profile-modal-host [class*="dialog"] {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
 /* UNDERLINE TABS SERAGAM DI SELURUH HALAMAN */
 .app-layout > main > .main-content .sipadu-underline-tabs,
 .app-layout > main > .main-content .up-tabs,
@@ -1423,6 +1454,47 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.querySelectorAll('.main-content table').forEach(initTablePagination);
+
+    /* HOIST POP-UP LENGKAPI DATA PROFIL KE ROOT BODY AGAR BEBAS GLITCH & BLUR SAMA DENGAN AUDITORIUM */
+    function stabilizeProfileModals() {
+        const candidates = document.querySelectorAll(
+            '.main-content [id*="profil" i], .main-content [id*="profile" i], .main-content [class*="profil" i], .main-content [class*="profile" i], .main-content [role="dialog"]'
+        );
+
+        candidates.forEach(function (el) {
+            if (
+                el.dataset.sipaduProfileHoisted === '1' ||
+                el.classList.contains('auditorium-modal') ||
+                el.classList.contains('topbar-profile-dropdown')
+            ) {
+                return;
+            }
+
+            const style = window.getComputedStyle(el);
+            const text = (el.textContent || '').toLowerCase();
+            const isFixedOverlay = style.position === 'fixed' && (
+                text.includes('lengkapi data profil') ||
+                text.includes('lengkapi profil') ||
+                /modal|overlay|backdrop|popup/.test((el.id + ' ' + el.className).toLowerCase())
+            );
+
+            if (isFixedOverlay) {
+                el.dataset.sipaduProfileHoisted = '1';
+                el.classList.add('sipadu-profile-modal-host');
+                document.body.appendChild(el);
+            }
+        });
+    }
+
+    stabilizeProfileModals();
+
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent && window.MutationObserver) {
+        const profileModalObserver = new MutationObserver(function () {
+            stabilizeProfileModals();
+        });
+        profileModalObserver.observe(mainContent, { childList: true, subtree: true });
+    }
 
     if (window.lucide) {
         window.lucide.createIcons();
