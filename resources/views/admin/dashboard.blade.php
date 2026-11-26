@@ -11,26 +11,20 @@
     $rejectedPercent = $total > 0 ? (($stats['rejected'] ?? 0) / $total) * 100 : 0;
     $cancelledPercent = $total > 0 ? ($cancelled / $total) * 100 : 0;
 
-    $sourceBookings = isset($bookings) ? collect($bookings) : collect();
+    $todayJakarta = \Carbon\Carbon::now('Asia/Jakarta')->toDateString();
 
-    $pendingBookings = $sourceBookings->filter(function ($item) {
-        return in_array(strtolower((string) ($item->status ?? '')), ['pending', 'menunggu'], true);
-    });
+    $pendingBookings = \App\Models\Booking::with(['user', 'auditorium'])
+        ->whereRaw('LOWER(TRIM(status)) IN (?, ?)', ['pending', 'menunggu'])
+        ->latest()
+        ->get();
 
-    if ($pendingBookings->isEmpty() && ($stats['pending'] ?? 0) > 0) {
-        $pendingBookings = \App\Models\Booking::with(['user', 'auditorium'])
-            ->whereIn('status', ['Pending', 'pending', 'PENDING', 'Menunggu', 'menunggu'])
-            ->latest()
-            ->get();
-    }
-
-    $upcomingBookings = isset($upcomingBookings)
-        ? collect($upcomingBookings)
-        : \App\Models\Booking::with(['user', 'auditorium'])
-            ->whereIn('status', ['Disetujui', 'disetujui', 'Approved', 'approved', 'APPROVED'])
-            ->whereDate('booking_date', '>=', now()->toDateString())
-            ->orderBy('booking_date', 'asc')
-            ->get();
+    // Ambil pengajuan berstatus Disetujui mulai dari HARI H (>= hari ini) saja
+    $upcomingBookings = \App\Models\Booking::with(['user', 'auditorium'])
+        ->whereRaw('LOWER(TRIM(status)) IN (?, ?)', ['disetujui', 'approved'])
+        ->whereDate('booking_date', '>=', $todayJakarta)
+        ->orderBy('booking_date', 'asc')
+        ->orderBy('start_time', 'asc')
+        ->get();
 @endphp
 
 <style>
@@ -211,32 +205,6 @@
         margin: 0;
     }
 
-    .section-head a {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 7px 12px;
-        border-radius: 10px;
-        background: rgba(35, 124, 77, 0.11);
-        color: #1f7a49;
-        text-decoration: none;
-        font-size: 11.5px;
-        font-weight: 700;
-        white-space: nowrap;
-        transition: background 0.2s ease, gap 0.2s ease, color 0.2s ease;
-    }
-
-    .section-head a svg {
-        width: 14px;
-        height: 14px;
-    }
-
-    .section-head a:hover {
-        background: rgba(35, 124, 77, 0.18);
-        color: #155a35;
-        gap: 7px;
-    }
-
     /* KARTU DIAGRAM PIE */
     .chart-content {
         display: flex;
@@ -393,118 +361,258 @@
         padding: 25px;
     }
 
-    /* GRID 2 KOLOM BERDAMPINGAN: DAFTAR PENGAJUAN TERBARU (PENDING) & JADWAL PEMINJAMAN MENDATANG */
-    .dash-tables-grid {
+    /* ============================================================
+       GRID 2 KOLOM: PENGAJUAN TERBARU & PEMINJAMAN MENDATANG
+       ============================================================ */
+    .dash-cards-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 20px;
         align-items: start;
     }
 
-    .dash-table-card {
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.42) 100%) !important;
+    .dash-feed-panel {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.46) 100%) !important;
         backdrop-filter: blur(18px) saturate(150%) !important;
         -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.55) !important;
+        border: 1px solid rgba(255, 255, 255, 0.62) !important;
         border-radius: 16px !important;
-        box-shadow: 0 8px 28px rgba(22, 54, 38, 0.06) !important;
-        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(22, 54, 38, 0.05) !important;
+        padding: 18px 20px 20px;
         min-width: 0;
     }
 
-    .dash-table-card .section-head {
-        padding: 16px 18px !important;
-        margin: 0 !important;
-        border-bottom: 1px solid rgba(22, 54, 38, 0.09);
-        background: rgba(255, 255, 255, 0.28);
-    }
-
-    .dash-title-row {
+    .dash-feed-head {
         display: flex;
         align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
     }
 
-    .dash-badge-count {
+    .dash-feed-head-left {
+        display: flex;
+        align-items: baseline;
+        gap: 7px;
+        min-width: 0;
+    }
+
+    .dash-feed-head h2 {
+        margin: 0;
+        font-size: 15.5px;
+        font-weight: 800;
+        color: #163626;
+        letter-spacing: -0.02em;
+    }
+
+    .dash-feed-count {
+        font-size: 12px;
+        font-weight: 700;
+        color: #64786c;
+    }
+
+    .dash-feed-more {
         display: inline-flex;
         align-items: center;
-        padding: 3px 9px;
+        gap: 4px;
+        color: #1f7a49;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: color .15s ease;
+    }
+
+    .dash-feed-more:hover {
+        color: #145332;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .dash-feed-more svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* LIST SCROLL */
+    .dash-feed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 430px;
+        overflow-y: auto;
+        padding: 2px 3px 4px 1px;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(22, 54, 38, 0.18) transparent;
+    }
+
+    .dash-feed-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .dash-feed-list::-webkit-scrollbar-thumb {
+        background: rgba(22, 54, 38, 0.18);
         border-radius: 999px;
-        font-size: 11px;
+    }
+
+    /* KARTU SIMETRIS & SEIMBANG */
+    .proto-card {
+        display: block;
+        padding: 15px 18px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(22, 54, 38, 0.09);
+        box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
+        text-decoration: none;
+        color: #163626;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .proto-card:hover {
+        background: #ffffff;
+        border-color: rgba(35, 124, 77, 0.34);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(22, 54, 38, 0.07);
+    }
+
+    .proto-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 12px;
+    }
+
+    .proto-card-heading {
+        min-width: 0;
+    }
+
+    .proto-card-title {
+        margin: 0;
+        font-size: 14.5px;
         font-weight: 800;
-        background: rgba(35, 124, 77, 0.14);
+        color: #163626;
+        line-height: 1.35;
+        letter-spacing: -0.015em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+
+    .proto-card:hover .proto-card-title {
         color: #1f7a49;
     }
 
-    .dash-badge-count.amber {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .dash-cell-primary {
-        display: block;
-        font-weight: 700;
-        color: #163626;
-    }
-
-    .dash-cell-sub {
-        display: block;
-        font-size: 11.5px;
-        font-weight: 500;
-        color: #64786c;
-        margin-top: 2px;
-    }
-
-    /* BADGE STATUS */
-    .status {
-        display: inline-flex;
+    .proto-card-sub {
+        margin: 3px 0 0;
+        font-size: 12px;
+        color: #5c7265;
+        display: flex;
         align-items: center;
-        padding: 5px 11px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 800;
+        gap: 6px;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .status.pending,
-    .status.menunggu {
-        color: #92400e;
+    .proto-card-sub .event-name {
+        font-weight: 600;
+        color: #465d50;
+    }
+
+    .proto-card-sub .sub-dot {
+        color: #9cb0a4;
+        flex-shrink: 0;
+    }
+
+    .proto-card-sub .org-name {
+        font-weight: 600;
+        color: #1f7a49;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* SOFT STATUS PILL DI KANAN ATAS */
+    .proto-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 13px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+        line-height: 1.2;
+    }
+
+    .proto-badge.live {
+        background: #dff3e6;
+        color: #1b653c;
+    }
+
+    .proto-badge.upcoming {
         background: #fef3c7;
-        border: 1px solid #fcd34d;
+        color: #854d0e;
     }
 
-    .status.disetujui,
-    .status.approved {
-        color: #065f46;
-        background: #bbf7d0;
-        border: 1px solid #34d399;
+    .proto-badge.pending {
+        background: #ffedd5;
+        color: #9a3412;
     }
 
-    .status.ditolak,
-    .status.rejected {
-        color: #991b1b;
-        background: #fee2e2;
-        border: 1px solid #fca5a5;
+    /* BARIS WAKTU BAWAH: TANGGAL & JAM SEJAJAR RAPI */
+    .proto-schedule-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(22, 54, 38, 0.06);
     }
 
-    .status.dibatalkan,
-    .status.cancelled {
-        color: #475569;
-        background: #e2e8f0;
-        border: 1px solid #cbd5e1;
+    .proto-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #3d5446;
+        min-width: 0;
+    }
+
+    .proto-meta-item svg {
+        width: 14px;
+        height: 14px;
+        color: #6b8274;
+        flex-shrink: 0;
+    }
+
+    .proto-meta-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
     }
 
     .dash-empty-state {
         text-align: center;
-        color: #4c6456;
-        padding: 32px 14px;
+        color: #5e7366;
+        padding: 34px 16px;
         font-size: 12.5px;
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px dashed rgba(22, 54, 38, 0.16);
+        border-radius: 13px;
     }
 
     /* RESPONSIVE */
-    @media (max-width: 1180px) {
-        .dash-tables-grid {
+    @media (max-width: 1120px) {
+        .dash-cards-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -532,8 +640,15 @@
             width: 100%;
         }
 
-        .dashboard-panel {
-            padding: 14px 15px 16px !important;
+        .dashboard-panel,
+        .dash-feed-panel {
+            padding: 15px 16px 16px !important;
+        }
+
+        .proto-schedule-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
         }
 
         .chart-content {
@@ -572,7 +687,8 @@
     @media (prefers-reduced-motion: reduce) {
         .pie-chart,
         .legend-item,
-        .pie-tooltip {
+        .pie-tooltip,
+        .proto-card {
             transition: none;
         }
     }
@@ -724,132 +840,146 @@
         @endif
     </div>
 
-    {{-- 2 TABEL BERDAMPINGAN: DAFTAR PENGAJUAN TERBARU (PENDING) & JADWAL PEMINJAMAN MENDATANG --}}
-    <div class="dash-tables-grid">
+    {{-- 2 PANEL CARD: PENGAJUAN TERBARU & PEMINJAMAN MENDATANG --}}
+    <div class="dash-cards-grid">
 
-        {{-- TABEL 1: DAFTAR PENGAJUAN TERBARU (KHUSUS STATUS PENDING) --}}
-        <div class="dash-table-card">
-            <div class="section-head">
-                <div>
-                    <div class="dash-title-row">
-                        <h2>Daftar Pengajuan Terbaru</h2>
-                        <span class="dash-badge-count amber">{{ $pendingBookings->count() }} Pending</span>
-                    </div>
-                    <p>Pengajuan berstatus pending yang menunggu verifikasi.</p>
+        {{-- PANEL 1: PENGAJUAN TERBARU (PENDING) --}}
+        <div class="dash-feed-panel">
+            <div class="dash-feed-head">
+                <div class="dash-feed-head-left">
+                    <h2>Pengajuan Terbaru</h2>
+                    <span class="dash-feed-count">({{ $pendingBookings->count() }})</span>
                 </div>
 
-                <a href="{{ route('admin.bookings', ['status' => 'pending']) }}">
+                <a href="{{ route('admin.bookings', ['status' => 'Pending']) }}" class="dash-feed-more">
                     Lihat semua
                     <i data-lucide="arrow-right"></i>
                 </a>
             </div>
 
-            <div class="sipadu-table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Peminjam</th>
-                            <th>Kegiatan</th>
-                            <th>Auditorium</th>
-                            <th>Tanggal</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
+            @if($pendingBookings->isNotEmpty())
+                <div class="dash-feed-list">
+                    @foreach($pendingBookings as $b)
+                        @php
+                            $bDate = $b->booking_date
+                                ? \Carbon\Carbon::parse($b->booking_date)->locale('id')->translatedFormat('d F Y')
+                                : '-';
+                            $bTime = !empty($b->start_time)
+                                ? str_replace(':', '.', substr($b->start_time, 0, 5)) . ' WIB'
+                                  . (!empty($b->end_time) ? ' - ' . str_replace(':', '.', substr($b->end_time, 0, 5)) . ' WIB' : '')
+                                : 'Waktu menyesuaikan';
+                            $bOrg = $b->organization ?? $b->organizer ?? optional($b->user)->name ?? 'Pemohon';
+                            $bVenue = optional($b->auditorium)->name ?? $b->event_name;
+                            $hasDistinctEvent = !empty(optional($b->auditorium)->name) && !empty($b->event_name);
+                        @endphp
+                        <a href="{{ route('admin.bookings', ['booking_id' => $b->id, 'open' => $b->id]) }}" class="proto-card">
+                            <div class="proto-card-top">
+                                <div class="proto-card-heading">
+                                    <h3 class="proto-card-title">{{ $bVenue }}</h3>
+                                    <p class="proto-card-sub">
+                                        @if($hasDistinctEvent)
+                                            <span class="event-name">{{ $b->event_name }}</span>
+                                            <span class="sub-dot">•</span>
+                                        @endif
+                                        <span class="org-name">{{ $bOrg }}</span>
+                                    </p>
+                                </div>
+                                <span class="proto-badge pending">Pending</span>
+                            </div>
 
-                    <tbody>
-                        @forelse($pendingBookings as $b)
-                            <tr>
-                                <td>
-                                    <span class="dash-cell-primary">{{ optional($b->user)->name ?? 'Pemohon' }}</span>
-                                </td>
-                                <td>
-                                    <span class="dash-cell-primary">{{ $b->event_name }}</span>
-                                </td>
-                                <td>{{ optional($b->auditorium)->name ?? '-' }}</td>
-                                <td>
-                                    {{ $b->booking_date ? \Carbon\Carbon::parse($b->booking_date)->format('d M Y') : '-' }}
-                                </td>
-                                <td>
-                                    <span class="status pending">
-                                        Pending
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr data-empty-row="1">
-                                <td colspan="5" class="dash-empty-state">
-                                    Tidak ada pengajuan pending saat ini.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                            <div class="proto-schedule-bar">
+                                <div class="proto-meta-item">
+                                    <i data-lucide="calendar"></i>
+                                    <span>{{ $bDate }}</span>
+                                </div>
+                                <div class="proto-meta-item">
+                                    <i data-lucide="clock"></i>
+                                    <span>{{ $bTime }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="dash-empty-state">
+                    Tidak ada pengajuan pending saat ini.
+                </div>
+            @endif
         </div>
 
-        {{-- TABEL 2: JADWAL PEMINJAMAN MENDATANG --}}
-        <div class="dash-table-card">
-            <div class="section-head">
-                <div>
-                    <div class="dash-title-row">
-                        <h2>Jadwal Peminjaman Mendatang</h2>
-                        <span class="dash-badge-count">{{ $upcomingBookings->count() }} Jadwal</span>
-                    </div>
-                    <p>Agenda penggunaan auditorium yang telah disetujui.</p>
+        {{-- PANEL 2: PEMINJAMAN MENDATANG (MULAI HARI H SAJA) --}}
+        <div class="dash-feed-panel">
+            <div class="dash-feed-head">
+                <div class="dash-feed-head-left">
+                    <h2>Peminjaman Mendatang</h2>
+                    <span class="dash-feed-count">({{ $upcomingBookings->count() }})</span>
                 </div>
 
-                <a href="{{ route('admin.bookings', ['status' => 'approved']) }}">
+                <a href="{{ route('admin.bookings', ['status' => 'Disetujui']) }}" class="dash-feed-more">
                     Lihat semua
                     <i data-lucide="arrow-right"></i>
                 </a>
             </div>
 
-            <div class="sipadu-table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Auditorium</th>
-                            <th>Kegiatan</th>
-                            <th>Peminjam</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
+            @if($upcomingBookings->isNotEmpty())
+                <div class="dash-feed-list">
+                    @foreach($upcomingBookings as $u)
+                        @php
+                            $now = \Carbon\Carbon::now('Asia/Jakarta');
+                            $today = $now->copy()->startOfDay();
+                            $eventDay = \Carbon\Carbon::parse($u->booking_date, 'Asia/Jakarta')->startOfDay();
+                            $diffDays = (int) $today->diffInDays($eventDay, false);
 
-                    <tbody>
-                        @forelse($upcomingBookings as $u)
-                            <tr>
-                                <td>
-                                    <span class="dash-cell-primary">
-                                        {{ $u->booking_date ? \Carbon\Carbon::parse($u->booking_date)->format('d M Y') : '-' }}
-                                    </span>
-                                    @if(!empty($u->start_time))
-                                        <span class="dash-cell-sub">
-                                            {{ substr($u->start_time, 0, 5) }}@if(!empty($u->end_time)) - {{ substr($u->end_time, 0, 5) }} WIB @endif
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="dash-cell-primary">{{ optional($u->auditorium)->name ?? '-' }}</span>
-                                </td>
-                                <td>{{ $u->event_name }}</td>
-                                <td>{{ optional($u->user)->name ?? 'Pemohon' }}</td>
-                                <td>
-                                    <span class="status disetujui">
-                                        Disetujui
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr data-empty-row="1">
-                                <td colspan="5" class="dash-empty-state">
-                                    Belum ada jadwal peminjaman mendatang.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                            if ($diffDays > 0) {
+                                $badgeText = 'Dalam ' . $diffDays . ' hari';
+                                $badgeClass = 'upcoming';
+                            } else {
+                                $badgeText = 'Hari ini';
+                                $badgeClass = 'live';
+                            }
+
+                            $uDate = \Carbon\Carbon::parse($u->booking_date)->locale('id')->translatedFormat('d F Y');
+                            $uTime = !empty($u->start_time)
+                                ? str_replace(':', '.', substr($u->start_time, 0, 5)) . ' WIB'
+                                  . (!empty($u->end_time) ? ' - ' . str_replace(':', '.', substr($u->end_time, 0, 5)) . ' WIB' : '')
+                                : 'Waktu menyesuaikan';
+                            $uOrg = $u->organization ?? $u->organizer ?? optional($u->user)->name ?? 'Pemohon';
+                            $uVenue = optional($u->auditorium)->name ?? $u->event_name;
+                            $hasDistinctEvent = !empty(optional($u->auditorium)->name) && !empty($u->event_name);
+                        @endphp
+                        <a href="{{ route('admin.bookings', ['booking_id' => $u->id, 'open' => $u->id]) }}" class="proto-card">
+                            <div class="proto-card-top">
+                                <div class="proto-card-heading">
+                                    <h3 class="proto-card-title">{{ $uVenue }}</h3>
+                                    <p class="proto-card-sub">
+                                        @if($hasDistinctEvent)
+                                            <span class="event-name">{{ $u->event_name }}</span>
+                                            <span class="sub-dot">•</span>
+                                        @endif
+                                        <span class="org-name">{{ $uOrg }}</span>
+                                    </p>
+                                </div>
+                                <span class="proto-badge {{ $badgeClass }}">{{ $badgeText }}</span>
+                            </div>
+
+                            <div class="proto-schedule-bar">
+                                <div class="proto-meta-item">
+                                    <i data-lucide="calendar"></i>
+                                    <span>{{ $uDate }}</span>
+                                </div>
+                                <div class="proto-meta-item">
+                                    <i data-lucide="clock"></i>
+                                    <span>{{ $uTime }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="dash-empty-state">
+                    Belum ada jadwal peminjaman mendatang.
+                </div>
+            @endif
         </div>
 
     </div>
@@ -862,6 +992,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        /* DIAGRAM PIE */
         const pie = document.getElementById('bookingPie');
         const tooltip = document.getElementById('pieTooltip');
         const pieTotal = document.getElementById('pieTotal');
@@ -872,7 +1003,6 @@
 
         const total = pie.dataset.total;
 
-        // Membuat diagram pie menggunakan JavaScript.
         const colors = [
             '#f59e0b',
             '#16a34a',
@@ -935,7 +1065,6 @@
             const x = event.clientX - centerX;
             const y = event.clientY - centerY;
 
-            // Abaikan area tengah diagram.
             const distance = Math.sqrt(x * x + y * y);
             const radius = rect.width / 2;
             const innerRadius = radius * 0.58;

@@ -15,7 +15,7 @@ class BookingController extends Controller
 {
     public function index(Request $r)
     {
-        $bookings = Booking::with('auditorium')
+        $bookings = Booking::with(['auditorium', 'histories'])
             ->where('user_id', $r->user()->id)
             ->latest()
             ->paginate(10);
@@ -131,6 +131,10 @@ class BookingController extends Controller
     {
         $query = Booking::with(['user', 'auditorium', 'histories'])->latest();
 
+        if ($request->filled('booking_id')) {
+            $query->where('id', $request->booking_id);
+        }
+
         if ($request->filled('q')) {
             $term = trim($request->q);
 
@@ -153,7 +157,11 @@ class BookingController extends Controller
             $query->whereDate('booking_date', $request->date);
         }
 
-        $bookings = $query->paginate(12)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100], true)
+            ? (int) $request->input('per_page')
+            : 10;
+
+        $bookings = $query->paginate($perPage)->withQueryString();
 
         $pageItems = $bookings->getCollection();
         $extraDrawerBookings = collect();
@@ -218,6 +226,10 @@ class BookingController extends Controller
         abort_unless(Auth::check() && Auth::user()->role === 'admin', 403);
 
         $query = Booking::with(['user', 'auditorium'])->latest();
+
+        if ($request->filled('booking_id')) {
+            $query->where('id', $request->booking_id);
+        }
 
         if ($request->filled('q')) {
             $term = trim($request->q);
@@ -415,9 +427,14 @@ class BookingController extends Controller
                     $oldStatus = $conflict->status;
                     $autoNote = '[Ditolak otomatis karena bentrok] ' . $data['conflict_rejection_reason'];
 
+                    // Pertahankan catatan lama (misal catatan perbaikan) jika sebelumnya pernah ada
+                    $combinedNote = filled($conflict->admin_note)
+                        ? trim($conflict->admin_note) . "\n\n" . $autoNote
+                        : $autoNote;
+
                     $conflict->update([
                         'status' => 'Ditolak',
-                        'admin_note' => $autoNote,
+                        'admin_note' => $combinedNote,
                     ]);
 
                     BookingHistory::create([
@@ -431,10 +448,18 @@ class BookingController extends Controller
             }
 
             $oldStatus = $target->status;
+            $newNote = $data['admin_note'] ?? null;
+
+            // Jika menolak/memutuskan setelah sebelumnya ada catatan (mis. catatan bentrok), gabungkan agar keduanya terbaca
+            if (filled($newNote) && filled($target->admin_note) && trim($target->admin_note) !== trim($newNote)) {
+                $finalNote = trim($target->admin_note) . "\n\n" . trim($newNote);
+            } else {
+                $finalNote = filled($newNote) ? trim($newNote) : $target->admin_note;
+            }
 
             $target->update([
                 'status' => $data['status'],
-                'admin_note' => $data['admin_note'] ?? null,
+                'admin_note' => $finalNote,
             ]);
 
             BookingHistory::create([
@@ -442,7 +467,7 @@ class BookingController extends Controller
                 'admin_id' => $r->user()->id,
                 'from_status' => $oldStatus,
                 'to_status' => $data['status'],
-                'note' => $data['admin_note'] ?? null,
+                'note' => $newNote,
             ]);
         });
 
