@@ -24,21 +24,27 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
-                'required', 'email', 'max:255', 'unique:users,email',
+                'required',
+                'email',
+                'max:255',
+                'unique:users,email',
                 function ($attribute, $value, $fail) {
                     $email = strtolower(trim($value));
-                    if (!str_ends_with($email, '@upnvj.ac.id') &&
-                        !str_ends_with($email, '@mahasiswa.upnvj.ac.id')) {
+
+                    if (
+                        !str_ends_with($email, '@upnvj.ac.id') &&
+                        !str_ends_with($email, '@mahasiswa.upnvj.ac.id')
+                    ) {
                         $fail('Gunakan email @upnvj.ac.id untuk pegawai atau @mahasiswa.upnvj.ac.id untuk mahasiswa.');
                     }
                 },
             ],
-            'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8|confirmed',
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Email institusi wajib diisi.',
-            'phone.required' => 'Nomor telepon wajib diisi.',
+            'email.unique' => 'Email institusi sudah terdaftar.',
+            'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
@@ -49,9 +55,8 @@ class AuthController extends Controller
             : 'pegawai';
 
         $user = User::create([
-            'name' => $validated['name'],
+            'name' => trim($validated['name']),
             'email' => $email,
-            'phone' => $validated['phone'],
             'password' => Hash::make($validated['password']),
             'role' => $role,
         ]);
