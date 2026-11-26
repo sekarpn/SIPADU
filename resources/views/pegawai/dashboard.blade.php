@@ -4,6 +4,15 @@
 
 @php
     $user = auth()->user();
+    $createBookingRoute = \Illuminate\Support\Facades\Route::has('pegawai.booking.create')
+        ? 'pegawai.booking.create'
+        : 'borrower.booking.create';
+    $bookingsListUrl = \Illuminate\Support\Facades\Route::has('pegawai.bookings')
+        ? route('pegawai.bookings')
+        : route('borrower.bookings');
+    $guidesUrl = \Illuminate\Support\Facades\Route::has('pegawai.guides')
+        ? route('pegawai.guides')
+        : route('borrower.guides');
 @endphp
 
 <style>
@@ -404,7 +413,7 @@
         margin: 0;
     }
 
-    /* AUDITORIUM (GLASS SUB-ITEM & GAMBAR FULL BLEED) */
+    /* AUDITORIUM (GLASS SUB-ITEM, SLIDER MULTI-FOTO & GAMBAR FULL BLEED) */
     .auditorium-section {
         margin-top: 0;
     }
@@ -479,28 +488,147 @@
         outline-offset: 3px;
     }
 
+    .auditorium-card.is-inactive-card {
+        opacity: 0.92;
+    }
+
     .auditorium-image-wrap {
         width: 100% !important;
+        height: 175px !important;
         overflow: hidden !important;
         position: relative;
         border-radius: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
+        background: #eaf4ee;
     }
 
+    /* SLIDER & SLIDESHOW FOTO AUDITORIUM (SAMA DENGAN ADMIN) */
+    .aud-slider {
+        width: 100%;
+        height: 175px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .aud-slider.is-modal-slider {
+        height: 250px;
+    }
+
+    .aud-slider-track {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .aud-slide {
+        flex: 0 0 100%;
+        width: 100%;
+        height: 100%;
+    }
+
+    .aud-slide img,
     .auditorium-card img,
     .auditorium-image-wrap img {
         width: 100% !important;
-        height: 175px !important;
+        height: 100% !important;
         object-fit: cover !important;
         display: block !important;
         border-radius: 0 !important;
         margin: 0 !important;
-        transition: transform .3s ease;
+        transition: transform .2s ease;
     }
 
-    .auditorium-card:hover img {
+    .auditorium-card:hover .aud-slide img {
         transform: scale(1.04);
+    }
+
+    .aud-slider-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 3;
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.92);
+        color: #163626;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+        opacity: 0.88;
+        transition: background .2s ease, transform .2s ease, opacity .2s ease;
+    }
+
+    .aud-slider-btn:hover {
+        background: #ffffff;
+        opacity: 1;
+        transform: translateY(-50%) scale(1.08);
+    }
+
+    .aud-slider-btn.prev {
+        left: 10px;
+    }
+
+    .aud-slider-btn.next {
+        right: 10px;
+    }
+
+    .aud-slider-count {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 3;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: rgba(15, 32, 23, 0.62);
+        color: #ffffff;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        backdrop-filter: blur(4px);
+    }
+
+    .aud-slider.is-modal-slider .aud-slider-count {
+        right: auto;
+        left: 14px;
+        top: 14px;
+    }
+
+    .aud-slider-dots {
+        position: absolute;
+        bottom: 9px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(15, 32, 23, 0.38);
+        backdrop-filter: blur(4px);
+    }
+
+    .aud-slider-dot {
+        width: 6px;
+        height: 6px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.52);
+        cursor: pointer;
+        transition: width .2s ease, background .2s ease;
+    }
+
+    .aud-slider-dot.is-active {
+        width: 14px;
+        border-radius: 999px;
+        background: #ffffff;
     }
 
     .auditorium-no-image {
@@ -527,12 +655,41 @@
         flex: 1;
     }
 
+    .auditorium-card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
     .auditorium-card-content h3 {
-        margin: 0 0 6px;
+        margin: 0;
         color: #163626;
         font-size: 16px;
         font-weight: 750;
         line-height: 1.35;
+    }
+
+    .aud-status-pill {
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 10.5px;
+        font-weight: 800;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .aud-status-pill.is-active {
+        color: #065f46;
+        background: #bbf7d0;
+        border: 1px solid #34d399;
+    }
+
+    .aud-status-pill.is-inactive {
+        color: #991b1b;
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
     }
 
     .auditorium-description {
@@ -557,11 +714,12 @@
 
     .auditorium-meta span {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 7px;
         font-size: 11px;
         color: #3c5446;
         font-weight: 500;
+        line-height: 1.4;
     }
 
     .auditorium-meta svg {
@@ -569,6 +727,22 @@
         height: 14px;
         color: #237c4d;
         flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .aud-inactive-alert {
+        margin-bottom: 12px;
+        padding: 8px 10px;
+        border-radius: 9px;
+        background: rgba(254, 242, 242, 0.92);
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .aud-inactive-alert strong {
+        color: #7f1d1d;
     }
 
     .auditorium-actions {
@@ -577,7 +751,8 @@
         margin-top: auto;
     }
 
-    .auditorium-actions a {
+    .auditorium-actions a,
+    .auditorium-actions .btn-booking-disabled {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -593,7 +768,8 @@
         z-index: 2;
     }
 
-    .auditorium-actions a svg {
+    .auditorium-actions a svg,
+    .auditorium-actions .btn-booking-disabled svg {
         width: 15px;
         height: 15px;
     }
@@ -609,6 +785,13 @@
         color: white;
     }
 
+    .btn-booking-disabled {
+        color: #991b1b;
+        background: rgba(254, 226, 226, 0.85);
+        border: 1px solid #fca5a5;
+        cursor: not-allowed;
+    }
+
     .empty-auditorium {
         background: rgba(255, 255, 255, 0.42);
         border: 1px solid rgba(255, 255, 255, 0.35);
@@ -620,68 +803,72 @@
         grid-column: 1 / -1;
     }
 
-    /* MODAL DETAIL AUDITORIUM */
+    /* SLIDE-OVER DETAIL DRAWER (DISAMAKAN DENGAN DRAWER ADMIN: ROUNDED FLOATING) */
     .auditorium-modal {
         position: fixed;
         inset: 0;
-        z-index: 9999;
+        z-index: 9995;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        background: rgba(12, 30, 20, .0);
-        backdrop-filter: blur(0);
-        -webkit-backdrop-filter: blur(0);
+        align-items: stretch;
+        justify-content: flex-end;
+        padding: 18px;
+        background: rgba(12, 28, 19, 0.36);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        transition: opacity .28s ease, background .28s ease, backdrop-filter .28s ease, visibility .28s ease;
+        transition: opacity 0.32s ease, visibility 0.32s ease;
     }
 
     .auditorium-modal.show {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
-        background: rgba(12, 30, 20, .58);
-        backdrop-filter: blur(7px);
-        -webkit-backdrop-filter: blur(7px);
     }
 
     .auditorium-modal-box {
         position: relative;
-        width: 100%;
-        max-width: 650px;
-        max-height: 90vh;
+        width: min(490px, calc(100vw - 36px));
+        max-width: 490px;
+        height: 100%;
+        max-height: calc(100dvh - 36px);
+        margin-left: auto;
         overflow-y: auto;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
-        opacity: 0;
-        transform: translateY(14px) scale(.985);
-        transition: opacity .28s ease, transform .28s cubic-bezier(.2,.8,.2,1);
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        background: #ffffff;
+        border: 1px solid #e2ebe5;
+        border-radius: 20px;
+        box-shadow: -12px 10px 42px rgba(22, 54, 38, 0.16);
+        transform: translate3d(calc(100% + 28px), 0, 0);
+        transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .auditorium-modal.show .auditorium-modal-box {
-        opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translate3d(0, 0, 0);
     }
 
     .modal-close {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        z-index: 2;
+        position: sticky;
+        float: right;
+        top: 14px;
+        right: 14px;
+        margin-right: 14px;
+        margin-bottom: -42px;
+        z-index: 4;
         width: 34px;
         height: 34px;
-        border: none;
-        border-radius: 50%;
+        border: 1px solid #dce5df;
+        border-radius: 10px;
         background: rgba(255, 255, 255, .95);
         color: #163626;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,.12);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+        transition: background .18s ease;
     }
 
     .modal-close:hover {
@@ -689,13 +876,13 @@
     }
 
     .modal-close svg {
-        width: 18px;
-        height: 18px;
+        width: 17px;
+        height: 17px;
     }
 
     .modal-image {
         width: 100%;
-        height: 260px;
+        height: 250px;
         object-fit: cover;
         display: block;
     }
@@ -716,28 +903,54 @@
     }
 
     .modal-content {
-        padding: 22px;
+        padding: 22px 24px 24px;
+    }
+
+    .modal-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
     }
 
     .modal-content h2 {
         color: #163626;
-        font-size: 21px;
-        font-weight: 750;
-        margin: 0 0 12px;
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.3;
     }
 
     .modal-description {
         font-size: 13px;
-        color: #556b5e;
+        color: #4c6456;
         line-height: 1.7;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
         white-space: pre-line;
+    }
+
+    .modal-deactivation-box {
+        margin-bottom: 18px;
+        padding: 11px 14px;
+        border-radius: 12px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        font-size: 12.5px;
+        line-height: 1.55;
+    }
+
+    .modal-deactivation-box strong {
+        display: block;
+        color: #7f1d1d;
+        margin-bottom: 2px;
     }
 
     .modal-info-title {
         color: #163626;
         font-size: 13px;
-        font-weight: 750;
+        font-weight: 800;
         margin: 18px 0 10px;
     }
 
@@ -751,9 +964,13 @@
         display: flex;
         align-items: flex-start;
         gap: 10px;
-        font-size: 12px;
-        color: #52665a;
+        font-size: 12.5px;
+        color: #4c6456;
         line-height: 1.6;
+    }
+
+    .modal-info-item strong {
+        color: #163626;
     }
 
     .modal-info-item svg {
@@ -761,7 +978,7 @@
         height: 16px;
         flex-shrink: 0;
         color: #237c4d;
-        margin-top: 1px;
+        margin-top: 2px;
     }
 
     .modal-facilities {
@@ -771,32 +988,38 @@
     }
 
     .facility-tag {
-        padding: 7px 10px;
-        border-radius: 7px;
+        padding: 7px 11px;
+        border-radius: 8px;
         background: #eaf5ed;
         color: #237c4d;
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 600;
     }
 
     .modal-actions {
-        margin-top: 22px;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #ebf0ed;
         display: flex;
         justify-content: flex-end;
     }
 
-    .modal-actions a {
+    .modal-actions a,
+    .modal-actions .modal-btn-disabled {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 7px;
+        border-radius: 10px;
+        padding: 11px 18px;
+        font-size: 12.5px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .modal-actions a {
         background: #237c4d;
         color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        padding: 11px 18px;
-        font-size: 12px;
-        font-weight: 700;
     }
 
     .modal-actions a:hover {
@@ -804,8 +1027,11 @@
         color: white;
     }
 
-    body.modal-open {
-        overflow: hidden;
+    .modal-actions .modal-btn-disabled {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+        cursor: not-allowed;
     }
 
     /* RESPONSIVE */
@@ -820,6 +1046,16 @@
 
         .stats {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .auditorium-modal {
+            padding: 12px;
+        }
+
+        .auditorium-modal-box {
+            width: min(440px, calc(100vw - 24px));
+            max-height: calc(100dvh - 24px);
+            border-radius: 18px;
         }
     }
 
@@ -855,47 +1091,26 @@
             padding: 12px 15px 15px 15px !important;
         }
 
+        .auditorium-modal {
+            padding: 10px;
+        }
+
+        .auditorium-modal-box {
+            width: 100%;
+            max-width: calc(100vw - 20px);
+            max-height: calc(100dvh - 20px);
+            border-radius: 18px;
+        }
+
+        .aud-slider.is-modal-slider,
         .modal-image {
-            height: 190px;
+            height: 210px !important;
         }
 
         .modal-content {
-            padding: 17px;
+            padding: 18px;
         }
     }
-
-    /* DETAIL AUDITORIUM: PANEL SAMPING, MENGIKUTI DETAIL KELOLA PEMINJAMAN ADMIN */
-    .auditorium-modal {
-        align-items: stretch !important;
-        justify-content: flex-end !important;
-        padding: 0 !important;
-        background: rgba(15, 32, 23, .40) !important;
-        backdrop-filter: blur(5px) !important;
-        -webkit-backdrop-filter: blur(5px) !important;
-    }
-    .auditorium-modal.show { background: rgba(15, 32, 23, .40) !important; }
-    .auditorium-modal-box {
-        width: min(510px, 100%) !important;
-        max-width: 510px !important;
-        height: 100% !important;
-        max-height: 100% !important;
-        margin-left: auto;
-        border-radius: 0 !important;
-        overflow-y: auto !important;
-        opacity: 1 !important;
-        transform: translateX(100%) !important;
-        transition: transform .28s ease !important;
-        box-shadow: -18px 0 55px rgba(12, 32, 21, .16) !important;
-    }
-    .auditorium-modal.show .auditorium-modal-box { transform: translateX(0) !important; }
-    .modal-image { height: 250px !important; }
-    .modal-close { position: sticky !important; float: right; top: 14px !important; margin-bottom: -40px; }
-    @media (max-width: 600px) {
-        .auditorium-modal-box { width: 100% !important; }
-        .modal-image { height: 210px !important; }
-        .modal-content { padding: 22px !important; }
-    }
-
 </style>
 
 <div class="dashboard-page">
@@ -907,7 +1122,7 @@
             <p>Temukan auditorium impian Anda untuk pengajuan peminjaman Anda.</p>
         </div>
 
-        <a class="dashboard-action" href="{{ route('borrower.booking.create') }}">
+        <a class="dashboard-action" href="{{ route($createBookingRoute) }}">
             <i data-lucide="plus"></i>
             Ajukan Peminjaman
         </a>
@@ -971,7 +1186,7 @@
                     <p>Ringkasan pengajuan peminjaman Anda</p>
                 </div>
 
-                <a href="{{ route('borrower.bookings') }}">
+                <a href="{{ $bookingsListUrl }}">
                     Lihat semua
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -1024,7 +1239,7 @@
                     <p>Panduan singkat peminjaman</p>
                 </div>
 
-                <a href="{{ route('borrower.guides') }}">
+                <a href="{{ $guidesUrl }}">
                     Informasi lebih lanjut
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -1082,25 +1297,69 @@
             @forelse($auditoriums as $a)
 
                 @php
-                    $description = is_string($a->description)
+                    $isActive = (bool) ($a->is_active ?? true);
+                    $deactivationReason = trim((string) ($a->deactivation_reason ?? $a->keterangan_nonaktif ?? ''));
+
+                    $description = is_string($a->description) && trim($a->description) !== ''
                         ? $a->description
                         : 'Informasi auditorium belum tersedia.';
 
-                    $location = is_string($a->location)
-                        ? $a->location
-                        : 'Lokasi belum tersedia';
+                    $lokasiKampus = is_string($a->lokasi_kampus) && trim($a->lokasi_kampus) !== ''
+                        ? trim($a->lokasi_kampus)
+                        : (is_string($a->location) && trim($a->location) !== '' ? trim($a->location) : 'Lokasi kampus belum tersedia');
 
-                    $capacity = is_scalar($a->capacity)
-                        ? $a->capacity
+                    $lokasiGedung = is_string($a->lokasi_gedung) && trim($a->lokasi_gedung) !== ''
+                        ? trim($a->lokasi_gedung)
+                        : null;
+
+                    $jamMulaiFmt = $a->jam_mulai
+                        ? \Carbon\Carbon::parse($a->jam_mulai)->format('H:i')
+                        : '07:00';
+
+                    $jamSelesaiFmt = $a->jam_selesai
+                        ? \Carbon\Carbon::parse($a->jam_selesai)->format('H:i')
+                        : '17:00';
+
+                    $jamOperasional = $jamMulaiFmt . ' - ' . $jamSelesaiFmt;
+
+                    $capacity = is_scalar($a->capacity) && trim((string) $a->capacity) !== ''
+                        ? (is_numeric($a->capacity) ? $a->capacity . ' orang' : $a->capacity)
                         : 'Belum tersedia';
 
-                    $facilities = is_array($a->facilities)
-                        ? $a->facilities
+                    $rawFacilities = $a->facilities;
+                    if (is_string($rawFacilities)) {
+                        $decodedFacilities = json_decode($rawFacilities, true);
+                        $rawFacilities = is_array($decodedFacilities)
+                            ? $decodedFacilities
+                            : array_filter(array_map('trim', explode(',', $rawFacilities)));
+                    }
+
+                    $facilities = is_array($rawFacilities)
+                        ? $rawFacilities
                         : [];
 
                     $facilities = array_filter($facilities, function ($item) {
                         return is_scalar($item) && trim((string) $item) !== '';
                     });
+
+                    // Ambil seluruh foto auditorium (images array + fallback image_path lama)
+                    $rawImages = $a->images;
+                    if (is_string($rawImages)) {
+                        $decodedImages = json_decode($rawImages, true);
+                        $rawImages = is_array($decodedImages) ? $decodedImages : [];
+                    }
+                    $photoPaths = array_values(array_filter(
+                        is_array($rawImages) ? $rawImages : [],
+                        fn ($p) => is_string($p) && trim($p) !== ''
+                    ));
+                    if (empty($photoPaths) && is_string($a->image_path) && trim($a->image_path) !== '') {
+                        $photoPaths[] = trim($a->image_path);
+                    }
+
+                    $photoItems = array_map(fn ($p) => [
+                        'path' => $p,
+                        'url'  => asset('storage/' . $p),
+                    ], $photoPaths);
 
                     $shortDescription = \Illuminate\Support\Str::limit(
                         $description,
@@ -1110,7 +1369,7 @@
 
                 {{-- KARTU AUDITORIUM --}}
                 <article
-                    class="auditorium-card"
+                    class="auditorium-card {{ !$isActive ? 'is-inactive-card' : '' }}"
                     onclick="openAuditoriumModal('auditorium-modal-{{ $a->id }}')"
                     role="button"
                     tabindex="0"
@@ -1119,12 +1378,43 @@
                 >
 
                     <div class="auditorium-image-wrap">
-                        @if($a->image_path)
-                            <img
-                                src="{{ asset('storage/' . $a->image_path) }}"
-                                alt="Foto {{ $a->name }}"
-                                loading="lazy"
-                            >
+                        @if(count($photoItems) > 0)
+                            <div class="aud-slider" data-aud-slider data-index="0" data-total="{{ count($photoItems) }}">
+                                <div class="aud-slider-track">
+                                    @foreach($photoItems as $idx => $item)
+                                        <div class="aud-slide">
+                                            <img
+                                                src="{{ $item['url'] }}"
+                                                alt="Foto {{ $a->name }} ({{ $idx + 1 }})"
+                                                loading="lazy"
+                                            >
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                @if(count($photoItems) > 1)
+                                    <span class="aud-slider-count">1 / {{ count($photoItems) }}</span>
+
+                                    <button type="button" class="aud-slider-btn prev" aria-label="Foto sebelumnya" onclick="event.stopPropagation(); stepAudSlider(this, -1)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                                    </button>
+                                    <button type="button" class="aud-slider-btn next" aria-label="Foto berikutnya" onclick="event.stopPropagation(); stepAudSlider(this, 1)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                    </button>
+
+                                    <div class="aud-slider-dots" onclick="event.stopPropagation()">
+                                        @foreach($photoItems as $idx => $item)
+                                            <button
+                                                type="button"
+                                                class="aud-slider-dot {{ $idx === 0 ? 'is-active' : '' }}"
+                                                aria-label="Ke foto {{ $idx + 1 }}"
+                                                data-slide-index="{{ $idx }}"
+                                                onclick="event.stopPropagation(); goToAudSlide(this)"
+                                            ></button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @else
                             <div class="auditorium-no-image">
                                 <i data-lucide="building-2"></i>
@@ -1133,7 +1423,14 @@
                     </div>
 
                     <div class="auditorium-card-content">
-                        <h3>{{ $a->name }}</h3>
+                        <div class="auditorium-card-head">
+                            <h3>{{ $a->name }}</h3>
+                            @if($isActive)
+                                <span class="aud-status-pill is-active">Aktif</span>
+                            @else
+                                <span class="aud-status-pill is-inactive">Nonaktif</span>
+                            @endif
+                        </div>
 
                         <p class="auditorium-description">
                             {{ $shortDescription }}
@@ -1142,7 +1439,19 @@
                         <div class="auditorium-meta">
                             <span>
                                 <i data-lucide="map-pin"></i>
-                                {{ $location }}
+                                {{ $lokasiKampus }}
+                            </span>
+
+                            @if($lokasiGedung)
+                                <span>
+                                    <i data-lucide="building"></i>
+                                    {{ \Illuminate\Support\Str::limit($lokasiGedung, 55) }}
+                                </span>
+                            @endif
+
+                            <span>
+                                <i data-lucide="clock"></i>
+                                Jam Operasional: {{ $jamOperasional }}
                             </span>
 
                             <span>
@@ -1151,20 +1460,33 @@
                             </span>
                         </div>
 
+                        @if(!$isActive && $deactivationReason !== '')
+                            <div class="aud-inactive-alert">
+                                <strong>Keterangan Nonaktif:</strong> {{ \Illuminate\Support\Str::limit($deactivationReason, 85) }}
+                            </div>
+                        @endif
+
                         <div class="auditorium-actions">
-                            <a
-                                href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
-                                class="btn-booking"
-                                onclick="event.stopPropagation()"
-                            >
-                                <i data-lucide="calendar-plus"></i>
-                                Ajukan Peminjaman
-                            </a>
+                            @if($isActive)
+                                <a
+                                    href="{{ route($createBookingRoute, ['auditorium' => $a->id]) }}"
+                                    class="btn-booking"
+                                    onclick="event.stopPropagation()"
+                                >
+                                    <i data-lucide="calendar-plus"></i>
+                                    Ajukan Peminjaman
+                                </a>
+                            @else
+                                <span class="btn-booking-disabled" onclick="event.stopPropagation(); openAuditoriumModal('auditorium-modal-{{ $a->id }}')">
+                                    <i data-lucide="ban"></i>
+                                    Sedang Nonaktif
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </article>
 
-                {{-- MODAL DETAIL LENGKAP --}}
+                {{-- MODAL / DRAWER DETAIL LENGKAP --}}
                 <div
                     class="auditorium-modal"
                     id="auditorium-modal-{{ $a->id }}"
@@ -1181,12 +1503,42 @@
                             <i data-lucide="x"></i>
                         </button>
 
-                        @if($a->image_path)
-                            <img
-                                class="modal-image"
-                                src="{{ asset('storage/' . $a->image_path) }}"
-                                alt="Foto {{ $a->name }}"
-                            >
+                        @if(count($photoItems) > 0)
+                            <div class="aud-slider is-modal-slider" data-aud-slider data-index="0" data-total="{{ count($photoItems) }}">
+                                <div class="aud-slider-track">
+                                    @foreach($photoItems as $idx => $item)
+                                        <div class="aud-slide">
+                                            <img
+                                                src="{{ $item['url'] }}"
+                                                alt="Foto {{ $a->name }} ({{ $idx + 1 }})"
+                                            >
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                @if(count($photoItems) > 1)
+                                    <span class="aud-slider-count">1 / {{ count($photoItems) }}</span>
+
+                                    <button type="button" class="aud-slider-btn prev" aria-label="Foto sebelumnya" onclick="stepAudSlider(this, -1)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                                    </button>
+                                    <button type="button" class="aud-slider-btn next" aria-label="Foto berikutnya" onclick="stepAudSlider(this, 1)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                    </button>
+
+                                    <div class="aud-slider-dots">
+                                        @foreach($photoItems as $idx => $item)
+                                            <button
+                                                type="button"
+                                                class="aud-slider-dot {{ $idx === 0 ? 'is-active' : '' }}"
+                                                aria-label="Ke foto {{ $idx + 1 }}"
+                                                data-slide-index="{{ $idx }}"
+                                                onclick="goToAudSlide(this)"
+                                            ></button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @else
                             <div class="modal-no-image">
                                 <i data-lucide="building-2"></i>
@@ -1194,7 +1546,21 @@
                         @endif
 
                         <div class="modal-content">
-                            <h2>{{ $a->name }}</h2>
+                            <div class="modal-title-row">
+                                <h2>{{ $a->name }}</h2>
+                                @if($isActive)
+                                    <span class="aud-status-pill is-active">Aktif</span>
+                                @else
+                                    <span class="aud-status-pill is-inactive">Nonaktif</span>
+                                @endif
+                            </div>
+
+                            @if(!$isActive)
+                                <div class="modal-deactivation-box">
+                                    <strong>Auditorium Sedang Nonaktif</strong>
+                                    {{ $deactivationReason !== '' ? $deactivationReason : 'Auditorium saat ini tidak tersedia untuk peminjaman baru.' }}
+                                </div>
+                            @endif
 
                             <div class="modal-description">
                                 {{ $description }}
@@ -1208,8 +1574,24 @@
                                 <div class="modal-info-item">
                                     <i data-lucide="map-pin"></i>
                                     <div>
-                                        <strong>Lokasi</strong><br>
-                                        {{ $location }}
+                                        <strong>Lokasi Kampus</strong><br>
+                                        {{ $lokasiKampus }}
+                                    </div>
+                                </div>
+
+                                <div class="modal-info-item">
+                                    <i data-lucide="building"></i>
+                                    <div>
+                                        <strong>Lokasi Gedung</strong><br>
+                                        {{ $lokasiGedung ?: 'Informasi lokasi gedung belum tersedia' }}
+                                    </div>
+                                </div>
+
+                                <div class="modal-info-item">
+                                    <i data-lucide="clock"></i>
+                                    <div>
+                                        <strong>Jam Operasional</strong><br>
+                                        {{ $jamOperasional }}
                                     </div>
                                 </div>
 
@@ -1241,12 +1623,19 @@
                             @endif
 
                             <div class="modal-actions">
-                                <a
-                                    href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
-                                >
-                                    <i data-lucide="calendar-plus"></i>
-                                    Ajukan Peminjaman
-                                </a>
+                                @if($isActive)
+                                    <a
+                                        href="{{ route($createBookingRoute, ['auditorium' => $a->id]) }}"
+                                    >
+                                        <i data-lucide="calendar-plus"></i>
+                                        Ajukan Peminjaman
+                                    </a>
+                                @else
+                                    <span class="modal-btn-disabled">
+                                        <i data-lucide="ban"></i>
+                                        Tidak Dapat Dipinjam (Nonaktif)
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -1262,8 +1651,10 @@
     </div>
 </div>
 
-{{-- JAVASCRIPT DETAIL AUDITORIUM --}}
+{{-- JAVASCRIPT DETAIL & SLIDER AUDITORIUM --}}
 <script>
+    const AUD_SLIDE_INTERVAL = 4000;
+
     function scrollAuditoriums(button, direction) {
         const track = document.getElementById('auditoriumCards');
         if (!track) return;
@@ -1272,12 +1663,80 @@
         track.scrollBy({ left: distance * direction, behavior: 'smooth' });
     }
 
+    function setAudSliderIndex(slider, nextIndex) {
+        const total = parseInt(slider.dataset.total || '1', 10);
+        if (total <= 1) return;
+
+        const normalized = ((nextIndex % total) + total) % total;
+        slider.dataset.index = String(normalized);
+
+        const track = slider.querySelector('.aud-slider-track');
+        if (track) {
+            track.style.transform = 'translateX(-' + (normalized * 100) + '%)';
+        }
+
+        const counter = slider.querySelector('.aud-slider-count');
+        if (counter) {
+            counter.textContent = (normalized + 1) + ' / ' + total;
+        }
+
+        slider.querySelectorAll('.aud-slider-dot').forEach((dot, idx) => {
+            dot.classList.toggle('is-active', idx === normalized);
+        });
+    }
+
+    function startAudSliderAutoplay(slider) {
+        const total = parseInt(slider.dataset.total || '1', 10);
+        if (total <= 1) return;
+
+        stopAudSliderAutoplay(slider);
+        slider._autoTimer = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                const current = parseInt(slider.dataset.index || '0', 10);
+                setAudSliderIndex(slider, current + 1);
+            }
+        }, AUD_SLIDE_INTERVAL);
+    }
+
+    function stopAudSliderAutoplay(slider) {
+        if (slider._autoTimer) {
+            clearInterval(slider._autoTimer);
+            slider._autoTimer = null;
+        }
+    }
+
+    function resetAudSliderAutoplay(slider) {
+        stopAudSliderAutoplay(slider);
+        if (!slider.matches(':hover')) {
+            startAudSliderAutoplay(slider);
+        }
+    }
+
+    function stepAudSlider(btn, delta) {
+        const slider = btn.closest('[data-aud-slider]');
+        if (!slider) return;
+        const current = parseInt(slider.dataset.index || '0', 10);
+        setAudSliderIndex(slider, current + delta);
+        resetAudSliderAutoplay(slider);
+    }
+
+    function goToAudSlide(dotBtn) {
+        const slider = dotBtn.closest('[data-aud-slider]');
+        if (!slider) return;
+        const index = parseInt(dotBtn.dataset.slideIndex || '0', 10);
+        setAudSliderIndex(slider, index);
+        resetAudSliderAutoplay(slider);
+    }
+
     function openAuditoriumModal(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+
         modal.classList.add('show');
-        document.body.classList.add('modal-open');
 
         if (window.lucide) {
             window.lucide.createIcons();
@@ -1289,11 +1748,56 @@
         if (!modal) return;
 
         modal.classList.remove('show');
-
-        if (!document.querySelector('.auditorium-modal.show')) {
-            document.body.classList.remove('modal-open');
-        }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // Pindahkan seluruh modal ke root <body> dan kunci scroll chaining agar backdrop blur menutupi layar tanpa menggeser layout
+        document.querySelectorAll('.auditorium-modal').forEach(modal => {
+            document.body.appendChild(modal);
+
+            modal.addEventListener('wheel', function (e) {
+                const box = modal.querySelector('.auditorium-modal-box');
+                if (!box || !box.contains(e.target)) {
+                    e.preventDefault();
+                    return;
+                }
+                const atTop = box.scrollTop <= 0 && e.deltaY < 0;
+                const atBottom = Math.ceil(box.scrollTop + box.clientHeight) >= box.scrollHeight && e.deltaY > 0;
+                if (atTop || atBottom) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        });
+
+        // Inisialisasi slideshow otomatis + kontrol swipe pada kartu dan drawer detail
+        document.querySelectorAll('[data-aud-slider]').forEach(slider => {
+            let startX = 0;
+
+            slider.addEventListener('mouseenter', () => stopAudSliderAutoplay(slider));
+            slider.addEventListener('mouseleave', () => startAudSliderAutoplay(slider));
+
+            slider.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                stopAudSliderAutoplay(slider);
+            }, { passive: true });
+
+            slider.addEventListener('touchend', e => {
+                const diff = e.changedTouches[0].clientX - startX;
+                if (Math.abs(diff) > 35) {
+                    e.stopPropagation();
+                    const current = parseInt(slider.dataset.index || '0', 10);
+                    setAudSliderIndex(slider, current + (diff < 0 ? 1 : -1));
+                }
+                startAudSliderAutoplay(slider);
+            }, { passive: true });
+
+            startAudSliderAutoplay(slider);
+        });
+    });
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
@@ -1301,14 +1805,8 @@
                 .forEach(function(modal) {
                     modal.classList.remove('show');
                 });
-
-            document.body.classList.remove('modal-open');
         }
     });
-
-    if (window.lucide) {
-        window.lucide.createIcons();
-    }
 </script>
 
 @endsection
