@@ -720,6 +720,13 @@ html.page-ready .app-layout > main > .main-content {
     white-space: normal !important;
 }
 
+/* RAMPINGKAN KOLOM PERTAMA (AUDITORIUM) AGAR JARAK ANTAR KOLOM LEBIH PROPORSIONAL */
+.app-layout > main > .main-content table:not([class*="fc-"]) th:first-child,
+.app-layout > main > .main-content table:not([class*="fc-"]) td:first-child {
+    width: 240px !important;
+    max-width: 240px !important;
+}
+
 .app-layout > main > .main-content table:not([class*="fc-"]) tbody tr:hover td {
     background: rgba(255, 255, 255, .42) !important;
     background-color: rgba(255, 255, 255, .42) !important;
@@ -1056,10 +1063,33 @@ html.page-ready .app-layout > main > .main-content {
                 @auth
                     @php
                         $topbarUser = auth()->user();
-                        $profileRoute = $topbarUser->role === 'admin'
+                        $topbarRole = strtolower((string) data_get($topbarUser, 'role', 'mahasiswa'));
+                        $profileRoute = $topbarRole === 'admin'
                             ? route('admin.profile')
-                            : ($topbarUser->role === 'pegawai' ? route('pegawai.profile') : route('borrower.profile'));
-                        $topbarPhotoPath = data_get($topbarUser, 'profile_photo_path');
+                            : ($topbarRole === 'pegawai' ? route('pegawai.profile') : route('borrower.profile'));
+
+                        $topbarName = (string) data_get($topbarUser, 'name', 'Pengguna');
+                        $topbarInitials = mb_strtoupper(mb_substr(trim($topbarName) !== '' ? trim($topbarName) : 'U', 0, 2));
+
+                        $rawPhotoPath = trim((string) data_get($topbarUser, 'profile_photo_path', ''));
+                        $cleanPhotoPath = ltrim(preg_replace('#^(public/|storage/)#', '', str_replace('\\', '/', $rawPhotoPath)), '/');
+
+                        $topbarPhotoUrl = null;
+                        if ($cleanPhotoPath !== '') {
+                            if (\Illuminate\Support\Str::startsWith($rawPhotoPath, ['http://', 'https://', 'data:'])) {
+                                $topbarPhotoUrl = $rawPhotoPath;
+                            } else {
+                                $publicStorageFile = public_path('storage/' . $cleanPhotoPath);
+                                $appStorageFile = storage_path('app/public/' . $cleanPhotoPath);
+
+                                if (is_file($publicStorageFile)) {
+                                    $topbarPhotoUrl = asset('storage/' . $cleanPhotoPath) . '?v=' . filemtime($publicStorageFile);
+                                } elseif (is_file($appStorageFile)) {
+                                    $mime = @mime_content_type($appStorageFile) ?: 'image/jpeg';
+                                    $topbarPhotoUrl = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($appStorageFile));
+                                }
+                            }
+                        }
                     @endphp
 
                     <span class="topbar-date">
@@ -1073,23 +1103,23 @@ html.page-ready .app-layout > main > .main-content {
                             id="topbarProfileBtn"
                             aria-expanded="false"
                             aria-haspopup="true"
-                            title="Menu Akun ({{ $topbarUser->name }})"
+                            title="Menu Akun ({{ $topbarName }})"
                         >
                             <span class="topbar-user-info">
-                                <strong>{{ $topbarUser->name }}</strong>
+                                <strong>{{ $topbarName }}</strong>
                                 <small>
-                                    {{ $topbarUser->role === 'admin' ? 'Administrator' : ($topbarUser->role === 'pegawai' ? 'Dosen & Tendik' : 'Mahasiswa') }}
+                                    {{ $topbarRole === 'admin' ? 'Administrator' : ($topbarRole === 'pegawai' ? 'Dosen & Tendik' : 'Mahasiswa') }}
                                 </small>
                             </span>
 
                             <span class="topbar-avatar">
-                                @if(!empty($topbarPhotoPath))
+                                @if(!empty($topbarPhotoUrl))
                                     <img
-                                        src="{{ asset('storage/' . $topbarPhotoPath) }}"
-                                        alt="{{ $topbarUser->name }}"
+                                        src="{{ $topbarPhotoUrl }}"
+                                        alt="{{ $topbarName }}"
                                     >
                                 @else
-                                    {{ strtoupper(substr($topbarUser->name, 0, 2)) }}
+                                    {{ $topbarInitials }}
                                 @endif
                             </span>
 
@@ -1098,7 +1128,7 @@ html.page-ready .app-layout > main > .main-content {
 
                         <div class="topbar-dropdown-menu" role="menu">
                             <div class="dropdown-user-header">
-                                <strong>{{ $topbarUser->name }}</strong>
+                                <strong>{{ $topbarName }}</strong>
                                 <small>{{ $topbarUser->email }}</small>
                             </div>
 
