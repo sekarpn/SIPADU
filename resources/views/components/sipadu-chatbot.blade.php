@@ -28,8 +28,9 @@
     }
 
     .sipadu-bot-launcher-icon {
-        width: 42px;
-        height: 42px;
+        position: relative;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         background: rgba(255, 255, 255, .18);
         display: flex;
@@ -38,65 +39,138 @@
         flex-shrink: 0;
     }
 
-    /* ANIMASI ROBOT INTERAKTIF (UKURAN DIPERBESAR) */
+    /* CINCIN RADAR HALUS DI BELAKANG ROBOT */
+    .sipadu-bot-launcher-icon::after {
+        content: "";
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        border: 2px solid rgba(134, 239, 172, .55);
+        animation: sipaduRadarRing 2.6s ease-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes sipaduRadarRing {
+        0% { transform: scale(.92); opacity: .85; }
+        75% { transform: scale(1.22); opacity: 0; }
+        100% { transform: scale(1.22); opacity: 0; }
+    }
+
+    /* ANIMASI ROBOT INTERAKTIF (UKURAN DIPERBESAR & LEBIH TERLIHAT) */
     .sipadu-robot-svg {
-        width: 31px;
-        height: 31px;
+        width: 34px;
+        height: 34px;
         overflow: visible;
-        animation: sipaduRobotFloat 3s ease-in-out infinite;
+        transform-origin: 16px 26px;
+        animation: sipaduRobotBob 2.4s ease-in-out infinite;
+    }
+
+    .sipadu-robot-head {
+        transform-origin: 16px 17px;
+        animation: sipaduHeadTilt 4s ease-in-out infinite;
+    }
+
+    .sipadu-robot-arm {
+        transform-origin: 27px 21px;
+        animation: sipaduArmWaveIdle 3.2s ease-in-out infinite;
+    }
+
+    .sipadu-bot-launcher:hover .sipadu-robot-arm {
+        animation: sipaduArmWaveActive .42s ease-in-out infinite alternate;
     }
 
     .sipadu-bot-launcher:hover .sipadu-robot-svg {
-        animation: sipaduRobotWave .55s ease-in-out infinite alternate;
+        animation: sipaduRobotBounce .5s ease-in-out infinite alternate;
+    }
+
+    .sipadu-robot-eyes {
+        transform-origin: 16px 16px;
+        animation: sipaduEyeLook 5s ease-in-out infinite;
     }
 
     .sipadu-robot-eye {
         transform-origin: center;
-        animation: sipaduRobotBlink 4.2s infinite;
+        transform-box: fill-box;
+        animation: sipaduRobotBlink 3.6s infinite;
     }
 
     .sipadu-robot-antenna-dot {
         transform-origin: center;
-        animation: sipaduAntennaPulse 2s ease-in-out infinite;
+        transform-box: fill-box;
+        animation: sipaduAntennaPulse 1.5s ease-in-out infinite;
     }
 
-    .sipadu-bot-window.is-thinking .sipadu-robot-svg {
-        animation: sipaduRobotThink .6s ease-in-out infinite alternate;
+    .sipadu-bot-window.is-thinking .sipadu-robot-head {
+        animation: sipaduHeadThink .45s ease-in-out infinite alternate;
+    }
+
+    .sipadu-bot-window.is-thinking .sipadu-robot-eyes {
+        animation: sipaduEyeScan .5s ease-in-out infinite alternate;
     }
 
     .sipadu-bot-window.is-thinking .sipadu-robot-antenna-dot {
         fill: #fde047;
-        animation: sipaduAntennaFast .45s ease-in-out infinite alternate;
+        animation: sipaduAntennaFast .35s ease-in-out infinite alternate;
     }
 
-    @keyframes sipaduRobotFloat {
+    @keyframes sipaduRobotBob {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-2.5px); }
+        50% { transform: translateY(-3.5px); }
     }
 
-    @keyframes sipaduRobotWave {
-        0% { transform: rotate(-6deg) scale(1.04); }
-        100% { transform: rotate(6deg) scale(1.04); }
+    @keyframes sipaduRobotBounce {
+        0% { transform: translateY(0) scale(1.03); }
+        100% { transform: translateY(-4px) scale(1.08); }
     }
 
-    @keyframes sipaduRobotThink {
-        0% { transform: translateX(-2px) rotate(-4deg); }
-        100% { transform: translateX(2px) rotate(4deg); }
+    @keyframes sipaduHeadTilt {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-6deg); }
+        75% { transform: rotate(6deg); }
+    }
+
+    @keyframes sipaduHeadThink {
+        0% { transform: rotate(-8deg) translateY(-1px); }
+        100% { transform: rotate(8deg) translateY(-1px); }
+    }
+
+    @keyframes sipaduArmWaveIdle {
+        0%, 55%, 100% { transform: rotate(0deg); }
+        65% { transform: rotate(-32deg); }
+        75% { transform: rotate(10deg); }
+        85% { transform: rotate(-28deg); }
+        93% { transform: rotate(6deg); }
+    }
+
+    @keyframes sipaduArmWaveActive {
+        0% { transform: rotate(-38deg); }
+        100% { transform: rotate(14deg); }
+    }
+
+    @keyframes sipaduEyeLook {
+        0%, 40%, 100% { transform: translateX(0); }
+        48%, 58% { transform: translateX(-1.5px); }
+        68%, 78% { transform: translateX(1.5px); }
+    }
+
+    @keyframes sipaduEyeScan {
+        0% { transform: translateX(-2px); }
+        100% { transform: translateX(2px); }
     }
 
     @keyframes sipaduRobotBlink {
-        0%, 46%, 50%, 96%, 100% { transform: scaleY(1); }
-        48%, 98% { transform: scaleY(0.12); }
+        0%, 44%, 49%, 92%, 100% { transform: scaleY(1); }
+        46.5%, 94.5% { transform: scaleY(0.1); }
     }
 
     @keyframes sipaduAntennaPulse {
         0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: .55; transform: scale(1.22); }
+        50% { opacity: .6; transform: scale(1.38); }
     }
 
     @keyframes sipaduAntennaFast {
-        from { transform: scale(0.9); opacity: .7; }
-        to { transform: scale(1.35); opacity: 1; }
+        from { transform: scale(0.95); opacity: .75; }
+        to { transform: scale(1.5); opacity: 1; }
     }
 
     /* JENDELA POPUP CHATBOT MINIMALIS SOLID */
@@ -396,14 +470,25 @@
 {{-- TOMBOL ROBOT INTERAKTIF --}}
 <button type="button" class="sipadu-bot-launcher" id="sipaduBotLauncher" aria-label="Buka Asisten SIPADU">
     <span class="sipadu-bot-launcher-icon">
-        <svg class="sipadu-robot-svg" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
-            <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.2" fill="#86efac"/>
-            <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
-            <rect x="9" y="12" width="14" height="8" rx="3.5" fill="#163626"/>
-            <circle class="sipadu-robot-eye" cx="13" cy="16" r="1.7" fill="#86efac"/>
-            <circle class="sipadu-robot-eye" cx="19" cy="16" r="1.7" fill="#86efac"/>
-            <path d="M13 26.5H19" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+        <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+            <g class="sipadu-robot-arm">
+                <path d="M27 21L31.5 16.5" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+                <circle cx="31.8" cy="16.2" r="1.8" fill="#86efac"/>
+            </g>
+            <g class="sipadu-robot-head">
+                <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.4" fill="#86efac"/>
+                <rect x="3.5" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                <rect x="26" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
+                <rect x="8.8" y="11.8" width="14.4" height="8.4" rx="3.8" fill="#163626"/>
+                <g class="sipadu-robot-eyes">
+                    <circle class="sipadu-robot-eye" cx="12.8" cy="15.5" r="1.8" fill="#86efac"/>
+                    <circle class="sipadu-robot-eye" cx="19.2" cy="15.5" r="1.8" fill="#86efac"/>
+                    <path d="M14.3 18.2Q16 19.4 17.7 18.2" stroke="#86efac" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+                </g>
+            </g>
+            <path d="M11 26.5H21" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
         </svg>
     </span>
     <span>Tanya SIPADU</span>
@@ -414,14 +499,25 @@
     <div class="sipadu-bot-header">
         <div class="sipadu-bot-header-info">
             <div class="sipadu-bot-avatar">
-                <svg class="sipadu-robot-svg" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                    <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
-                    <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.2" fill="#86efac"/>
-                    <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
-                    <rect x="9" y="12" width="14" height="8" rx="3.5" fill="#163626"/>
-                    <circle class="sipadu-robot-eye" cx="13" cy="16" r="1.7" fill="#86efac"/>
-                    <circle class="sipadu-robot-eye" cx="19" cy="16" r="1.7" fill="#86efac"/>
-                    <path d="M13 26.5H19" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+                <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+                    <g class="sipadu-robot-arm">
+                        <path d="M27 21L31.5 16.5" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+                        <circle cx="31.8" cy="16.2" r="1.8" fill="#86efac"/>
+                    </g>
+                    <g class="sipadu-robot-head">
+                        <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                        <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.4" fill="#86efac"/>
+                        <rect x="3.5" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                        <rect x="26" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                        <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
+                        <rect x="8.8" y="11.8" width="14.4" height="8.4" rx="3.8" fill="#163626"/>
+                        <g class="sipadu-robot-eyes">
+                            <circle class="sipadu-robot-eye" cx="12.8" cy="15.5" r="1.8" fill="#86efac"/>
+                            <circle class="sipadu-robot-eye" cx="19.2" cy="15.5" r="1.8" fill="#86efac"/>
+                            <path d="M14.3 18.2Q16 19.4 17.7 18.2" stroke="#86efac" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+                        </g>
+                    </g>
+                    <path d="M11 26.5H21" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
                 </svg>
             </div>
             <div>
