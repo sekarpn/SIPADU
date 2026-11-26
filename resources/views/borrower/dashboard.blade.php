@@ -557,12 +557,11 @@
 
     .auditorium-meta span {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 7px;
         font-size: 11px;
         color: #3c5446;
         font-weight: 500;
-        line-height: 1.4;
     }
 
     .auditorium-meta svg {
@@ -570,7 +569,6 @@
         height: 14px;
         color: #237c4d;
         flex-shrink: 0;
-        margin-top: 1px;
     }
 
     .auditorium-actions {
@@ -1084,44 +1082,20 @@
             @forelse($auditoriums as $a)
 
                 @php
-                    $description = is_string($a->description) && trim($a->description) !== ''
+                    $description = is_string($a->description)
                         ? $a->description
                         : 'Informasi auditorium belum tersedia.';
 
-                    $lokasiKampus = is_string($a->lokasi_kampus) && trim($a->lokasi_kampus) !== ''
-                        ? trim($a->lokasi_kampus)
-                        : (is_string($a->location) && trim($a->location) !== '' ? trim($a->location) : 'Lokasi kampus belum tersedia');
+                    $location = is_string($a->location)
+                        ? $a->location
+                        : 'Lokasi belum tersedia';
 
-                    $lokasiGedung = is_string($a->lokasi_gedung) && trim($a->lokasi_gedung) !== ''
-                        ? trim($a->lokasi_gedung)
-                        : null;
-
-                    $jamMulaiFmt = $a->jam_mulai
-                        ? \Carbon\Carbon::parse($a->jam_mulai)->format('H:i')
-                        : null;
-
-                    $jamSelesaiFmt = $a->jam_selesai
-                        ? \Carbon\Carbon::parse($a->jam_selesai)->format('H:i')
-                        : null;
-
-                    $jamOperasional = ($jamMulaiFmt && $jamSelesaiFmt)
-                        ? ($jamMulaiFmt . ' - ' . $jamSelesaiFmt)
+                    $capacity = is_scalar($a->capacity)
+                        ? $a->capacity
                         : 'Belum tersedia';
 
-                    $capacity = is_scalar($a->capacity) && trim((string) $a->capacity) !== ''
-                        ? (is_numeric($a->capacity) ? $a->capacity . ' orang' : $a->capacity)
-                        : 'Belum tersedia';
-
-                    $rawFacilities = $a->facilities;
-                    if (is_string($rawFacilities)) {
-                        $decodedFacilities = json_decode($rawFacilities, true);
-                        $rawFacilities = is_array($decodedFacilities)
-                            ? $decodedFacilities
-                            : array_filter(array_map('trim', explode(',', $rawFacilities)));
-                    }
-
-                    $facilities = is_array($rawFacilities)
-                        ? $rawFacilities
+                    $facilities = is_array($a->facilities)
+                        ? $a->facilities
                         : [];
 
                     $facilities = array_filter($facilities, function ($item) {
@@ -1168,19 +1142,7 @@
                         <div class="auditorium-meta">
                             <span>
                                 <i data-lucide="map-pin"></i>
-                                {{ $lokasiKampus }}
-                            </span>
-
-                            @if($lokasiGedung)
-                                <span>
-                                    <i data-lucide="building"></i>
-                                    {{ \Illuminate\Support\Str::limit($lokasiGedung, 55) }}
-                                </span>
-                            @endif
-
-                            <span>
-                                <i data-lucide="clock"></i>
-                                Jam Operasional: {{ $jamOperasional }}
+                                {{ $location }}
                             </span>
 
                             <span>
@@ -1246,24 +1208,8 @@
                                 <div class="modal-info-item">
                                     <i data-lucide="map-pin"></i>
                                     <div>
-                                        <strong>Lokasi Kampus</strong><br>
-                                        {{ $lokasiKampus }}
-                                    </div>
-                                </div>
-
-                                <div class="modal-info-item">
-                                    <i data-lucide="building"></i>
-                                    <div>
-                                        <strong>Lokasi Gedung</strong><br>
-                                        {{ $lokasiGedung ?: 'Informasi lokasi gedung belum tersedia' }}
-                                    </div>
-                                </div>
-
-                                <div class="modal-info-item">
-                                    <i data-lucide="clock"></i>
-                                    <div>
-                                        <strong>Jam Operasional</strong><br>
-                                        {{ $jamOperasional }}
+                                        <strong>Lokasi</strong><br>
+                                        {{ $location }}
                                     </div>
                                 </div>
 
