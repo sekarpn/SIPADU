@@ -1399,4 +1399,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+@include('components.sipadu-chatbot')
 @endsection
