@@ -1409,8 +1409,8 @@
                                    type="email"
                                    name="email"
                                    value="{{ old('email', $userEmail) }}"
-                                   data-edit-placeholder="Masukkan email UPNVJ"
-                                   placeholder="{{ $initPersonalEdit ? 'Masukkan email UPNVJ' : '' }}"
+                                   data-edit-placeholder="Masukkan email"
+                                   placeholder="{{ $initPersonalEdit ? 'Masukkan email' : '' }}"
                                    {{ $initPersonalEdit ? '' : 'readonly tabindex=-1' }}
                                    required>
                             @error('email')

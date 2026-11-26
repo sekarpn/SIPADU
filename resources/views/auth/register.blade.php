@@ -616,7 +616,7 @@
                         name="email"
                         type="email"
                         value="{{ old('email') }}"
-                        placeholder="Masukkan email UPNVJ"
+                        placeholder="Masukkan email institusi"
                         autocomplete="email"
                         required
                     >
