@@ -528,7 +528,7 @@
         display: block !important;
         border-radius: 0 !important;
         margin: 0 !important;
-        transition: transform .3s ease;
+        transition: transform .2s ease;
     }
 
     .auditorium-card:hover .aud-slide img {
