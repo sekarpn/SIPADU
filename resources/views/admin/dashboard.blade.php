@@ -11,14 +11,17 @@
     $rejectedPercent = $total > 0 ? (($stats['rejected'] ?? 0) / $total) * 100 : 0;
     $cancelledPercent = $total > 0 ? ($cancelled / $total) * 100 : 0;
 
+    $todayJakarta = \Carbon\Carbon::now('Asia/Jakarta')->toDateString();
+
     $pendingBookings = \App\Models\Booking::with(['user', 'auditorium'])
         ->whereRaw('LOWER(TRIM(status)) IN (?, ?)', ['pending', 'menunggu'])
         ->latest()
         ->get();
 
-    // Ambil SEMUA pengajuan berstatus Disetujui, diurutkan dari tanggal terdekat
+    // Ambil pengajuan berstatus Disetujui mulai dari HARI H (>= hari ini) saja
     $upcomingBookings = \App\Models\Booking::with(['user', 'auditorium'])
         ->whereRaw('LOWER(TRIM(status)) IN (?, ?)', ['disetujui', 'approved'])
+        ->whereDate('booking_date', '>=', $todayJakarta)
         ->orderBy('booking_date', 'asc')
         ->orderBy('start_time', 'asc')
         ->get();
@@ -359,7 +362,7 @@
     }
 
     /* ============================================================
-       GRID 2 KOLOM: PENGAJUAN TERBARU & PEMINJAMAN MENDATANG (UPGRADED UI)
+       GRID 2 KOLOM: PENGAJUAN TERBARU & PEMINJAMAN MENDATANG
        ============================================================ */
     .dash-cards-grid {
         display: grid;
@@ -369,12 +372,12 @@
     }
 
     .dash-feed-panel {
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.48) 100%) !important;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.46) 100%) !important;
         backdrop-filter: blur(18px) saturate(150%) !important;
         -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.65) !important;
-        border-radius: 18px !important;
-        box-shadow: 0 8px 28px rgba(22, 54, 38, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.62) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 28px rgba(22, 54, 38, 0.05) !important;
         padding: 18px 20px 20px;
         min-width: 0;
     }
@@ -385,64 +388,46 @@
         justify-content: space-between;
         gap: 12px;
         margin-bottom: 14px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid rgba(22, 54, 38, 0.08);
     }
 
-    .dash-feed-title-wrap {
+    .dash-feed-head-left {
         display: flex;
-        align-items: center;
-        gap: 9px;
+        align-items: baseline;
+        gap: 7px;
         min-width: 0;
     }
 
-    .dash-feed-title-wrap h2 {
+    .dash-feed-head h2 {
         margin: 0;
-        font-size: 16.5px;
+        font-size: 15.5px;
         font-weight: 800;
         color: #163626;
         letter-spacing: -0.02em;
     }
 
     .dash-feed-count {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 24px;
-        height: 24px;
-        padding: 0 8px;
-        border-radius: 999px;
-        background: rgba(35, 124, 77, 0.14);
-        color: #165e38;
-        font-size: 11.5px;
-        font-weight: 800;
-    }
-
-    .dash-feed-count.is-amber {
-        background: rgba(217, 119, 6, 0.15);
-        color: #92400e;
+        font-size: 12px;
+        font-weight: 700;
+        color: #64786c;
     }
 
     .dash-feed-more {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 7px 12px;
-        border-radius: 10px;
-        background: rgba(35, 124, 77, 0.11);
+        gap: 4px;
         color: #1f7a49;
         text-decoration: none;
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 700;
         white-space: nowrap;
         flex-shrink: 0;
-        transition: background .2s ease, gap .2s ease, color .2s ease;
+        transition: color .15s ease;
     }
 
     .dash-feed-more:hover {
-        background: #237c4d;
-        color: #ffffff;
-        gap: 7px;
+        color: #145332;
+        text-decoration: underline;
+        text-underline-offset: 3px;
     }
 
     .dash-feed-more svg {
@@ -450,294 +435,183 @@
         height: 14px;
     }
 
-    /* AREA SCROLL DAFTAR CARD */
+    /* LIST SCROLL */
     .dash-feed-list {
         display: flex;
         flex-direction: column;
-        gap: 11px;
+        gap: 12px;
         max-height: 430px;
         overflow-y: auto;
-        padding: 3px 4px 4px 1px;
+        padding: 2px 3px 4px 1px;
         overscroll-behavior: contain;
         scrollbar-width: thin;
-        scrollbar-color: rgba(72, 131, 91, 0.42) rgba(22, 54, 38, 0.05);
+        scrollbar-color: rgba(22, 54, 38, 0.18) transparent;
     }
 
     .dash-feed-list::-webkit-scrollbar {
         width: 5px;
     }
 
-    .dash-feed-list::-webkit-scrollbar-track {
-        background: rgba(22, 54, 38, 0.05);
-        border-radius: 999px;
-    }
-
     .dash-feed-list::-webkit-scrollbar-thumb {
-        background: rgba(72, 131, 91, 0.42);
+        background: rgba(22, 54, 38, 0.18);
         border-radius: 999px;
     }
 
-    .dash-feed-list::-webkit-scrollbar-thumb:hover {
-        background: rgba(72, 131, 91, 0.68);
-    }
-
-    /* KARTU ITEM DENGAN KALENDER MINI + AKSEN GARIS KIRI */
-    .dash-booking-card {
-        position: relative;
-        display: grid;
-        grid-template-columns: 62px minmax(0, 1fr);
-        align-items: center;
-        gap: 14px;
-        flex-shrink: 0;
-        text-decoration: none;
-        background: rgba(255, 255, 255, 0.78);
-        border: 1px solid rgba(22, 54, 38, 0.12);
+    /* KARTU SIMETRIS & SEIMBANG */
+    .proto-card {
+        display: block;
+        padding: 15px 18px;
         border-radius: 14px;
-        padding: 13px 15px 13px 17px;
-        color: #163626;
-        overflow: hidden;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(22, 54, 38, 0.09);
         box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
-        transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
-    }
-
-    .dash-booking-card::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: #237c4d;
-    }
-
-    .dash-booking-card.accent-pending::before {
-        background: #f59e0b;
-    }
-
-    .dash-booking-card.accent-upcoming::before {
-        background: #eab308;
-    }
-
-    .dash-booking-card.accent-live::before {
-        background: #16a34a;
-    }
-
-    .dash-booking-card:hover {
-        background: #ffffff;
-        border-color: #2f7d58;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(22, 54, 38, 0.08);
-    }
-
-    /* BLOK TANGGAL KALENDER MINI */
-    .dash-date-tile {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 8px 4px;
-        border-radius: 11px;
-        background: rgba(35, 124, 77, 0.09);
-        border: 1px solid rgba(35, 124, 77, 0.16);
-        text-align: center;
-    }
-
-    .dash-booking-card.accent-pending .dash-date-tile {
-        background: rgba(245, 158, 11, 0.10);
-        border-color: rgba(245, 158, 11, 0.22);
-    }
-
-    .dash-date-day {
-        font-size: 19px;
-        font-weight: 800;
-        line-height: 1.05;
+        text-decoration: none;
         color: #163626;
-        letter-spacing: -0.03em;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
     }
 
-    .dash-date-month {
-        font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #1f7a49;
-        margin-top: 2px;
+    .proto-card:hover {
+        background: #ffffff;
+        border-color: rgba(35, 124, 77, 0.34);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(22, 54, 38, 0.07);
     }
 
-    .dash-booking-card.accent-pending .dash-date-month {
-        color: #b45309;
-    }
-
-    .dash-date-year {
-        font-size: 9.5px;
-        font-weight: 600;
-        color: #64786c;
-        margin-top: 1px;
-    }
-
-    /* KONTEN KANAN KARTU */
-    .dash-card-body {
-        min-width: 0;
-    }
-
-    .dash-booking-card-top {
+    .proto-card-top {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 8px;
+        gap: 14px;
+        margin-bottom: 12px;
     }
 
-    .dash-booking-title-group {
+    .proto-card-heading {
         min-width: 0;
     }
 
-    .dash-booking-title {
+    .proto-card-title {
         margin: 0;
-        font-size: 14px;
+        font-size: 14.5px;
         font-weight: 800;
         color: #163626;
-        line-height: 1.32;
+        line-height: 1.35;
+        letter-spacing: -0.015em;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        transition: color .15s ease;
     }
 
-    .dash-booking-sub {
-        margin: 2px 0 0;
+    .proto-card:hover .proto-card-title {
+        color: #1f7a49;
+    }
+
+    .proto-card-sub {
+        margin: 3px 0 0;
         font-size: 12px;
-        font-weight: 600;
-        color: #4c6456;
+        color: #5c7265;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    /* BADGE STATUS DI POJOK KANAN */
-    .dash-card-badge {
+    .proto-card-sub .event-name {
+        font-weight: 600;
+        color: #465d50;
+    }
+
+    .proto-card-sub .sub-dot {
+        color: #9cb0a4;
+        flex-shrink: 0;
+    }
+
+    .proto-card-sub .org-name {
+        font-weight: 600;
+        color: #1f7a49;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* SOFT STATUS PILL DI KANAN ATAS */
+    .proto-badge {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 4px 11px;
+        justify-content: center;
+        padding: 5px 13px;
         border-radius: 999px;
-        font-size: 11px;
-        font-weight: 800;
+        font-size: 11.5px;
+        font-weight: 700;
         white-space: nowrap;
         flex-shrink: 0;
         line-height: 1.2;
     }
 
-    .dash-card-badge::before {
-        content: "";
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background: currentColor;
+    .proto-badge.live {
+        background: #dff3e6;
+        color: #1b653c;
     }
 
-    .dash-card-badge.live {
-        background: #dcfce7;
-        color: #166534;
-        border: 1px solid rgba(22, 101, 52, 0.18);
-    }
-
-    .dash-card-badge.upcoming {
-        background: #fef08a;
-        color: #713f12;
-        border: 1px solid rgba(161, 98, 7, 0.22);
-    }
-
-    .dash-card-badge.pending {
+    .proto-badge.upcoming {
         background: #fef3c7;
-        color: #92400e;
-        border: 1px solid rgba(180, 83, 9, 0.2);
+        color: #854d0e;
     }
 
-    /* FOOTER KARTU: CHIP PENGUSUL & JAM + PANAH */
-    .dash-booking-footer {
+    .proto-badge.pending {
+        background: #ffedd5;
+        color: #9a3412;
+    }
+
+    /* BARIS WAKTU BAWAH: TANGGAL & JAM SEJAJAR RAPI */
+    .proto-schedule-bar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 8px;
+        gap: 12px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(22, 54, 38, 0.06);
     }
 
-    .dash-booking-chips {
-        display: flex;
+    .proto-meta-item {
+        display: inline-flex;
         align-items: center;
         gap: 7px;
-        flex-wrap: wrap;
+        font-size: 12px;
+        font-weight: 500;
+        color: #3d5446;
         min-width: 0;
     }
 
-    .dash-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 9px;
-        border-radius: 7px;
-        background: #f2f6f3;
-        border: 1px solid rgba(22, 54, 38, 0.08);
-        font-size: 11px;
-        font-weight: 600;
-        color: #2c3e33;
-        max-width: 100%;
-    }
-
-    .dash-chip.is-org {
-        background: rgba(35, 124, 77, 0.08);
-        border-color: rgba(35, 124, 77, 0.14);
-        color: #163626;
-        font-weight: 700;
-    }
-
-    .dash-chip svg {
-        width: 12.5px;
-        height: 12.5px;
-        color: #1f7a49;
+    .proto-meta-item svg {
+        width: 14px;
+        height: 14px;
+        color: #6b8274;
         flex-shrink: 0;
     }
 
-    .dash-chip span {
+    .proto-meta-item span {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    .dash-card-arrow {
-        width: 24px;
-        height: 24px;
-        border-radius: 7px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #64786c;
-        flex-shrink: 0;
-        transition: background .18s ease, color .18s ease, transform .18s ease;
-    }
-
-    .dash-card-arrow svg {
-        width: 14px;
-        height: 14px;
-    }
-
-    .dash-booking-card:hover .dash-card-arrow {
-        background: rgba(35, 124, 77, 0.12);
-        color: #1f7a49;
-        transform: translateX(2px);
+        font-variant-numeric: tabular-nums;
     }
 
     .dash-empty-state {
         text-align: center;
-        color: #4c6456;
-        padding: 32px 14px;
+        color: #5e7366;
+        padding: 34px 16px;
         font-size: 12.5px;
-        background: rgba(255, 255, 255, 0.5);
-        border: 1px dashed rgba(22, 54, 38, 0.18);
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px dashed rgba(22, 54, 38, 0.16);
         border-radius: 13px;
     }
 
     /* RESPONSIVE */
-    @media (max-width: 1180px) {
+    @media (max-width: 1120px) {
         .dash-cards-grid {
             grid-template-columns: 1fr;
         }
@@ -771,6 +645,12 @@
             padding: 15px 16px 16px !important;
         }
 
+        .proto-schedule-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
         .chart-content {
             gap: 28px;
         }
@@ -802,19 +682,13 @@
         .stat-card strong {
             font-size: 22px;
         }
-
-        .dash-booking-card {
-            grid-template-columns: 54px minmax(0, 1fr);
-            gap: 11px;
-            padding: 12px 12px 12px 15px;
-        }
     }
 
     @media (prefers-reduced-motion: reduce) {
         .pie-chart,
         .legend-item,
         .pie-tooltip,
-        .dash-booking-card {
+        .proto-card {
             transition: none;
         }
     }
@@ -966,15 +840,15 @@
         @endif
     </div>
 
-    {{-- 2 PANEL KARTU BERDAMPINGAN: PENGAJUAN TERBARU & PEMINJAMAN MENDATANG --}}
+    {{-- 2 PANEL CARD: PENGAJUAN TERBARU & PEMINJAMAN MENDATANG --}}
     <div class="dash-cards-grid">
 
-        {{-- KARTU 1: PENGAJUAN TERBARU (PENDING) --}}
+        {{-- PANEL 1: PENGAJUAN TERBARU (PENDING) --}}
         <div class="dash-feed-panel">
             <div class="dash-feed-head">
-                <div class="dash-feed-title-wrap">
+                <div class="dash-feed-head-left">
                     <h2>Pengajuan Terbaru</h2>
-                    <span class="dash-feed-count is-amber">{{ $pendingBookings->count() }}</span>
+                    <span class="dash-feed-count">({{ $pendingBookings->count() }})</span>
                 </div>
 
                 <a href="{{ route('admin.bookings', ['status' => 'Pending']) }}" class="dash-feed-more">
@@ -987,49 +861,40 @@
                 <div class="dash-feed-list">
                     @foreach($pendingBookings as $b)
                         @php
-                            $bParsed = $b->booking_date ? \Carbon\Carbon::parse($b->booking_date)->locale('id') : null;
-                            $bDay = $bParsed ? $bParsed->format('d') : '--';
-                            $bMonth = $bParsed ? $bParsed->translatedFormat('M') : '-';
-                            $bYear = $bParsed ? $bParsed->format('Y') : '';
-
+                            $bDate = $b->booking_date
+                                ? \Carbon\Carbon::parse($b->booking_date)->locale('id')->translatedFormat('d F Y')
+                                : '-';
                             $bTime = !empty($b->start_time)
-                                ? str_replace(':', '.', substr($b->start_time, 0, 5))
-                                  . (!empty($b->end_time) ? ' – ' . str_replace(':', '.', substr($b->end_time, 0, 5)) . ' WIB' : ' WIB')
+                                ? str_replace(':', '.', substr($b->start_time, 0, 5)) . ' WIB'
+                                  . (!empty($b->end_time) ? ' - ' . str_replace(':', '.', substr($b->end_time, 0, 5)) . ' WIB' : '')
                                 : 'Waktu menyesuaikan';
                             $bOrg = $b->organization ?? $b->organizer ?? optional($b->user)->name ?? 'Pemohon';
+                            $bVenue = optional($b->auditorium)->name ?? $b->event_name;
+                            $hasDistinctEvent = !empty(optional($b->auditorium)->name) && !empty($b->event_name);
                         @endphp
-                        <a href="{{ route('admin.bookings', ['q' => $b->event_name, 'open' => $b->id]) }}" class="dash-booking-card accent-pending">
-                            <div class="dash-date-tile">
-                                <span class="dash-date-day">{{ $bDay }}</span>
-                                <span class="dash-date-month">{{ $bMonth }}</span>
-                                <span class="dash-date-year">{{ $bYear }}</span>
+                        <a href="{{ route('admin.bookings', ['booking_id' => $b->id, 'open' => $b->id]) }}" class="proto-card">
+                            <div class="proto-card-top">
+                                <div class="proto-card-heading">
+                                    <h3 class="proto-card-title">{{ $bVenue }}</h3>
+                                    <p class="proto-card-sub">
+                                        @if($hasDistinctEvent)
+                                            <span class="event-name">{{ $b->event_name }}</span>
+                                            <span class="sub-dot">•</span>
+                                        @endif
+                                        <span class="org-name">{{ $bOrg }}</span>
+                                    </p>
+                                </div>
+                                <span class="proto-badge pending">Pending</span>
                             </div>
 
-                            <div class="dash-card-body">
-                                <div class="dash-booking-card-top">
-                                    <div class="dash-booking-title-group">
-                                        <h3 class="dash-booking-title">{{ optional($b->auditorium)->name ?? $b->event_name }}</h3>
-                                        @if(!empty(optional($b->auditorium)->name) && !empty($b->event_name))
-                                            <p class="dash-booking-sub">{{ $b->event_name }}</p>
-                                        @endif
-                                    </div>
-                                    <span class="dash-card-badge pending">Pending</span>
+                            <div class="proto-schedule-bar">
+                                <div class="proto-meta-item">
+                                    <i data-lucide="calendar"></i>
+                                    <span>{{ $bDate }}</span>
                                 </div>
-
-                                <div class="dash-booking-footer">
-                                    <div class="dash-booking-chips">
-                                        <span class="dash-chip is-org">
-                                            <i data-lucide="user"></i>
-                                            <span>{{ $bOrg }}</span>
-                                        </span>
-                                        <span class="dash-chip">
-                                            <i data-lucide="clock"></i>
-                                            <span>{{ $bTime }}</span>
-                                        </span>
-                                    </div>
-                                    <span class="dash-card-arrow">
-                                        <i data-lucide="chevron-right"></i>
-                                    </span>
+                                <div class="proto-meta-item">
+                                    <i data-lucide="clock"></i>
+                                    <span>{{ $bTime }}</span>
                                 </div>
                             </div>
                         </a>
@@ -1042,12 +907,12 @@
             @endif
         </div>
 
-        {{-- KARTU 2: PEMINJAMAN MENDATANG --}}
+        {{-- PANEL 2: PEMINJAMAN MENDATANG (MULAI HARI H SAJA) --}}
         <div class="dash-feed-panel">
             <div class="dash-feed-head">
-                <div class="dash-feed-title-wrap">
+                <div class="dash-feed-head-left">
                     <h2>Peminjaman Mendatang</h2>
-                    <span class="dash-feed-count">{{ $upcomingBookings->count() }}</span>
+                    <span class="dash-feed-count">({{ $upcomingBookings->count() }})</span>
                 </div>
 
                 <a href="{{ route('admin.bookings', ['status' => 'Disetujui']) }}" class="dash-feed-more">
@@ -1062,64 +927,49 @@
                         @php
                             $now = \Carbon\Carbon::now('Asia/Jakarta');
                             $today = $now->copy()->startOfDay();
-                            $eventDay = $u->booking_date
-                                ? \Carbon\Carbon::parse($u->booking_date, 'Asia/Jakarta')->startOfDay()
-                                : null;
-                            $diffDays = $eventDay ? (int) $today->diffInDays($eventDay, false) : null;
+                            $eventDay = \Carbon\Carbon::parse($u->booking_date, 'Asia/Jakarta')->startOfDay();
+                            $diffDays = (int) $today->diffInDays($eventDay, false);
 
-                            if ($diffDays !== null && $diffDays > 0) {
+                            if ($diffDays > 0) {
                                 $badgeText = 'Dalam ' . $diffDays . ' hari';
                                 $badgeClass = 'upcoming';
-                                $cardAccent = 'accent-upcoming';
                             } else {
-                                $badgeText = 'Berlangsung';
+                                $badgeText = 'Hari ini';
                                 $badgeClass = 'live';
-                                $cardAccent = 'accent-live';
                             }
 
-                            $uParsed = $u->booking_date ? \Carbon\Carbon::parse($u->booking_date)->locale('id') : null;
-                            $uDay = $uParsed ? $uParsed->format('d') : '--';
-                            $uMonth = $uParsed ? $uParsed->translatedFormat('M') : '-';
-                            $uYear = $uParsed ? $uParsed->format('Y') : '';
-
+                            $uDate = \Carbon\Carbon::parse($u->booking_date)->locale('id')->translatedFormat('d F Y');
                             $uTime = !empty($u->start_time)
-                                ? str_replace(':', '.', substr($u->start_time, 0, 5))
-                                  . (!empty($u->end_time) ? ' – ' . str_replace(':', '.', substr($u->end_time, 0, 5)) . ' WIB' : ' WIB')
+                                ? str_replace(':', '.', substr($u->start_time, 0, 5)) . ' WIB'
+                                  . (!empty($u->end_time) ? ' - ' . str_replace(':', '.', substr($u->end_time, 0, 5)) . ' WIB' : '')
                                 : 'Waktu menyesuaikan';
                             $uOrg = $u->organization ?? $u->organizer ?? optional($u->user)->name ?? 'Pemohon';
+                            $uVenue = optional($u->auditorium)->name ?? $u->event_name;
+                            $hasDistinctEvent = !empty(optional($u->auditorium)->name) && !empty($u->event_name);
                         @endphp
-                        <a href="{{ route('admin.bookings', ['q' => $u->event_name, 'open' => $u->id]) }}" class="dash-booking-card {{ $cardAccent }}">
-                            <div class="dash-date-tile">
-                                <span class="dash-date-day">{{ $uDay }}</span>
-                                <span class="dash-date-month">{{ $uMonth }}</span>
-                                <span class="dash-date-year">{{ $uYear }}</span>
+                        <a href="{{ route('admin.bookings', ['booking_id' => $u->id, 'open' => $u->id]) }}" class="proto-card">
+                            <div class="proto-card-top">
+                                <div class="proto-card-heading">
+                                    <h3 class="proto-card-title">{{ $uVenue }}</h3>
+                                    <p class="proto-card-sub">
+                                        @if($hasDistinctEvent)
+                                            <span class="event-name">{{ $u->event_name }}</span>
+                                            <span class="sub-dot">•</span>
+                                        @endif
+                                        <span class="org-name">{{ $uOrg }}</span>
+                                    </p>
+                                </div>
+                                <span class="proto-badge {{ $badgeClass }}">{{ $badgeText }}</span>
                             </div>
 
-                            <div class="dash-card-body">
-                                <div class="dash-booking-card-top">
-                                    <div class="dash-booking-title-group">
-                                        <h3 class="dash-booking-title">{{ optional($u->auditorium)->name ?? $u->event_name }}</h3>
-                                        @if(!empty(optional($u->auditorium)->name) && !empty($u->event_name))
-                                            <p class="dash-booking-sub">{{ $u->event_name }}</p>
-                                        @endif
-                                    </div>
-                                    <span class="dash-card-badge {{ $badgeClass }}">{{ $badgeText }}</span>
+                            <div class="proto-schedule-bar">
+                                <div class="proto-meta-item">
+                                    <i data-lucide="calendar"></i>
+                                    <span>{{ $uDate }}</span>
                                 </div>
-
-                                <div class="dash-booking-footer">
-                                    <div class="dash-booking-chips">
-                                        <span class="dash-chip is-org">
-                                            <i data-lucide="user"></i>
-                                            <span>{{ $uOrg }}</span>
-                                        </span>
-                                        <span class="dash-chip">
-                                            <i data-lucide="clock"></i>
-                                            <span>{{ $uTime }}</span>
-                                        </span>
-                                    </div>
-                                    <span class="dash-card-arrow">
-                                        <i data-lucide="chevron-right"></i>
-                                    </span>
+                                <div class="proto-meta-item">
+                                    <i data-lucide="clock"></i>
+                                    <span>{{ $uTime }}</span>
                                 </div>
                             </div>
                         </a>

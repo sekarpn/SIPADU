@@ -63,6 +63,24 @@
         letter-spacing: -0.3px;
     }
 
+    /* EFEK MENGETIK (TYPEWRITER) PADA JUDUL SELAMAT DATANG */
+    .dashboard-welcome h1.is-typing::after {
+        content: '';
+        display: inline-block;
+        width: 2.5px;
+        height: 0.92em;
+        margin-left: 4px;
+        vertical-align: -2px;
+        background-color: #237c4d;
+        border-radius: 2px;
+        animation: sipaduCaretBlink 0.75s step-end infinite;
+    }
+
+    @keyframes sipaduCaretBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+
     .dashboard-welcome p {
         font-size: 13px;
         color: #324a3c;
@@ -192,7 +210,7 @@
         -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
         border: 1px solid rgba(255, 255, 255, 0.38) !important;
         border-radius: 16px;
-        padding: 14px 20px 18px 20px !important;
+        padding: 16px 20px 18px 20px !important;
         min-width: 0;
         box-shadow: 0 8px 24px rgba(22, 54, 38, 0.05) !important;
         display: flex;
@@ -219,11 +237,24 @@
         margin-bottom: 14px;
     }
 
+    .section-head-title {
+        display: flex;
+        align-items: baseline;
+        gap: 7px;
+    }
+
     .section-head h2 {
         font-size: 15.5px;
-        font-weight: 750;
+        font-weight: 800;
         color: #163626;
         margin: 0 0 2px;
+        letter-spacing: -0.02em;
+    }
+
+    .section-head-count {
+        font-size: 12px;
+        font-weight: 700;
+        color: #64786c;
     }
 
     .section-head p {
@@ -238,7 +269,7 @@
         gap: 4px;
         color: #1f7a49;
         text-decoration: none;
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 700;
         white-space: nowrap;
         transition: gap 0.2s ease, color 0.2s ease;
@@ -252,98 +283,206 @@
     .section-head a:hover {
         color: #155a35;
         gap: 7px;
+        text-decoration: underline;
+        text-underline-offset: 3px;
     }
 
-    /* TABEL PENGAJUAN (SEJAJAR ATAS & BAWAH DENGAN INFORMASI SIPADU) */
-    .dashboard-table-wrap {
-        width: 100%;
-        flex: 1;
+    /* ============================================================
+       KARTU PENGAJUAN TERBARU (SELARAS DENGAN DASHBOARD ADMIN)
+       ============================================================ */
+    .borrower-feed-list {
         display: flex;
         flex-direction: column;
-        margin-top: 4px;
-        background: rgba(255, 255, 255, 0.42) !important;
-        border: 1px solid rgba(255, 255, 255, 0.35) !important;
-        border-radius: 12px;
-        overflow-x: hidden;
-        overflow-y: hidden;
+        gap: 11px;
+        max-height: 292px;
+        overflow-y: auto;
+        padding: 2px 3px 4px 1px;
+        margin-top: 2px;
+        flex: 1;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(22, 54, 38, 0.18) transparent;
     }
 
-    .dashboard-table {
-        width: 100%;
+    .borrower-feed-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .borrower-feed-list::-webkit-scrollbar-thumb {
+        background: rgba(22, 54, 38, 0.18);
+        border-radius: 999px;
+    }
+
+    .proto-card {
+        display: block;
+        padding: 14px 17px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(22, 54, 38, 0.09);
+        box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
+        text-decoration: none;
+        color: #163626;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .proto-card:hover {
+        background: #ffffff;
+        border-color: rgba(35, 124, 77, 0.34);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(22, 54, 38, 0.07);
+    }
+
+    .proto-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 11px;
+    }
+
+    .proto-card-heading {
         min-width: 0;
-        max-width: 100%;
-        height: 100%;
-        table-layout: fixed;
-        border-collapse: collapse;
+    }
+
+    .proto-card-title {
+        margin: 0;
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #163626;
+        line-height: 1.35;
+        letter-spacing: -0.015em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+
+    .proto-card:hover .proto-card-title {
+        color: #1f7a49;
+    }
+
+    .proto-card-sub {
+        margin: 3px 0 0;
         font-size: 12px;
-    }
-
-    .dashboard-table th,
-    .dashboard-table td {
-        overflow-wrap: anywhere;
-        word-break: normal;
-    }
-
-    .dashboard-table th {
-        background: rgba(35, 124, 77, 0.14) !important;
-        color: #163626 !important;
-        font-size: 11px;
-        font-weight: 750;
-        text-align: left;
-        padding: 13px 14px;
-        border-bottom: none !important;
-    }
-
-    .dashboard-table td {
-        color: #243b2e;
-        font-weight: 500;
-        padding: 14px 14px;
-        border-bottom: 1px solid rgba(22, 54, 38, 0.06);
-        vertical-align: middle;
-        transition: background 0.2s ease;
-    }
-
-    .dashboard-table tbody tr:hover td {
-        background: rgba(255, 255, 255, 0.55) !important;
-    }
-
-    .dashboard-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .dashboard-table .empty {
-        text-align: center;
-        color: #4c6456;
-        padding: 25px 10px;
-    }
-
-    .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 10.5px;
-        font-weight: 700;
+        color: #5c7265;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .status.pending {
-        color: #b4690e;
-        background: rgba(254, 240, 213, 0.92);
+    .proto-card-sub .event-name {
+        font-weight: 600;
+        color: #465d50;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .status.disetujui {
-        color: #157343;
-        background: rgba(220, 243, 229, 0.92);
+    .proto-card-sub .sub-dot {
+        color: #9cb0a4;
+        flex-shrink: 0;
     }
 
-    .status.ditolak {
-        color: #c53030;
-        background: rgba(254, 226, 226, 0.92);
+    .proto-card-sub .org-name {
+        font-weight: 600;
+        color: #1f7a49;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .status.dibatalkan {
+    /* SOFT STATUS PILL DI KANAN ATAS */
+    .proto-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 13px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+        line-height: 1.2;
+    }
+
+    .proto-badge.pending {
+        background: #ffedd5;
+        color: #9a3412;
+    }
+
+    .proto-badge.disetujui,
+    .proto-badge.approved {
+        background: #dff3e6;
+        color: #1b653c;
+    }
+
+    .proto-badge.ditolak,
+    .proto-badge.rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .proto-badge.revisi {
+        background: #fef3c7;
+        color: #854d0e;
+    }
+
+    .proto-badge.dibatalkan,
+    .proto-badge.cancelled {
+        background: #e2e8f0;
         color: #475569;
-        background: rgba(226, 232, 240, 0.92);
+    }
+
+    /* BARIS WAKTU BAWAH: TANGGAL & JAM SEJAJAR RAPI */
+    .proto-schedule-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 9px;
+        border-top: 1px solid rgba(22, 54, 38, 0.06);
+    }
+
+    .proto-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #3d5446;
+        min-width: 0;
+    }
+
+    .proto-meta-item svg {
+        width: 14px;
+        height: 14px;
+        color: #6b8274;
+        flex-shrink: 0;
+    }
+
+    .proto-meta-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .dash-empty-state {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #5e7366;
+        padding: 32px 16px;
+        font-size: 12.5px;
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px dashed rgba(22, 54, 38, 0.16);
+        border-radius: 13px;
     }
 
     /* INFORMASI SIPADU (KOTAK GLASS SUB-ITEM SIMETRIS) */
@@ -351,7 +490,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        margin-top: 4px;
+        margin-top: 2px;
         flex: 1;
     }
 
@@ -360,15 +499,15 @@
         align-items: center;
         gap: 12px;
         flex: 1;
-        background: rgba(255, 255, 255, 0.42) !important;
-        border: 1px solid rgba(255, 255, 255, 0.35) !important;
-        border-radius: 12px;
-        padding: 11px 13px;
+        background: rgba(255, 255, 255, 0.48) !important;
+        border: 1px solid rgba(255, 255, 255, 0.42) !important;
+        border-radius: 13px;
+        padding: 12px 14px;
         transition: background 0.2s ease, transform 0.2s ease;
     }
 
     .guide-item:hover {
-        background: rgba(255, 255, 255, 0.65) !important;
+        background: rgba(255, 255, 255, 0.72) !important;
         transform: translateX(2px);
     }
 
@@ -379,7 +518,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
+        border-radius: 9px;
         background: rgba(33, 128, 77, 0.16);
         color: #1f7a49;
     }
@@ -1073,11 +1212,17 @@
             font-size: 22px;
         }
 
+        .proto-schedule-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
         .auditorium-cards > .auditorium-card { flex-basis: 85%; }
         .auditorium-arrow { width: 32px; height: 32px; }
 
         .dashboard-panel {
-            padding: 12px 15px 15px 15px !important;
+            padding: 14px 16px 16px 16px !important;
         }
 
         .auditorium-modal {
@@ -1100,6 +1245,14 @@
             padding: 18px;
         }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+        .proto-card,
+        .guide-item,
+        .auditorium-card {
+            transition: none;
+        }
+    }
 </style>
 
 <div class="dashboard-page">
@@ -1107,7 +1260,7 @@
     {{-- HEADER --}}
     <div class="dashboard-topbar">
         <div class="dashboard-welcome">
-            <h1>Selamat datang, {{ $user->name }}!</h1>
+            <h1 data-typewriter="Selamat datang, {{ $user->name }}!">Selamat datang, {{ $user->name }}!</h1>
             <p>Temukan auditorium impian Anda untuk pengajuan peminjaman Anda.</p>
         </div>
 
@@ -1167,11 +1320,14 @@
     {{-- PENGAJUAN DAN INFORMASI --}}
     <div class="dashboard-middle">
 
-        {{-- PENGAJUAN TERBARU (DIBATASI 3 DATA AGAR SEJAJAR) --}}
+        {{-- PENGAJUAN TERBARU (CARD SIMETRIS SEPERTI DASHBOARD ADMIN) --}}
         <div class="dashboard-panel">
             <div class="section-head">
                 <div>
-                    <h2>Pengajuan Terbaru</h2>
+                    <div class="section-head-title">
+                        <h2>Pengajuan Terbaru</h2>
+                        <span class="section-head-count">({{ $bookings->count() }})</span>
+                    </div>
                     <p>Ringkasan pengajuan peminjaman Anda</p>
                 </div>
 
@@ -1181,43 +1337,70 @@
                 </a>
             </div>
 
-            <div class="dashboard-table-wrap">
-                <table class="dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Auditorium</th>
-                            <th>Kegiatan</th>
-                            <th>Tanggal</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
+            @if($bookings->isNotEmpty())
+                <div class="borrower-feed-list">
+                    @foreach($bookings as $b)
+                        @php
+                            $statusRaw = strtolower(trim((string) $b->status));
+                            $badgeClass = match ($statusRaw) {
+                                'disetujui', 'approved' => 'disetujui',
+                                'ditolak', 'rejected' => 'ditolak',
+                                'perlu revisi' => 'revisi',
+                                'dibatalkan', 'cancelled' => 'dibatalkan',
+                                default => 'pending',
+                            };
 
-                    <tbody>
-                        @forelse($bookings->take(3) as $b)
-                            <tr>
-                                <td>{{ $b->auditorium->name ?? '-' }}</td>
-                                <td>{{ $b->event_name }}</td>
-                                <td>
-                                    {{ $b->booking_date
-                                        ? \Carbon\Carbon::parse($b->booking_date)->format('d M Y')
-                                        : '-' }}
-                                </td>
-                                <td>
-                                    <span class="status {{ strtolower($b->status) }}">
-                                        {{ $b->status }}
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="empty">
-                                    Belum ada pengajuan peminjaman.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                            $bDate = $b->booking_date
+                                ? \Carbon\Carbon::parse($b->booking_date)->locale('id')->translatedFormat('d F Y')
+                                : '-';
+                            $bTime = !empty($b->start_time)
+                                ? str_replace(':', '.', substr($b->start_time, 0, 5)) . ' WIB'
+                                  . (!empty($b->end_time) ? ' - ' . str_replace(':', '.', substr($b->end_time, 0, 5)) . ' WIB' : '')
+                                : 'Waktu menyesuaikan';
+                            $bOrg = trim((string) ($b->organization ?? ''));
+                            $bVenue = optional($b->auditorium)->name ?? $b->event_name;
+                            $hasDistinctEvent = !empty(optional($b->auditorium)->name) && !empty($b->event_name);
+                        @endphp
+
+                        <a href="{{ route('borrower.bookings', ['booking_id' => $b->id]) }}" class="proto-card">
+                            <div class="proto-card-top">
+                                <div class="proto-card-heading">
+                                    <h3 class="proto-card-title">{{ $bVenue }}</h3>
+                                    @if($hasDistinctEvent || $bOrg !== '')
+                                        <p class="proto-card-sub">
+                                            @if($hasDistinctEvent)
+                                                <span class="event-name">{{ $b->event_name }}</span>
+                                            @endif
+                                            @if($hasDistinctEvent && $bOrg !== '')
+                                                <span class="sub-dot">•</span>
+                                            @endif
+                                            @if($bOrg !== '')
+                                                <span class="org-name">{{ $bOrg }}</span>
+                                            @endif
+                                        </p>
+                                    @endif
+                                </div>
+                                <span class="proto-badge {{ $badgeClass }}">{{ $b->status }}</span>
+                            </div>
+
+                            <div class="proto-schedule-bar">
+                                <div class="proto-meta-item">
+                                    <i data-lucide="calendar"></i>
+                                    <span>{{ $bDate }}</span>
+                                </div>
+                                <div class="proto-meta-item">
+                                    <i data-lucide="clock"></i>
+                                    <span>{{ $bTime }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="dash-empty-state">
+                    Belum ada pengajuan peminjaman.
+                </div>
+            @endif
         </div>
 
         {{-- INFORMASI SIPADU --}}
@@ -1604,9 +1787,47 @@
     </div>
 </div>
 
-{{-- JAVASCRIPT DETAIL & SLIDER AUDITORIUM --}}
+{{-- JAVASCRIPT DETAIL, TYPEWRITER & SLIDER AUDITORIUM --}}
 <script>
     const AUD_SLIDE_INTERVAL = 4000;
+
+    function initWelcomeTypewriter() {
+        const heading = document.querySelector('.dashboard-welcome h1[data-typewriter]');
+        if (!heading) return;
+
+        const fullText = heading.getAttribute('data-typewriter') || '';
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefersReducedMotion || !fullText) {
+            heading.textContent = fullText;
+            return;
+        }
+
+        const initialHeight = heading.offsetHeight;
+        if (initialHeight > 0) {
+            heading.style.minHeight = initialHeight + 'px';
+        }
+
+        heading.textContent = '';
+        heading.classList.add('is-typing');
+
+        let index = 0;
+        const typingSpeed = 42;
+
+        const timer = setInterval(() => {
+            index++;
+            heading.textContent = fullText.slice(0, index);
+
+            if (index >= fullText.length) {
+                clearInterval(timer);
+                heading.style.minHeight = '';
+
+                setTimeout(() => {
+                    heading.classList.remove('is-typing');
+                }, 1200);
+            }
+        }, typingSpeed);
+    }
 
     function scrollAuditoriums(button, direction) {
         const track = document.getElementById('auditoriumCards');
@@ -1704,6 +1925,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        initWelcomeTypewriter();
+
         if (window.lucide) {
             window.lucide.createIcons();
         }
