@@ -61,7 +61,7 @@ class AdminController extends Controller
 
         $data = $r->validate([
             'name' => 'required|string|max:255',
-            'lokasi_kampus' => 'required|in:UPNVJ Kampus Pondok Labu,UPNVJ Kampus Limo',
+            'lokasi_kampus' => 'required|in:UPNVJ - Kampus Pondok Labu,UPNVJ - Kampus Limo',
             'lokasi_gedung' => 'nullable|string|max:500',
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
@@ -75,7 +75,7 @@ class AdminController extends Controller
             'remove_images.*' => 'string',
         ], [
             'lokasi_kampus.required' => 'Lokasi kampus wajib dipilih.',
-            'lokasi_kampus.in' => 'Lokasi kampus harus UPNVJ Kampus Pondok Labu atau UPNVJ Kampus Limo.',
+            'lokasi_kampus.in' => 'Lokasi kampus harus UPNVJ - Kampus Pondok Labu atau UPNVJ - Kampus Limo.',
             'jam_mulai.required' => 'Jam mulai operasional wajib diisi.',
             'jam_mulai.date_format' => 'Format jam mulai tidak valid.',
             'jam_selesai.required' => 'Jam selesai operasional wajib diisi.',

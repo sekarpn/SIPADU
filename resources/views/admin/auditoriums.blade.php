@@ -1046,8 +1046,8 @@
 @php
     $oldLokasiKampus = (string) old('lokasi_kampus', '');
     $campusLocations = [
-        'UPNVJ Kampus Pondok Labu',
-        'UPNVJ Kampus Limo',
+        'UPNVJ - Kampus Pondok Labu',
+        'UPNVJ - Kampus Limo',
     ];
 @endphp
 
