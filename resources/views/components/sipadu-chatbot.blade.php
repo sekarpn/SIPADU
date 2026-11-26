@@ -1,10 +1,36 @@
 <style>
-    /* TOMBOL FLOATING ROBOT MINIMALIS (EDGE-SNAP DRAGGABLE) */
-    .sipadu-bot-launcher {
+    /* KONTAINER UTAMA: MENYATUKAN KOTAK CHAT & TOMBOL ROBOT DALAM SATU WADAH */
+    .sipadu-bot-dock {
         position: fixed;
         right: 24px;
         bottom: 24px;
-        z-index: 99980;
+        z-index: 99985;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+        font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        color: #163626;
+        pointer-events: none;
+    }
+
+    /* JIKA MENEMPEL DI SISI KIRI LAYAR, RATA KIRI */
+    .sipadu-bot-dock.is-left {
+        align-items: flex-start;
+    }
+
+    /* JIKA DI POSISI ATAS LAYAR, TOMBOL DI ATAS & KOTAK CHAT DI BAWAHNYA */
+    .sipadu-bot-dock.is-top {
+        flex-direction: column-reverse;
+    }
+
+    .sipadu-bot-dock.is-snapping {
+        transition: left .28s cubic-bezier(0.22, 1, 0.36, 1), top .28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    }
+
+    /* TOMBOL FLOATING ROBOT MINIMALIS (DRAGGABLE) */
+    .sipadu-bot-launcher {
+        pointer-events: auto;
         display: inline-flex;
         align-items: center;
         gap: 11px;
@@ -13,7 +39,7 @@
         border: 1px solid rgba(255, 255, 255, .28);
         background: #237c4d;
         color: #ffffff;
-        font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        font-family: inherit;
         font-size: 13.5px;
         font-weight: 700;
         cursor: grab;
@@ -28,15 +54,10 @@
         box-shadow: 0 14px 30px rgba(22, 54, 38, .28);
     }
 
-    .sipadu-bot-launcher.is-dragging {
+    .sipadu-bot-dock.is-dragging .sipadu-bot-launcher {
         cursor: grabbing;
-        opacity: .94;
+        opacity: .95;
         box-shadow: 0 18px 38px rgba(22, 54, 38, .35);
-    }
-
-    .sipadu-bot-launcher.is-snapping,
-    .sipadu-bot-window.is-snapping {
-        transition: left .28s cubic-bezier(0.22, 1, 0.36, 1), top .28s cubic-bezier(0.22, 1, 0.36, 1), background .2s ease, box-shadow .22s ease !important;
     }
 
     .sipadu-bot-launcher-icon {
@@ -190,24 +211,19 @@
         to { transform: scale(1.5); opacity: 1; }
     }
 
-    /* JENDELA POPUP CHATBOT MINIMALIS SOLID (MENGIKUTI POSISI WIDGET) */
+    /* JENDELA POPUP CHATBOT: MENYATU DI DALAM DOCK BERSAMA TOMBOL ROBOT */
     .sipadu-bot-window {
-        position: fixed;
-        right: 24px;
-        bottom: 96px;
-        z-index: 99985;
+        pointer-events: auto;
         width: min(390px, calc(100vw - 32px));
-        height: 520px;
+        height: 500px;
         max-height: calc(100vh - 124px);
         display: none;
         flex-direction: column;
         border-radius: 18px;
         background: #ffffff;
         border: 1px solid #d7e5dc;
-        box-shadow: 0 18px 44px rgba(22, 54, 38, .16);
+        box-shadow: 0 18px 44px rgba(22, 54, 38, .18);
         overflow: hidden;
-        font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-        color: #163626;
     }
 
     .sipadu-bot-window.is-open {
@@ -215,17 +231,17 @@
         animation: sipaduBotPop .22s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .sipadu-bot-window.is-dragging {
-        box-shadow: 0 24px 56px rgba(22, 54, 38, .26);
+    .sipadu-bot-dock.is-dragging .sipadu-bot-window {
+        box-shadow: 0 24px 56px rgba(22, 54, 38, .28);
         user-select: none;
     }
 
     @keyframes sipaduBotPop {
-        from { opacity: 0; transform: translateY(12px) scale(.97); }
+        from { opacity: 0; transform: translateY(10px) scale(.97); }
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* HEADER SOLID HIJAU (AREA PEGANGAN GESER) */
+    /* HEADER SOLID HIJAU (PEGANGAN GESER SELURUH WIDGET) */
     .sipadu-bot-header {
         display: flex;
         align-items: center;
@@ -240,7 +256,7 @@
         touch-action: none;
     }
 
-    .sipadu-bot-window.is-dragging .sipadu-bot-header {
+    .sipadu-bot-dock.is-dragging .sipadu-bot-header {
         cursor: grabbing;
     }
 
@@ -484,93 +500,97 @@
     }
 
     @media (max-width: 480px) {
-        .sipadu-bot-launcher {
+        .sipadu-bot-dock {
             right: 16px;
             bottom: 16px;
+        }
+        .sipadu-bot-launcher {
             padding: 9px 16px 9px 11px;
         }
         .sipadu-bot-window {
-            right: 16px;
-            bottom: 84px;
             width: calc(100vw - 32px);
         }
     }
 </style>
 
-{{-- TOMBOL ROBOT INTERAKTIF (MENEMPEL KE PINGGIR LAYAR) --}}
-<button type="button" class="sipadu-bot-launcher" id="sipaduBotLauncher" aria-label="Buka Asisten SIPADU" title="Klik untuk membuka, atau geser ke pinggir kiri/kanan layar">
-    <span class="sipadu-bot-launcher-icon">
-        <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
-            <g class="sipadu-robot-arm">
-                <path d="M27 21L31.5 16.5" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
-                <circle cx="31.8" cy="16.2" r="1.8" fill="#86efac"/>
-            </g>
-            <g class="sipadu-robot-head">
-                <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
-                <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.4" fill="#86efac"/>
-                <rect x="3.5" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
-                <rect x="26" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
-                <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
-                <rect x="8.8" y="11.8" width="14.4" height="8.4" rx="3.8" fill="#163626"/>
-                <g class="sipadu-robot-eyes">
-                    <circle class="sipadu-robot-eye" cx="12.8" cy="15.5" r="1.8" fill="#86efac"/>
-                    <circle class="sipadu-robot-eye" cx="19.2" cy="15.5" r="1.8" fill="#86efac"/>
-                    <path d="M14.3 18.2Q16 19.4 17.7 18.2" stroke="#86efac" stroke-width="1.3" stroke-linecap="round" fill="none"/>
-                </g>
-            </g>
-            <path d="M11 26.5H21" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
-        </svg>
-    </span>
-    <span>Tanya SIPADU</span>
-</button>
-
-{{-- JENDELA CHATBOT MINIMALIS (MENGIKUTI PINGGIR TOMBOL ROBOT) --}}
-<div class="sipadu-bot-window" id="sipaduBotWindow" role="dialog" aria-label="Asisten Virtual SIPADU">
-    <div class="sipadu-bot-header" id="sipaduBotHeader" title="Geser ke pinggir kiri/kanan layar">
-        <div class="sipadu-bot-header-info">
-            <div class="sipadu-bot-avatar">
-                <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
-                    <g class="sipadu-robot-arm">
-                        <path d="M27 21L31.5 16.5" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
-                        <circle cx="31.8" cy="16.2" r="1.8" fill="#86efac"/>
-                    </g>
-                    <g class="sipadu-robot-head">
-                        <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
-                        <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.4" fill="#86efac"/>
-                        <rect x="3.5" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
-                        <rect x="26" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
-                        <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
-                        <rect x="8.8" y="11.8" width="14.4" height="8.4" rx="3.8" fill="#163626"/>
-                        <g class="sipadu-robot-eyes">
-                            <circle class="sipadu-robot-eye" cx="12.8" cy="15.5" r="1.8" fill="#86efac"/>
-                            <circle class="sipadu-robot-eye" cx="19.2" cy="15.5" r="1.8" fill="#86efac"/>
-                            <path d="M14.3 18.2Q16 19.4 17.7 18.2" stroke="#86efac" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+{{-- SATU KESATUAN KONTAINER WIDGET (KOTAK CHAT + TOMBOL ROBOT SELALU MENYATU) --}}
+<div class="sipadu-bot-dock" id="sipaduBotDock">
+    {{-- JENDELA CHATBOT MINIMALIS --}}
+    <div class="sipadu-bot-window" id="sipaduBotWindow" role="dialog" aria-label="Asisten Virtual SIPADU">
+        <div class="sipadu-bot-header" id="sipaduBotHeader" title="Geser ke pinggir kiri/kanan layar">
+            <div class="sipadu-bot-header-info">
+                <div class="sipadu-bot-avatar">
+                    <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+                        <g class="sipadu-robot-arm">
+                            <path d="M27 21L31.5 16.5" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+                            <circle cx="31.8" cy="16.2" r="1.8" fill="#86efac"/>
                         </g>
-                    </g>
-                    <path d="M11 26.5H21" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
-                </svg>
+                        <g class="sipadu-robot-head">
+                            <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                            <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.4" fill="#86efac"/>
+                            <rect x="3.5" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                            <rect x="26" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                            <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
+                            <rect x="8.8" y="11.8" width="14.4" height="8.4" rx="3.8" fill="#163626"/>
+                            <g class="sipadu-robot-eyes">
+                                <circle class="sipadu-robot-eye" cx="12.8" cy="15.5" r="1.8" fill="#86efac"/>
+                                <circle class="sipadu-robot-eye" cx="19.2" cy="15.5" r="1.8" fill="#86efac"/>
+                                <path d="M14.3 18.2Q16 19.4 17.7 18.2" stroke="#86efac" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+                            </g>
+                        </g>
+                        <path d="M11 26.5H21" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h4>Asisten SIPADU</h4>
+                    <span id="sipaduBotStatus">● Siap membantu Anda</span>
+                </div>
             </div>
-            <div>
-                <h4>Asisten SIPADU</h4>
-                <span id="sipaduBotStatus">● Siap membantu Anda</span>
+            <div class="sipadu-bot-header-actions">
+                <button type="button" class="sipadu-bot-icon-btn" id="sipaduBotReset" title="Mulai ulang chat">Reset</button>
+                <button type="button" class="sipadu-bot-icon-btn" id="sipaduBotClose" title="Tutup">✕</button>
             </div>
         </div>
-        <div class="sipadu-bot-header-actions">
-            <button type="button" class="sipadu-bot-icon-btn" id="sipaduBotReset" title="Mulai ulang chat">Reset</button>
-            <button type="button" class="sipadu-bot-icon-btn" id="sipaduBotClose" title="Tutup">✕</button>
-        </div>
+
+        <div class="sipadu-bot-messages" id="sipaduBotMessages"></div>
+
+        <form class="sipadu-bot-input-bar" id="sipaduBotForm">
+            <input type="text" id="sipaduBotInput" placeholder="Ketik pertanyaan atau jumlah peserta..." autocomplete="off">
+            <button type="submit" class="sipadu-bot-send">Kirim</button>
+        </form>
     </div>
 
-    <div class="sipadu-bot-messages" id="sipaduBotMessages"></div>
-
-    <form class="sipadu-bot-input-bar" id="sipaduBotForm">
-        <input type="text" id="sipaduBotInput" placeholder="Ketik pertanyaan atau jumlah peserta..." autocomplete="off">
-        <button type="submit" class="sipadu-bot-send">Kirim</button>
-    </form>
+    {{-- TOMBOL ROBOT INTERAKTIF --}}
+    <button type="button" class="sipadu-bot-launcher" id="sipaduBotLauncher" aria-label="Buka Asisten SIPADU" title="Klik untuk membuka, atau geser ke pinggir kiri/kanan layar">
+        <span class="sipadu-bot-launcher-icon">
+            <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+                <g class="sipadu-robot-arm">
+                    <path d="M27 21L31.5 16.5" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+                    <circle cx="31.8" cy="16.2" r="1.8" fill="#86efac"/>
+                </g>
+                <g class="sipadu-robot-head">
+                    <line x1="16" y1="3" x2="16" y2="8" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                    <circle class="sipadu-robot-antenna-dot" cx="16" cy="3" r="2.4" fill="#86efac"/>
+                    <rect x="3.5" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                    <rect x="26" y="13.5" width="2.5" height="5" rx="1.2" fill="#86efac"/>
+                    <rect x="6" y="8" width="20" height="16" rx="6" fill="#ffffff"/>
+                    <rect x="8.8" y="11.8" width="14.4" height="8.4" rx="3.8" fill="#163626"/>
+                    <g class="sipadu-robot-eyes">
+                        <circle class="sipadu-robot-eye" cx="12.8" cy="15.5" r="1.8" fill="#86efac"/>
+                        <circle class="sipadu-robot-eye" cx="19.2" cy="15.5" r="1.8" fill="#86efac"/>
+                        <path d="M14.3 18.2Q16 19.4 17.7 18.2" stroke="#86efac" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+                    </g>
+                </g>
+                <path d="M11 26.5H21" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+        </span>
+        <span>Tanya SIPADU</span>
+    </button>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const dock = document.getElementById('sipaduBotDock');
     const launcher = document.getElementById('sipaduBotLauncher');
     const win = document.getElementById('sipaduBotWindow');
     const headerHandle = document.getElementById('sipaduBotHeader');
@@ -585,121 +605,90 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const STORAGE_KEY_HISTORY = 'sipadu_bot_history_v2';
     const STORAGE_KEY_OPEN = 'sipadu_bot_open_v2';
-    const STORAGE_KEY_EDGE_STATE = 'sipadu_bot_edge_state_v1';
+    const STORAGE_KEY_DOCK = 'sipadu_bot_dock_state_v1';
 
     const EDGE_MARGIN = window.innerWidth <= 480 ? 16 : 24;
-    const WIDGET_GAP = 12;
 
     /* ==========================================================
-       EDGE SNAPPING: OTOMATIS MENEMPEL KE PINGGIR HALAMAN
+       SATU KONTAINER DOCK: MENYATUKAN KOTAK CHAT & TOMBOL ROBOT
        ========================================================== */
-    function clampTop(top, el) {
-        const minTop = EDGE_MARGIN;
-        const maxTop = Math.max(minTop, window.innerHeight - el.offsetHeight - EDGE_MARGIN);
-        return Math.min(Math.max(minTop, top), maxTop);
+    function clampDockPosition(left, top) {
+        const maxLeft = Math.max(EDGE_MARGIN, window.innerWidth - dock.offsetWidth - EDGE_MARGIN);
+        const maxTop = Math.max(EDGE_MARGIN, window.innerHeight - dock.offsetHeight - EDGE_MARGIN);
+        return {
+            left: Math.min(Math.max(EDGE_MARGIN, left), maxLeft),
+            top: Math.min(Math.max(EDGE_MARGIN, top), maxTop),
+        };
     }
 
-    function getSnappedLeft(currentLeft, el) {
-        const centerX = currentLeft + (el.offsetWidth / 2);
-        const isLeftSide = centerX < (window.innerWidth / 2);
-        return isLeftSide
-            ? EDGE_MARGIN
-            : Math.max(EDGE_MARGIN, window.innerWidth - el.offsetWidth - EDGE_MARGIN);
+    function updateDockOrientation(centerX, centerY) {
+        const isLeft = centerX < (window.innerWidth / 2);
+        const isTop = centerY < (window.innerHeight * 0.35);
+        dock.classList.toggle('is-left', isLeft);
+        dock.classList.toggle('is-top', isTop);
     }
 
-    function syncWindowToLauncher(launcherLeft, launcherTop, animate = false) {
-        if (!win.classList.contains('is-open')) return;
+    function snapDockToEdge(animate = true) {
+        const rect = dock.getBoundingClientRect();
+        const centerX = rect.left + (rect.width / 2);
+        const centerY = rect.top + (rect.height / 2);
+        const isLeft = centerX < (window.innerWidth / 2);
 
-        win.classList.toggle('is-snapping', animate);
-        win.style.right = 'auto';
-        win.style.bottom = 'auto';
+        updateDockOrientation(centerX, centerY);
 
-        const isLeftSide = (launcherLeft + launcher.offsetWidth / 2) < (window.innerWidth / 2);
-        const targetLeft = isLeftSide
+        const updatedRect = dock.getBoundingClientRect();
+        const targetLeft = isLeft
             ? EDGE_MARGIN
-            : Math.max(EDGE_MARGIN, window.innerWidth - win.offsetWidth - EDGE_MARGIN);
+            : Math.max(EDGE_MARGIN, window.innerWidth - updatedRect.width - EDGE_MARGIN);
+        const targetTop = clampDockPosition(targetLeft, updatedRect.top).top;
 
-        let targetTop = launcherTop - win.offsetHeight - WIDGET_GAP;
-        if (targetTop < EDGE_MARGIN) {
-            const spaceBelow = window.innerHeight - (launcherTop + launcher.offsetHeight) - WIDGET_GAP - EDGE_MARGIN;
-            if (spaceBelow >= win.offsetHeight || launcherTop < (window.innerHeight - (launcherTop + launcher.offsetHeight))) {
-                targetTop = launcherTop + launcher.offsetHeight + WIDGET_GAP;
-            }
-        }
-
-        win.style.left = targetLeft + 'px';
-        win.style.top = clampTop(targetTop, win) + 'px';
+        dock.classList.toggle('is-snapping', animate);
+        dock.style.right = 'auto';
+        dock.style.bottom = 'auto';
+        dock.style.left = targetLeft + 'px';
+        dock.style.top = targetTop + 'px';
 
         if (animate) {
-            setTimeout(() => win.classList.remove('is-snapping'), 300);
+            setTimeout(() => dock.classList.remove('is-snapping'), 300);
         }
-    }
-
-    function syncLauncherToWindow(winLeft, winTop) {
-        launcher.style.right = 'auto';
-        launcher.style.bottom = 'auto';
-
-        const isLeftSide = (winLeft + win.offsetWidth / 2) < (window.innerWidth / 2);
-        const targetLeft = isLeftSide
-            ? EDGE_MARGIN
-            : Math.max(EDGE_MARGIN, window.innerWidth - launcher.offsetWidth - EDGE_MARGIN);
-
-        let targetTop = winTop + win.offsetHeight + WIDGET_GAP;
-        if (targetTop + launcher.offsetHeight > window.innerHeight - EDGE_MARGIN) {
-            targetTop = winTop - launcher.offsetHeight - WIDGET_GAP;
-        }
-
-        launcher.style.left = targetLeft + 'px';
-        launcher.style.top = clampTop(targetTop, launcher) + 'px';
-    }
-
-    function snapBothToNearestEdge() {
-        const lRect = launcher.getBoundingClientRect();
-        const isLeftSide = (lRect.left + lRect.width / 2) < (window.innerWidth / 2);
-
-        const snappedLauncherLeft = isLeftSide
-            ? EDGE_MARGIN
-            : Math.max(EDGE_MARGIN, window.innerWidth - launcher.offsetWidth - EDGE_MARGIN);
-        const snappedLauncherTop = clampTop(lRect.top, launcher);
-
-        launcher.classList.add('is-snapping');
-        launcher.style.right = 'auto';
-        launcher.style.bottom = 'auto';
-        launcher.style.left = snappedLauncherLeft + 'px';
-        launcher.style.top = snappedLauncherTop + 'px';
-
-        syncWindowToLauncher(snappedLauncherLeft, snappedLauncherTop, true);
-
-        setTimeout(() => launcher.classList.remove('is-snapping'), 300);
 
         try {
-            sessionStorage.setItem(STORAGE_KEY_EDGE_STATE, JSON.stringify({
-                side: isLeftSide ? 'left' : 'right',
-                top: snappedLauncherTop,
+            sessionStorage.setItem(STORAGE_KEY_DOCK, JSON.stringify({
+                side: isLeft ? 'left' : 'right',
+                topRatio: targetTop / Math.max(1, window.innerHeight),
             }));
         } catch (e) {}
     }
 
-    function applySavedEdgePosition() {
+    function applySavedDockState() {
         try {
-            const raw = sessionStorage.getItem(STORAGE_KEY_EDGE_STATE);
+            const raw = sessionStorage.getItem(STORAGE_KEY_DOCK);
             if (!raw) return;
             const state = JSON.parse(raw);
-            if (!state || typeof state.top !== 'number') return;
+            if (!state) return;
 
-            const left = state.side === 'left'
+            const isLeft = state.side === 'left';
+            dock.classList.toggle('is-left', isLeft);
+
+            const desiredTop = (typeof state.topRatio === 'number')
+                ? state.topRatio * window.innerHeight
+                : (window.innerHeight - dock.offsetHeight - EDGE_MARGIN);
+
+            updateDockOrientation(isLeft ? 0 : window.innerWidth, desiredTop + dock.offsetHeight / 2);
+
+            const targetLeft = isLeft
                 ? EDGE_MARGIN
-                : Math.max(EDGE_MARGIN, window.innerWidth - launcher.offsetWidth - EDGE_MARGIN);
-            const top = clampTop(state.top, launcher);
+                : Math.max(EDGE_MARGIN, window.innerWidth - dock.offsetWidth - EDGE_MARGIN);
+            const clamped = clampDockPosition(targetLeft, desiredTop);
 
-            launcher.style.right = 'auto';
-            launcher.style.bottom = 'auto';
-            launcher.style.left = left + 'px';
-            launcher.style.top = top + 'px';
+            dock.style.right = 'auto';
+            dock.style.bottom = 'auto';
+            dock.style.left = clamped.left + 'px';
+            dock.style.top = clamped.top + 'px';
         } catch (e) {}
     }
 
-    function makeEdgeDraggable(dragTarget, handleEl, isWindowDrag, onClickCallback) {
+    function attachDockDrag(handleEl, onClickCallback) {
         let isPointerDown = false;
         let hasMoved = false;
         let startX = 0;
@@ -709,19 +698,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         handleEl.addEventListener('pointerdown', function (e) {
             if (e.button !== 0 && e.pointerType === 'mouse') return;
-            if (e.target.closest('button, a, input') && handleEl !== dragTarget) return;
+            if (e.target.closest('button, a, input') && handleEl !== launcher) return;
 
             isPointerDown = true;
             hasMoved = false;
             startX = e.clientX;
             startY = e.clientY;
 
-            const rect = dragTarget.getBoundingClientRect();
+            const rect = dock.getBoundingClientRect();
             origLeft = rect.left;
             origTop = rect.top;
 
-            dragTarget.classList.remove('is-snapping');
-            win.classList.remove('is-snapping');
+            dock.classList.remove('is-snapping');
             handleEl.setPointerCapture(e.pointerId);
         });
 
@@ -732,39 +720,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!hasMoved && Math.hypot(dx, dy) > 5) {
                 hasMoved = true;
-                dragTarget.classList.add('is-dragging');
-                dragTarget.style.right = 'auto';
-                dragTarget.style.bottom = 'auto';
+                dock.classList.add('is-dragging');
+                dock.style.right = 'auto';
+                dock.style.bottom = 'auto';
             }
 
             if (hasMoved) {
-                const maxLeft = Math.max(EDGE_MARGIN, window.innerWidth - dragTarget.offsetWidth - EDGE_MARGIN);
-                const nextLeft = Math.min(Math.max(EDGE_MARGIN, origLeft + dx), maxLeft);
-                const nextTop = clampTop(origTop + dy, dragTarget);
-
-                dragTarget.style.left = nextLeft + 'px';
-                dragTarget.style.top = nextTop + 'px';
-
-                if (isWindowDrag) {
-                    syncLauncherToWindow(nextLeft, nextTop);
-                } else {
-                    syncWindowToLauncher(nextLeft, nextTop, false);
-                }
+                const clamped = clampDockPosition(origLeft + dx, origTop + dy);
+                dock.style.left = clamped.left + 'px';
+                dock.style.top = clamped.top + 'px';
             }
         });
 
         function finishDrag(e) {
             if (!isPointerDown) return;
             isPointerDown = false;
-            dragTarget.classList.remove('is-dragging');
+            dock.classList.remove('is-dragging');
 
             try {
                 handleEl.releasePointerCapture(e.pointerId);
             } catch (err) {}
 
             if (hasMoved) {
-                // Jika dilepas di tengah layar, otomatis bergeser menempel ke pinggir kiri/kanan terdekat
-                snapBothToNearestEdge();
+                snapDockToEdge(true);
             } else if (typeof onClickCallback === 'function') {
                 onClickCallback();
             }
@@ -774,13 +752,12 @@ document.addEventListener('DOMContentLoaded', function () {
         handleEl.addEventListener('pointercancel', finishDrag);
     }
 
-    applySavedEdgePosition();
-    makeEdgeDraggable(launcher, launcher, false, () => toggleChat());
-    makeEdgeDraggable(win, headerHandle, true, null);
+    attachDockDrag(launcher, () => toggleChat());
+    attachDockDrag(headerHandle, null);
 
     window.addEventListener('resize', function () {
-        if (launcher.style.left) {
-            snapBothToNearestEdge();
+        if (dock.style.left) {
+            snapDockToEdge(false);
         }
     });
 
@@ -947,12 +924,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function toggleChat(openState) {
         const shouldOpen = typeof openState === 'boolean' ? openState : !win.classList.contains('is-open');
+
+        // Jaga posisi tombol robot tetap di tempatnya saat kotak chat dibuka/ditutup
+        const prevLauncherRect = launcher.getBoundingClientRect();
+
         win.classList.toggle('is-open', shouldOpen);
         sessionStorage.setItem(STORAGE_KEY_OPEN, shouldOpen ? '1' : '0');
 
+        if (dock.style.left) {
+            const newLauncherRect = launcher.getBoundingClientRect();
+            const deltaY = prevLauncherRect.top - newLauncherRect.top;
+            const currentTop = parseFloat(dock.style.top || '0') + deltaY;
+            const clamped = clampDockPosition(parseFloat(dock.style.left), currentTop);
+            dock.style.left = clamped.left + 'px';
+            dock.style.top = clamped.top + 'px';
+            snapDockToEdge(false);
+        }
+
         if (shouldOpen) {
-            const rect = launcher.getBoundingClientRect();
-            syncWindowToLauncher(rect.left, rect.top, false);
             if (messagesBox.innerHTML.trim() === '') {
                 sendBotPayload({ message: 'halo' });
             }
@@ -966,10 +955,14 @@ document.addEventListener('DOMContentLoaded', function () {
         messagesBox.querySelector('.sipadu-typing')?.remove();
         messagesBox.scrollTop = messagesBox.scrollHeight;
     }
+
+    applySavedDockState();
+
     if (sessionStorage.getItem(STORAGE_KEY_OPEN) === '1') {
         win.classList.add('is-open');
-        const rect = launcher.getBoundingClientRect();
-        syncWindowToLauncher(rect.left, rect.top, false);
+        if (dock.style.left) {
+            snapDockToEdge(false);
+        }
     }
 
     closeBtn?.addEventListener('click', () => toggleChat(false));
