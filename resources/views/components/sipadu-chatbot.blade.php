@@ -7,14 +7,14 @@
         z-index: 99980;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 18px 10px 12px;
+        gap: 11px;
+        padding: 10px 20px 10px 12px;
         border-radius: 999px;
         border: 1px solid rgba(255, 255, 255, .28);
         background: #237c4d;
         color: #ffffff;
         font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-        font-size: 13px;
+        font-size: 13.5px;
         font-weight: 700;
         cursor: pointer;
         box-shadow: 0 10px 26px rgba(22, 54, 38, .22);
@@ -28,20 +28,20 @@
     }
 
     .sipadu-bot-launcher-icon {
-        width: 34px;
-        height: 34px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, .16);
+        background: rgba(255, 255, 255, .18);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
     }
 
-    /* ANIMASI ROBOT INTERAKTIF */
+    /* ANIMASI ROBOT INTERAKTIF (UKURAN DIPERBESAR) */
     .sipadu-robot-svg {
-        width: 24px;
-        height: 24px;
+        width: 31px;
+        height: 31px;
         overflow: visible;
         animation: sipaduRobotFloat 3s ease-in-out infinite;
     }
@@ -103,11 +103,11 @@
     .sipadu-bot-window {
         position: fixed;
         right: 24px;
-        bottom: 84px;
+        bottom: 88px;
         z-index: 99985;
         width: min(390px, calc(100vw - 32px));
         height: 520px;
-        max-height: calc(100vh - 112px);
+        max-height: calc(100vh - 116px);
         display: none;
         flex-direction: column;
         border-radius: 18px;
@@ -148,10 +148,10 @@
     }
 
     .sipadu-bot-avatar {
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, .16);
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, .18);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -383,11 +383,11 @@
         .sipadu-bot-launcher {
             right: 16px;
             bottom: 16px;
-            padding: 9px 15px 9px 11px;
+            padding: 9px 16px 9px 11px;
         }
         .sipadu-bot-window {
             right: 16px;
-            bottom: 74px;
+            bottom: 78px;
             width: calc(100vw - 32px);
         }
     }
