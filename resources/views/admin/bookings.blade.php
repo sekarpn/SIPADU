@@ -102,6 +102,36 @@
     line-height: 1.55;
 }
 
+/* TOMBOL DOWNLOAD DATA */
+.booking-page .bp-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: #237c4d;
+    color: #ffffff !important;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none !important;
+    border: 1px solid rgba(255, 255, 255, .28);
+    box-shadow: 0 4px 14px rgba(35, 124, 77, .22);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.booking-page .bp-download-btn:hover {
+    background: #1b633d;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(35, 124, 77, .28);
+}
+
+.booking-page .bp-download-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
 /* SCORECARDS */
 .booking-page .bp-stats {
     display: grid;
@@ -1276,6 +1306,16 @@ body.bp-drawer-open {
             <h1>Kelola Peminjaman Auditorium</h1>
             <p>Kelola pengajuan peminjaman, periksa jadwal, dan tentukan keputusan untuk setiap permohonan.</p>
         </div>
+
+        <a
+            href="{{ route('admin.bookings.export', request()->query()) }}"
+            class="bp-download-btn"
+            id="exportBookingBtn"
+            title="Unduh rekap data peminjaman (CSV/Excel)"
+        >
+            <i data-lucide="download"></i>
+            <span>Download Data</span>
+        </a>
     </div>
 
     {{-- STATISTIK --}}
@@ -2015,14 +2055,13 @@ body.bp-drawer-open {
         const tabsWrap = document.getElementById('bookingStatusTabs');
         const paginationWrap = document.getElementById('bookingPagination');
         const templatesWrap = document.getElementById('bpDrawerTemplates');
+        const exportBtn = document.getElementById('exportBookingBtn');
 
         if (!form || !searchInput || !tableWrap) return;
 
         let debounceTimer = null;
         let activeController = null;
 
-        // Nilai filter auditorium dan tanggal yang sudah diterapkan.
-        // Perubahan dropdown tidak diterapkan sampai tombol Terapkan Filter diklik.
         let appliedFilters = {
             auditorium: form.elements.auditorium ? form.elements.auditorium.value : '',
             date: form.elements.date ? form.elements.date.value : ''
@@ -2086,6 +2125,11 @@ body.bp-drawer-open {
 
                 window.history.replaceState({}, '', targetUrl);
 
+                if (exportBtn) {
+                    const parsedUrl = new URL(targetUrl, window.location.origin);
+                    exportBtn.href = "{{ route('admin.bookings.export') }}" + parsedUrl.search;
+                }
+
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
@@ -2115,7 +2159,6 @@ body.bp-drawer-open {
             });
         }
 
-        // Auditorium dan tanggal hanya diterapkan saat tombol Terapkan Filter diklik.
         form.addEventListener('submit', function (event) {
             event.preventDefault();
             clearTimeout(debounceTimer);
@@ -2187,9 +2230,5 @@ body.bp-drawer-open {
             closeBookingDrawer();
         }
     });
-
-    if (window.lucide) {
-        window.lucide.createIcons();
-    }
 </script>
 @endsection

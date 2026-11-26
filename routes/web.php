@@ -6,10 +6,12 @@ use App\Http\Controllers\{
     PublicController,
     DashboardController,
     BookingController,
-    AdminController
+    AdminController,
+    ChatbotController
 };
 
 Route::get('/', [PublicController::class, 'landing'])->name('landing');
+Route::post('/chatbot/reply', [ChatbotController::class, 'reply'])->name('chatbot.reply');
 
 // AUTH
 Route::middleware('guest')->group(function () {
@@ -70,6 +72,7 @@ Route::middleware(['auth', 'role:admin'])
 
         // PENGELOLAAN PENGAJUAN
         Route::get('/pengajuan', [BookingController::class, 'adminIndex'])->name('bookings');
+        Route::get('/pengajuan/export', [BookingController::class, 'adminExport'])->name('bookings.export');
 
         // DOWNLOAD SURAT PEMINJAMAN
         Route::get('/pengajuan/{booking}/surat', [BookingController::class, 'downloadLetter'])

@@ -4,7 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ $title ?? 'SIPADU' }} · SIPADU UPNVJ</title>
+    <title>{{ $title ?? 'SIPADU' }}</title>
+
+    {{-- FAVICON SIPADU --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/logo/LogoFavicon_sipadu.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

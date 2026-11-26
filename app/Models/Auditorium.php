@@ -2,33 +2,67 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Auditorium extends Model
 {
-    // Menentukan nama tabel yang benar di database
+    use HasFactory;
+
     protected $table = 'auditoriums';
 
     protected $fillable = [
         'name',
+        'lokasi_kampus',
+        'lokasi_gedung',
+        'jam_mulai',
+        'jam_selesai',
         'location',
         'capacity',
-        'description',
         'facilities',
-        'is_active',
+        'description',
         'image_path',
+        'images',
+        'is_active',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'facilities' => 'array',
+        'images' => 'array',
+        'is_active' => 'boolean',
+    ];
+
+    /* Mengambil seluruh path foto auditorium (kompatibel dengan data lama `image_path`) */
+    public function getAllImagesAttribute(): array
     {
-        return [
-            'facilities' => 'array',
-            'is_active' => 'boolean',
-        ];
+        $images = $this->images;
+        if (is_string($images)) {
+            $decoded = json_decode($images, true);
+            $images = is_array($decoded) ? $decoded : [];
+        }
+
+        $images = array_values(array_filter(
+            is_array($images) ? $images : [],
+            fn ($path) => is_string($path) && trim($path) !== ''
+        ));
+
+        if (empty($images) && is_string($this->image_path) && trim($this->image_path) !== '') {
+            $images[] = trim($this->image_path);
+        }
+
+        return $images;
     }
 
-    public function bookings()
+    public function getJamOperasionalAttribute(): string
     {
-        return $this->hasMany(Booking::class);
+        if (!$this->jam_mulai || !$this->jam_selesai) {
+            return '-';
+        }
+
+        $mulai = Carbon::parse($this->jam_mulai)->format('H:i');
+        $selesai = Carbon::parse($this->jam_selesai)->format('H:i');
+
+        return "{$mulai} - {$selesai}";
     }
 }

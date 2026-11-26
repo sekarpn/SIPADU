@@ -18,10 +18,31 @@
         min-height: 100vh;
     }
 
+    /* Cegah halaman dashboard melebar dan memunculkan scrollbar horizontal */
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: clip !important;
+    }
+
+    .app-layout {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: clip !important;
+    }
+
+    .app-layout > main,
+    .app-layout > main > .main-content,
+    .dashboard-page {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
     .dashboard-page {
         width: 100%;
-        box-sizing: border-box;
         padding: 10px 10px 35px;
+        overflow-x: clip;
     }
 
     /* HEADER */
@@ -243,16 +264,24 @@
         background: rgba(255, 255, 255, 0.42) !important;
         border: 1px solid rgba(255, 255, 255, 0.35) !important;
         border-radius: 12px;
-        overflow-x: auto;
+        overflow-x: hidden;
         overflow-y: hidden;
     }
 
     .dashboard-table {
         width: 100%;
+        min-width: 0;
+        max-width: 100%;
         height: 100%;
+        table-layout: fixed;
         border-collapse: collapse;
         font-size: 12px;
-        min-width: 480px;
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+        overflow-wrap: anywhere;
+        word-break: normal;
     }
 
     .dashboard-table th {
@@ -528,11 +557,12 @@
 
     .auditorium-meta span {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 7px;
         font-size: 11px;
         color: #3c5446;
         font-weight: 500;
+        line-height: 1.4;
     }
 
     .auditorium-meta svg {
@@ -540,6 +570,7 @@
         height: 14px;
         color: #237c4d;
         flex-shrink: 0;
+        margin-top: 1px;
     }
 
     .auditorium-actions {
@@ -1053,20 +1084,44 @@
             @forelse($auditoriums as $a)
 
                 @php
-                    $description = is_string($a->description)
+                    $description = is_string($a->description) && trim($a->description) !== ''
                         ? $a->description
                         : 'Informasi auditorium belum tersedia.';
 
-                    $location = is_string($a->location)
-                        ? $a->location
-                        : 'Lokasi belum tersedia';
+                    $lokasiKampus = is_string($a->lokasi_kampus) && trim($a->lokasi_kampus) !== ''
+                        ? trim($a->lokasi_kampus)
+                        : (is_string($a->location) && trim($a->location) !== '' ? trim($a->location) : 'Lokasi kampus belum tersedia');
 
-                    $capacity = is_scalar($a->capacity)
-                        ? $a->capacity
+                    $lokasiGedung = is_string($a->lokasi_gedung) && trim($a->lokasi_gedung) !== ''
+                        ? trim($a->lokasi_gedung)
+                        : null;
+
+                    $jamMulaiFmt = $a->jam_mulai
+                        ? \Carbon\Carbon::parse($a->jam_mulai)->format('H:i')
+                        : null;
+
+                    $jamSelesaiFmt = $a->jam_selesai
+                        ? \Carbon\Carbon::parse($a->jam_selesai)->format('H:i')
+                        : null;
+
+                    $jamOperasional = ($jamMulaiFmt && $jamSelesaiFmt)
+                        ? ($jamMulaiFmt . ' - ' . $jamSelesaiFmt)
                         : 'Belum tersedia';
 
-                    $facilities = is_array($a->facilities)
-                        ? $a->facilities
+                    $capacity = is_scalar($a->capacity) && trim((string) $a->capacity) !== ''
+                        ? (is_numeric($a->capacity) ? $a->capacity . ' orang' : $a->capacity)
+                        : 'Belum tersedia';
+
+                    $rawFacilities = $a->facilities;
+                    if (is_string($rawFacilities)) {
+                        $decodedFacilities = json_decode($rawFacilities, true);
+                        $rawFacilities = is_array($decodedFacilities)
+                            ? $decodedFacilities
+                            : array_filter(array_map('trim', explode(',', $rawFacilities)));
+                    }
+
+                    $facilities = is_array($rawFacilities)
+                        ? $rawFacilities
                         : [];
 
                     $facilities = array_filter($facilities, function ($item) {
@@ -1113,7 +1168,19 @@
                         <div class="auditorium-meta">
                             <span>
                                 <i data-lucide="map-pin"></i>
-                                {{ $location }}
+                                {{ $lokasiKampus }}
+                            </span>
+
+                            @if($lokasiGedung)
+                                <span>
+                                    <i data-lucide="building"></i>
+                                    {{ \Illuminate\Support\Str::limit($lokasiGedung, 55) }}
+                                </span>
+                            @endif
+
+                            <span>
+                                <i data-lucide="clock"></i>
+                                Jam Operasional: {{ $jamOperasional }}
                             </span>
 
                             <span>
@@ -1179,8 +1246,24 @@
                                 <div class="modal-info-item">
                                     <i data-lucide="map-pin"></i>
                                     <div>
-                                        <strong>Lokasi</strong><br>
-                                        {{ $location }}
+                                        <strong>Lokasi Kampus</strong><br>
+                                        {{ $lokasiKampus }}
+                                    </div>
+                                </div>
+
+                                <div class="modal-info-item">
+                                    <i data-lucide="building"></i>
+                                    <div>
+                                        <strong>Lokasi Gedung</strong><br>
+                                        {{ $lokasiGedung ?: 'Informasi lokasi gedung belum tersedia' }}
+                                    </div>
+                                </div>
+
+                                <div class="modal-info-item">
+                                    <i data-lucide="clock"></i>
+                                    <div>
+                                        <strong>Jam Operasional</strong><br>
+                                        {{ $jamOperasional }}
                                     </div>
                                 </div>
 

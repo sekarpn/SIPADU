@@ -263,81 +263,6 @@
         flex-shrink: 0 !important;
     }
 
-    /* LOGOUT */
-    html body .app-layout aside#mainSidebar.sidebar form.logout,
-    aside#mainSidebar.sidebar form.logout {
-        margin-top: auto !important;
-        margin-bottom: 0 !important;
-        padding-top: 10px !important;
-        border-top: 1px solid rgba(22,54,38,.08) !important;
-        background: transparent !important;
-    }
-
-    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"],
-    aside#mainSidebar.sidebar form.logout button[type="submit"] {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        gap: 10px !important;
-        width: 100% !important;
-        min-height: 37px !important;
-        margin: 1.5px 0 !important;
-        padding: 8px 11px !important;
-        border: 1px solid transparent !important;
-        border-radius: 10px !important;
-        background: transparent !important;
-        background-color: transparent !important;
-        background-image: none !important;
-        color: #3c5446 !important;
-        font: 700 12.5px 'Plus Jakarta Sans', 'Instrument Sans', sans-serif !important;
-        letter-spacing: normal !important;
-        text-transform: none !important;
-        cursor: pointer;
-        white-space: nowrap;
-        box-shadow: none !important;
-        transform: none !important;
-        transition: background .18s ease, background-color .18s ease, color .18s ease, border-color .18s ease;
-    }
-
-    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] svg,
-    aside#mainSidebar.sidebar form.logout button[type="submit"] svg {
-        width: 17px !important;
-        height: 17px !important;
-        min-width: 17px !important;
-        color: #3c5446 !important;
-        stroke: currentColor !important;
-        fill: none !important;
-        transition: color .18s ease;
-    }
-
-    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] span,
-    aside#mainSidebar.sidebar form.logout button[type="submit"] span {
-        display: inline !important;
-        color: inherit !important;
-    }
-
-    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:hover,
-    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible,
-    aside#mainSidebar.sidebar form.logout button[type="submit"]:hover,
-    aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible {
-        background: rgba(254, 226, 226, .92) !important;
-        background-color: rgba(254, 226, 226, .92) !important;
-        background-image: none !important;
-        border-color: rgba(220, 38, 38, .26) !important;
-        color: #dc2626 !important;
-        box-shadow: none !important;
-        transform: none !important;
-    }
-
-    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:hover svg,
-    html body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible svg,
-    aside#mainSidebar.sidebar form.logout button[type="submit"]:hover svg,
-    aside#mainSidebar.sidebar form.logout button[type="submit"]:focus-visible svg {
-        color: #dc2626 !important;
-        stroke: currentColor !important;
-    }
-
-
     /* COLLAPSED SIDEBAR */
     .app-layout.sidebar-closed .sidebar,
     html.sipadu-sidebar-closed .app-layout .sidebar {
@@ -362,9 +287,7 @@
     html.sipadu-sidebar-closed .app-layout .sidebar .nav-link span,
     html.sipadu-sidebar-closed .app-layout .sidebar .nav-dropdown-toggle span,
     html.sipadu-sidebar-closed .app-layout .sidebar .nav-dropdown-caret,
-    html.sipadu-sidebar-closed .app-layout .sidebar .nav-sublink span,
-    html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] span,
-    html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] span {
+    html.sipadu-sidebar-closed .app-layout .sidebar .nav-sublink span {
         display: none !important;
     }
 
@@ -405,13 +328,6 @@
         font-size: 9px !important;
     }
 
-    html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"],
-    html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] {
-        justify-content: center !important;
-        gap: 0 !important;
-        padding: 9px 0 !important;
-    }
-
     .app-layout.sidebar-closed .sidebar .brand-icon,
     html.sipadu-sidebar-closed .app-layout .sidebar .brand-icon {
         width: 40px !important;
@@ -419,8 +335,8 @@
         min-width: 40px !important;
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
+    /* RESPONSIVE (HANYA UNTUK LAYAR HP DI BAWAH 640px) */
+    @media (max-width: 640px) {
         .sidebar,
         #mainSidebar {
             width: 248px !important;
@@ -444,9 +360,7 @@
         html.sipadu-sidebar-closed .app-layout .sidebar .nav-link span,
         html.sipadu-sidebar-closed .app-layout .sidebar .nav-dropdown-toggle span,
         html.sipadu-sidebar-closed .app-layout .sidebar .nav-dropdown-caret,
-        html.sipadu-sidebar-closed .app-layout .sidebar .nav-sublink span,
-        html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"] span,
-        html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] span {
+        html.sipadu-sidebar-closed .app-layout .sidebar .nav-sublink span {
             display: inline !important;
         }
 
@@ -482,13 +396,6 @@
             height: 20px !important;
             padding: 0 6px !important;
             font-size: 10px !important;
-        }
-
-        html.sipadu-sidebar-closed body .app-layout aside#mainSidebar.sidebar form.logout button[type="submit"],
-        html body .app-layout.sidebar-closed aside#mainSidebar.sidebar form.logout button[type="submit"] {
-            justify-content: flex-start !important;
-            gap: 10px !important;
-            padding: 8px 11px !important;
         }
     }
 </style>
@@ -660,20 +567,6 @@
             </a>
         </div>
     </div>
-
-    {{-- LOGOUT --}}
-    <form
-        method="POST"
-        action="{{ route('logout') }}"
-        class="logout"
-    >
-        @csrf
-
-        <button type="submit" title="Logout">
-            <i data-lucide="log-out"></i>
-            <span>Logout</span>
-        </button>
-    </form>
 
 </aside>
 
