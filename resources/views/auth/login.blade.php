@@ -529,7 +529,7 @@
                         name="email"
                         type="email"
                         value="{{ old('email') }}"
-                        placeholder="Masukkan email"
+                        placeholder="Masukkan email UPNVJ"
                         autocomplete="username"
                         required
                         autofocus
