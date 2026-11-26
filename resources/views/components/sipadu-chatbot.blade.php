@@ -1,5 +1,5 @@
 <style>
-    /* TOMBOL FLOATING ROBOT MINIMALIS (TANPA GRADASI) */
+    /* TOMBOL FLOATING ROBOT MINIMALIS (DRAGGABLE) */
     .sipadu-bot-launcher {
         position: fixed;
         right: 24px;
@@ -16,15 +16,22 @@
         font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
         font-size: 13.5px;
         font-weight: 700;
-        cursor: pointer;
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
         box-shadow: 0 10px 26px rgba(22, 54, 38, .22);
-        transition: transform .22s ease, background .2s ease, box-shadow .22s ease;
+        transition: background .2s ease, box-shadow .22s ease;
     }
 
     .sipadu-bot-launcher:hover {
         background: #1b663f;
-        transform: translateY(-3px);
         box-shadow: 0 14px 30px rgba(22, 54, 38, .28);
+    }
+
+    .sipadu-bot-launcher.is-dragging {
+        cursor: grabbing;
+        opacity: .94;
+        box-shadow: 0 18px 38px rgba(22, 54, 38, .35);
     }
 
     .sipadu-bot-launcher-icon {
@@ -37,6 +44,11 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        pointer-events: none;
+    }
+
+    .sipadu-bot-launcher span {
+        pointer-events: none;
     }
 
     /* CINCIN RADAR HALUS DI BELAKANG ROBOT */
@@ -56,7 +68,7 @@
         100% { transform: scale(1.22); opacity: 0; }
     }
 
-    /* ANIMASI ROBOT INTERAKTIF (UKURAN DIPERBESAR & LEBIH TERLIHAT) */
+    /* ANIMASI ROBOT INTERAKTIF */
     .sipadu-robot-svg {
         width: 34px;
         height: 34px;
@@ -173,7 +185,7 @@
         to { transform: scale(1.5); opacity: 1; }
     }
 
-    /* JENDELA POPUP CHATBOT MINIMALIS SOLID */
+    /* JENDELA POPUP CHATBOT MINIMALIS SOLID (DRAGGABLE LEWAT HEADER) */
     .sipadu-bot-window {
         position: fixed;
         right: 24px;
@@ -198,12 +210,17 @@
         animation: sipaduBotPop .22s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
+    .sipadu-bot-window.is-dragging {
+        box-shadow: 0 24px 56px rgba(22, 54, 38, .26);
+        user-select: none;
+    }
+
     @keyframes sipaduBotPop {
         from { opacity: 0; transform: translateY(12px) scale(.97); }
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* HEADER SOLID HIJAU */
+    /* HEADER SOLID HIJAU (AREA PEGANGAN GESER) */
     .sipadu-bot-header {
         display: flex;
         align-items: center;
@@ -213,12 +230,20 @@
         background: #237c4d;
         color: #ffffff;
         flex-shrink: 0;
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+    }
+
+    .sipadu-bot-window.is-dragging .sipadu-bot-header {
+        cursor: grabbing;
     }
 
     .sipadu-bot-header-info {
         display: flex;
         align-items: center;
         gap: 11px;
+        pointer-events: none;
     }
 
     .sipadu-bot-avatar {
@@ -467,8 +492,8 @@
     }
 </style>
 
-{{-- TOMBOL ROBOT INTERAKTIF --}}
-<button type="button" class="sipadu-bot-launcher" id="sipaduBotLauncher" aria-label="Buka Asisten SIPADU">
+{{-- TOMBOL ROBOT INTERAKTIF (BISA DIGESER) --}}
+<button type="button" class="sipadu-bot-launcher" id="sipaduBotLauncher" aria-label="Buka Asisten SIPADU" title="Klik untuk membuka, atau tahan & geser untuk memindahkan posisi">
     <span class="sipadu-bot-launcher-icon">
         <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
             <g class="sipadu-robot-arm">
@@ -494,9 +519,9 @@
     <span>Tanya SIPADU</span>
 </button>
 
-{{-- JENDELA CHATBOT MINIMALIS --}}
+{{-- JENDELA CHATBOT MINIMALIS (BISA DIGESER LEWAT HEADER) --}}
 <div class="sipadu-bot-window" id="sipaduBotWindow" role="dialog" aria-label="Asisten Virtual SIPADU">
-    <div class="sipadu-bot-header">
+    <div class="sipadu-bot-header" id="sipaduBotHeader" title="Tahan & geser untuk memindahkan jendela">
         <div class="sipadu-bot-header-info">
             <div class="sipadu-bot-avatar">
                 <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
@@ -543,6 +568,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const launcher = document.getElementById('sipaduBotLauncher');
     const win = document.getElementById('sipaduBotWindow');
+    const headerHandle = document.getElementById('sipaduBotHeader');
     const closeBtn = document.getElementById('sipaduBotClose');
     const resetBtn = document.getElementById('sipaduBotReset');
     const statusText = document.getElementById('sipaduBotStatus');
@@ -554,7 +580,147 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const STORAGE_KEY_HISTORY = 'sipadu_bot_history_v2';
     const STORAGE_KEY_OPEN = 'sipadu_bot_open_v2';
+    const STORAGE_KEY_POS_LAUNCHER = 'sipadu_bot_pos_launcher_v1';
+    const STORAGE_KEY_POS_WINDOW = 'sipadu_bot_pos_window_v1';
 
+    /* ==========================================================
+       FITUR DRAGGABLE (GESER BEBAS + BATAS LAYAR + SIMPAN POSISI)
+       ========================================================== */
+    function clampPosition(left, top, el) {
+        const margin = 12;
+        const maxLeft = Math.max(margin, window.innerWidth - el.offsetWidth - margin);
+        const maxTop = Math.max(margin, window.innerHeight - el.offsetHeight - margin);
+        return {
+            left: Math.min(Math.max(margin, left), maxLeft),
+            top: Math.min(Math.max(margin, top), maxTop),
+        };
+    }
+
+    function applySavedPosition(el, storageKey) {
+        try {
+            const raw = sessionStorage.getItem(storageKey);
+            if (!raw) return;
+            const pos = JSON.parse(raw);
+            if (typeof pos.left === 'number' && typeof pos.top === 'number') {
+                el.style.right = 'auto';
+                el.style.bottom = 'auto';
+                const clamped = clampPosition(pos.left, pos.top, el);
+                el.style.left = clamped.left + 'px';
+                el.style.top = clamped.top + 'px';
+            }
+        } catch (e) {}
+    }
+
+    function makeDraggable(targetEl, handleEl, storageKey, onClickCallback) {
+        let isPointerDown = false;
+        let hasMoved = false;
+        let startX = 0;
+        let startY = 0;
+        let origLeft = 0;
+        let origTop = 0;
+
+        handleEl.addEventListener('pointerdown', function (e) {
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            if (e.target.closest('button, a, input')) {
+                if (handleEl !== targetEl) return;
+            }
+
+            isPointerDown = true;
+            hasMoved = false;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const rect = targetEl.getBoundingClientRect();
+            origLeft = rect.left;
+            origTop = rect.top;
+
+            handleEl.setPointerCapture(e.pointerId);
+        });
+
+        handleEl.addEventListener('pointermove', function (e) {
+            if (!isPointerDown) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            if (!hasMoved && Math.hypot(dx, dy) > 5) {
+                hasMoved = true;
+                targetEl.classList.add('is-dragging');
+                targetEl.style.right = 'auto';
+                targetEl.style.bottom = 'auto';
+            }
+
+            if (hasMoved) {
+                const clamped = clampPosition(origLeft + dx, origTop + dy, targetEl);
+                targetEl.style.left = clamped.left + 'px';
+                targetEl.style.top = clamped.top + 'px';
+            }
+        });
+
+        function finishDrag(e) {
+            if (!isPointerDown) return;
+            isPointerDown = false;
+            targetEl.classList.remove('is-dragging');
+
+            try {
+                handleEl.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+
+            if (hasMoved) {
+                const rect = targetEl.getBoundingClientRect();
+                try {
+                    sessionStorage.setItem(storageKey, JSON.stringify({
+                        left: rect.left,
+                        top: rect.top,
+                    }));
+                } catch (err) {}
+            } else if (typeof onClickCallback === 'function') {
+                onClickCallback();
+            }
+        }
+
+        handleEl.addEventListener('pointerup', finishDrag);
+        handleEl.addEventListener('pointercancel', finishDrag);
+    }
+
+    function positionWindowNearLauncher() {
+        if (sessionStorage.getItem(STORAGE_KEY_POS_WINDOW)) {
+            applySavedPosition(win, STORAGE_KEY_POS_WINDOW);
+            return;
+        }
+        const rect = launcher.getBoundingClientRect();
+        win.style.right = 'auto';
+        win.style.bottom = 'auto';
+        const desiredLeft = rect.right - win.offsetWidth;
+        const desiredTop = rect.top - win.offsetHeight - 12;
+        const clamped = clampPosition(
+            desiredLeft < 12 ? rect.left : desiredLeft,
+            desiredTop < 12 ? rect.bottom + 12 : desiredTop,
+            win
+        );
+        win.style.left = clamped.left + 'px';
+        win.style.top = clamped.top + 'px';
+    }
+
+    applySavedPosition(launcher, STORAGE_KEY_POS_LAUNCHER);
+    makeDraggable(launcher, launcher, STORAGE_KEY_POS_LAUNCHER, () => toggleChat());
+    makeDraggable(win, headerHandle, STORAGE_KEY_POS_WINDOW, null);
+
+    window.addEventListener('resize', function () {
+        if (launcher.style.left) {
+            const c1 = clampPosition(parseFloat(launcher.style.left), parseFloat(launcher.style.top), launcher);
+            launcher.style.left = c1.left + 'px';
+            launcher.style.top = c1.top + 'px';
+        }
+        if (win.classList.contains('is-open') && win.style.left) {
+            const c2 = clampPosition(parseFloat(win.style.left), parseFloat(win.style.top), win);
+            win.style.left = c2.left + 'px';
+            win.style.top = c2.top + 'px';
+        }
+    });
+
+    /* ==========================================================
+       LOGIKA CHATBOT
+       ========================================================== */
     function formatMarkdownBold(text) {
         return text
             .replace(/&/g, '&amp;')
@@ -718,10 +884,11 @@ document.addEventListener('DOMContentLoaded', function () {
         win.classList.toggle('is-open', shouldOpen);
         sessionStorage.setItem(STORAGE_KEY_OPEN, shouldOpen ? '1' : '0');
 
-        if (shouldOpen && messagesBox.innerHTML.trim() === '') {
-            sendBotPayload({ message: 'halo' });
-        }
         if (shouldOpen) {
+            positionWindowNearLauncher();
+            if (messagesBox.innerHTML.trim() === '') {
+                sendBotPayload({ message: 'halo' });
+            }
             setTimeout(() => input.focus(), 180);
         }
     }
@@ -734,9 +901,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (sessionStorage.getItem(STORAGE_KEY_OPEN) === '1') {
         win.classList.add('is-open');
+        positionWindowNearLauncher();
     }
 
-    launcher?.addEventListener('click', () => toggleChat());
     closeBtn?.addEventListener('click', () => toggleChat(false));
     resetBtn?.addEventListener('click', resetConversation);
 
