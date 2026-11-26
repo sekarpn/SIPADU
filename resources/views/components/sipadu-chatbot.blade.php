@@ -1,5 +1,5 @@
 <style>
-    /* TOMBOL FLOATING ROBOT MINIMALIS (DRAGGABLE) */
+    /* TOMBOL FLOATING ROBOT MINIMALIS (EDGE-SNAP DRAGGABLE) */
     .sipadu-bot-launcher {
         position: fixed;
         right: 24px;
@@ -32,6 +32,11 @@
         cursor: grabbing;
         opacity: .94;
         box-shadow: 0 18px 38px rgba(22, 54, 38, .35);
+    }
+
+    .sipadu-bot-launcher.is-snapping,
+    .sipadu-bot-window.is-snapping {
+        transition: left .28s cubic-bezier(0.22, 1, 0.36, 1), top .28s cubic-bezier(0.22, 1, 0.36, 1), background .2s ease, box-shadow .22s ease !important;
     }
 
     .sipadu-bot-launcher-icon {
@@ -492,8 +497,8 @@
     }
 </style>
 
-{{-- TOMBOL ROBOT INTERAKTIF (BISA DIGESER) --}}
-<button type="button" class="sipadu-bot-launcher" id="sipaduBotLauncher" aria-label="Buka Asisten SIPADU" title="Klik untuk membuka, atau tahan & geser untuk memindahkan posisi">
+{{-- TOMBOL ROBOT INTERAKTIF (MENEMPEL KE PINGGIR LAYAR) --}}
+<button type="button" class="sipadu-bot-launcher" id="sipaduBotLauncher" aria-label="Buka Asisten SIPADU" title="Klik untuk membuka, atau geser ke pinggir kiri/kanan layar">
     <span class="sipadu-bot-launcher-icon">
         <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
             <g class="sipadu-robot-arm">
@@ -519,9 +524,9 @@
     <span>Tanya SIPADU</span>
 </button>
 
-{{-- JENDELA CHATBOT MINIMALIS (OTOMATIS MENGIKUTI TOMBOL ROBOT) --}}
+{{-- JENDELA CHATBOT MINIMALIS (MENGIKUTI PINGGIR TOMBOL ROBOT) --}}
 <div class="sipadu-bot-window" id="sipaduBotWindow" role="dialog" aria-label="Asisten Virtual SIPADU">
-    <div class="sipadu-bot-header" id="sipaduBotHeader" title="Tahan & geser untuk memindahkan widget">
+    <div class="sipadu-bot-header" id="sipaduBotHeader" title="Geser ke pinggir kiri/kanan layar">
         <div class="sipadu-bot-header-info">
             <div class="sipadu-bot-avatar">
                 <svg class="sipadu-robot-svg" viewBox="0 0 34 34" fill="none" aria-hidden="true">
@@ -580,99 +585,121 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const STORAGE_KEY_HISTORY = 'sipadu_bot_history_v2';
     const STORAGE_KEY_OPEN = 'sipadu_bot_open_v2';
-    const STORAGE_KEY_POS_LAUNCHER = 'sipadu_bot_pos_launcher_v2';
+    const STORAGE_KEY_EDGE_STATE = 'sipadu_bot_edge_state_v1';
+
+    const EDGE_MARGIN = window.innerWidth <= 480 ? 16 : 24;
+    const WIDGET_GAP = 12;
 
     /* ==========================================================
-       SINKRONISASI POSISI KOTAK CHAT MENGIKUTI TOMBOL ROBOT
+       EDGE SNAPPING: OTOMATIS MENEMPEL KE PINGGIR HALAMAN
        ========================================================== */
-    function clampPosition(left, top, el) {
-        const margin = 12;
-        const maxLeft = Math.max(margin, window.innerWidth - el.offsetWidth - margin);
-        const maxTop = Math.max(margin, window.innerHeight - el.offsetHeight - margin);
-        return {
-            left: Math.min(Math.max(margin, left), maxLeft),
-            top: Math.min(Math.max(margin, top), maxTop),
-        };
+    function clampTop(top, el) {
+        const minTop = EDGE_MARGIN;
+        const maxTop = Math.max(minTop, window.innerHeight - el.offsetHeight - EDGE_MARGIN);
+        return Math.min(Math.max(minTop, top), maxTop);
     }
 
-    function syncWindowToLauncher() {
+    function getSnappedLeft(currentLeft, el) {
+        const centerX = currentLeft + (el.offsetWidth / 2);
+        const isLeftSide = centerX < (window.innerWidth / 2);
+        return isLeftSide
+            ? EDGE_MARGIN
+            : Math.max(EDGE_MARGIN, window.innerWidth - el.offsetWidth - EDGE_MARGIN);
+    }
+
+    function syncWindowToLauncher(launcherLeft, launcherTop, animate = false) {
         if (!win.classList.contains('is-open')) return;
 
-        const rect = launcher.getBoundingClientRect();
-        const gap = 12;
-        const winWidth = win.offsetWidth;
-        const winHeight = win.offsetHeight;
-
+        win.classList.toggle('is-snapping', animate);
         win.style.right = 'auto';
         win.style.bottom = 'auto';
 
-        // Sejajarkan sisi kanan kotak chat dengan sisi kanan tombol robot (atau sisi kiri jika terlalu mepet kiri)
-        let targetLeft = rect.right - winWidth;
-        if (targetLeft < 12) {
-            targetLeft = rect.left;
-        }
+        const isLeftSide = (launcherLeft + launcher.offsetWidth / 2) < (window.innerWidth / 2);
+        const targetLeft = isLeftSide
+            ? EDGE_MARGIN
+            : Math.max(EDGE_MARGIN, window.innerWidth - win.offsetWidth - EDGE_MARGIN);
 
-        // Tempatkan di atas tombol robot; jika ruang atas tidak cukup, letakkan di bawah tombol robot
-        let targetTop = rect.top - winHeight - gap;
-        if (targetTop < 12) {
-            const spaceBelow = window.innerHeight - rect.bottom - gap - 12;
-            if (spaceBelow >= winHeight || rect.top < (window.innerHeight - rect.bottom)) {
-                targetTop = rect.bottom + gap;
+        let targetTop = launcherTop - win.offsetHeight - WIDGET_GAP;
+        if (targetTop < EDGE_MARGIN) {
+            const spaceBelow = window.innerHeight - (launcherTop + launcher.offsetHeight) - WIDGET_GAP - EDGE_MARGIN;
+            if (spaceBelow >= win.offsetHeight || launcherTop < (window.innerHeight - (launcherTop + launcher.offsetHeight))) {
+                targetTop = launcherTop + launcher.offsetHeight + WIDGET_GAP;
             }
         }
 
-        const clamped = clampPosition(targetLeft, targetTop, win);
-        win.style.left = clamped.left + 'px';
-        win.style.top = clamped.top + 'px';
+        win.style.left = targetLeft + 'px';
+        win.style.top = clampTop(targetTop, win) + 'px';
+
+        if (animate) {
+            setTimeout(() => win.classList.remove('is-snapping'), 300);
+        }
     }
 
-    function syncLauncherToWindow() {
-        const winRect = win.getBoundingClientRect();
-        const launcherRect = launcher.getBoundingClientRect();
-        const gap = 12;
-
+    function syncLauncherToWindow(winLeft, winTop) {
         launcher.style.right = 'auto';
         launcher.style.bottom = 'auto';
 
-        let targetLeft = winRect.right - launcherRect.width;
-        let targetTop = winRect.bottom + gap;
+        const isLeftSide = (winLeft + win.offsetWidth / 2) < (window.innerWidth / 2);
+        const targetLeft = isLeftSide
+            ? EDGE_MARGIN
+            : Math.max(EDGE_MARGIN, window.innerWidth - launcher.offsetWidth - EDGE_MARGIN);
 
-        // Jika kotak chat digeser terlalu ke bawah, pindahkan tombol robot ke atas kotak chat
-        if (targetTop + launcherRect.height > window.innerHeight - 12) {
-            targetTop = winRect.top - launcherRect.height - gap;
+        let targetTop = winTop + win.offsetHeight + WIDGET_GAP;
+        if (targetTop + launcher.offsetHeight > window.innerHeight - EDGE_MARGIN) {
+            targetTop = winTop - launcher.offsetHeight - WIDGET_GAP;
         }
 
-        const clamped = clampPosition(targetLeft, targetTop, launcher);
-        launcher.style.left = clamped.left + 'px';
-        launcher.style.top = clamped.top + 'px';
+        launcher.style.left = targetLeft + 'px';
+        launcher.style.top = clampTop(targetTop, launcher) + 'px';
     }
 
-    function saveLauncherPosition() {
-        const rect = launcher.getBoundingClientRect();
+    function snapBothToNearestEdge() {
+        const lRect = launcher.getBoundingClientRect();
+        const isLeftSide = (lRect.left + lRect.width / 2) < (window.innerWidth / 2);
+
+        const snappedLauncherLeft = isLeftSide
+            ? EDGE_MARGIN
+            : Math.max(EDGE_MARGIN, window.innerWidth - launcher.offsetWidth - EDGE_MARGIN);
+        const snappedLauncherTop = clampTop(lRect.top, launcher);
+
+        launcher.classList.add('is-snapping');
+        launcher.style.right = 'auto';
+        launcher.style.bottom = 'auto';
+        launcher.style.left = snappedLauncherLeft + 'px';
+        launcher.style.top = snappedLauncherTop + 'px';
+
+        syncWindowToLauncher(snappedLauncherLeft, snappedLauncherTop, true);
+
+        setTimeout(() => launcher.classList.remove('is-snapping'), 300);
+
         try {
-            sessionStorage.setItem(STORAGE_KEY_POS_LAUNCHER, JSON.stringify({
-                left: rect.left,
-                top: rect.top,
+            sessionStorage.setItem(STORAGE_KEY_EDGE_STATE, JSON.stringify({
+                side: isLeftSide ? 'left' : 'right',
+                top: snappedLauncherTop,
             }));
         } catch (e) {}
     }
 
-    function applySavedPosition() {
+    function applySavedEdgePosition() {
         try {
-            const raw = sessionStorage.getItem(STORAGE_KEY_POS_LAUNCHER);
+            const raw = sessionStorage.getItem(STORAGE_KEY_EDGE_STATE);
             if (!raw) return;
-            const pos = JSON.parse(raw);
-            if (typeof pos.left === 'number' && typeof pos.top === 'number') {
-                launcher.style.right = 'auto';
-                launcher.style.bottom = 'auto';
-                const clamped = clampPosition(pos.left, pos.top, launcher);
-                launcher.style.left = clamped.left + 'px';
-                launcher.style.top = clamped.top + 'px';
-            }
+            const state = JSON.parse(raw);
+            if (!state || typeof state.top !== 'number') return;
+
+            const left = state.side === 'left'
+                ? EDGE_MARGIN
+                : Math.max(EDGE_MARGIN, window.innerWidth - launcher.offsetWidth - EDGE_MARGIN);
+            const top = clampTop(state.top, launcher);
+
+            launcher.style.right = 'auto';
+            launcher.style.bottom = 'auto';
+            launcher.style.left = left + 'px';
+            launcher.style.top = top + 'px';
         } catch (e) {}
     }
 
-    function makeSyncedDraggable(dragTarget, handleEl, isWindowDrag, onClickCallback) {
+    function makeEdgeDraggable(dragTarget, handleEl, isWindowDrag, onClickCallback) {
         let isPointerDown = false;
         let hasMoved = false;
         let startX = 0;
@@ -693,6 +720,8 @@ document.addEventListener('DOMContentLoaded', function () {
             origLeft = rect.left;
             origTop = rect.top;
 
+            dragTarget.classList.remove('is-snapping');
+            win.classList.remove('is-snapping');
             handleEl.setPointerCapture(e.pointerId);
         });
 
@@ -709,15 +738,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (hasMoved) {
-                const clamped = clampPosition(origLeft + dx, origTop + dy, dragTarget);
-                dragTarget.style.left = clamped.left + 'px';
-                dragTarget.style.top = clamped.top + 'px';
+                const maxLeft = Math.max(EDGE_MARGIN, window.innerWidth - dragTarget.offsetWidth - EDGE_MARGIN);
+                const nextLeft = Math.min(Math.max(EDGE_MARGIN, origLeft + dx), maxLeft);
+                const nextTop = clampTop(origTop + dy, dragTarget);
 
-                // Ikutkan pasangan elemennya secara real-time
+                dragTarget.style.left = nextLeft + 'px';
+                dragTarget.style.top = nextTop + 'px';
+
                 if (isWindowDrag) {
-                    syncLauncherToWindow();
+                    syncLauncherToWindow(nextLeft, nextTop);
                 } else {
-                    syncWindowToLauncher();
+                    syncWindowToLauncher(nextLeft, nextTop, false);
                 }
             }
         });
@@ -732,7 +763,8 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch (err) {}
 
             if (hasMoved) {
-                saveLauncherPosition();
+                // Jika dilepas di tengah layar, otomatis bergeser menempel ke pinggir kiri/kanan terdekat
+                snapBothToNearestEdge();
             } else if (typeof onClickCallback === 'function') {
                 onClickCallback();
             }
@@ -742,17 +774,14 @@ document.addEventListener('DOMContentLoaded', function () {
         handleEl.addEventListener('pointercancel', finishDrag);
     }
 
-    applySavedPosition();
-    makeSyncedDraggable(launcher, launcher, false, () => toggleChat());
-    makeSyncedDraggable(win, headerHandle, true, null);
+    applySavedEdgePosition();
+    makeEdgeDraggable(launcher, launcher, false, () => toggleChat());
+    makeEdgeDraggable(win, headerHandle, true, null);
 
     window.addEventListener('resize', function () {
         if (launcher.style.left) {
-            const c = clampPosition(parseFloat(launcher.style.left), parseFloat(launcher.style.top), launcher);
-            launcher.style.left = c.left + 'px';
-            launcher.style.top = c.top + 'px';
+            snapBothToNearestEdge();
         }
-        syncWindowToLauncher();
     });
 
     /* ==========================================================
@@ -922,7 +951,8 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.setItem(STORAGE_KEY_OPEN, shouldOpen ? '1' : '0');
 
         if (shouldOpen) {
-            syncWindowToLauncher();
+            const rect = launcher.getBoundingClientRect();
+            syncWindowToLauncher(rect.left, rect.top, false);
             if (messagesBox.innerHTML.trim() === '') {
                 sendBotPayload({ message: 'halo' });
             }
@@ -938,7 +968,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (sessionStorage.getItem(STORAGE_KEY_OPEN) === '1') {
         win.classList.add('is-open');
-        syncWindowToLauncher();
+        const rect = launcher.getBoundingClientRect();
+        syncWindowToLauncher(rect.left, rect.top, false);
     }
 
     closeBtn?.addEventListener('click', () => toggleChat(false));
