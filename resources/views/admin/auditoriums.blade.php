@@ -328,6 +328,21 @@
         font-weight: 700;
     }
 
+    .aud-deactivation-note {
+        margin-top: 8px !important;
+        padding: 8px 11px;
+        border-radius: 10px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .aud-deactivation-note strong {
+        color: #7f1d1d;
+    }
+
     /* FOOTER KARTU CLEAN: TOGGLE DI KIRI, TOMBOL EDIT & HAPUS DI KANAN */
     .auditorium-actions {
         display: flex !important;
@@ -378,6 +393,7 @@
         z-index: 9990;
         background: rgba(12, 28, 19, 0.36);
         backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
         touch-action: none;
         overscroll-behavior: none;
         opacity: 0;
@@ -973,7 +989,7 @@
         grid-column: 1 / -1;
     }
 
-    /* SWITCH & MODAL KONFIRMASI STATUS */
+    /* SWITCH & MODAL KONFIRMASI STATUS (BLUR SAMA SEPERTI DRAWER TAMBAH AUDITORIUM) */
     .auditorium-status-control { display: inline-flex; align-items: center; gap: 9px; color: #294735; font-size: 12.5px; font-weight: 700; }
     .auditorium-switch { position: relative; display: inline-block; width: 42px; height: 24px; cursor: pointer; }
     .auditorium-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
@@ -982,14 +998,112 @@
     .auditorium-switch input:checked + .auditorium-switch-track { background: #237c4d; }
     .auditorium-switch input:checked + .auditorium-switch-track::before { transform: translateX(18px); }
     .auditorium-switch input:focus-visible + .auditorium-switch-track { outline: 3px solid rgba(35,124,77,.2); outline-offset: 2px; }
-    .aud-status-modal { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(12, 28, 19, .48); }
-    .aud-status-modal.is-open { display: flex; }
-    .aud-status-dialog { width: min(420px, 100%); padding: 24px; border-radius: 17px; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.2); color: #163626; }
-    .aud-status-dialog h3 { margin: 0 0 8px; font-size: 17px; }
-    .aud-status-dialog p { margin: 0 0 20px; color: #64786c; font-size: 13px; line-height: 1.55; }
+
+    .aud-status-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(12, 28, 19, 0.36);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        touch-action: none;
+        overscroll-behavior: none;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.28s ease, visibility 0.28s ease;
+    }
+
+    .aud-status-modal.is-open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .aud-status-dialog {
+        width: min(440px, 100%);
+        padding: 24px;
+        border-radius: 18px;
+        border: 1px solid #e2ebe5;
+        background: #ffffff;
+        box-shadow: 0 20px 54px rgba(22, 54, 38, .18);
+        color: #163626;
+        font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        box-sizing: border-box;
+        transform: translateY(8px) scale(0.97);
+        opacity: 0;
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+    }
+
+    .aud-status-modal.is-open .aud-status-dialog {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    .aud-status-dialog h3 { margin: 0 0 8px; font-size: 17px; font-weight: 800; color: #163626; }
+    .aud-status-dialog p { margin: 0 0 18px; color: #4c6456; font-size: 13px; line-height: 1.55; }
+
+    .aud-status-reason-box {
+        margin-bottom: 18px;
+    }
+
+    .aud-status-reason-box[hidden] {
+        display: none !important;
+    }
+
+    .aud-status-reason-box label {
+        display: block;
+        margin: 0 0 6px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #294735;
+    }
+
+    .aud-status-reason-box textarea {
+        width: 100%;
+        min-height: 92px;
+        padding: 10px 13px;
+        border: 1px solid #d5e1da;
+        border-radius: 11px;
+        background: #ffffff;
+        font-family: inherit;
+        font-size: 13px;
+        color: #163626;
+        line-height: 1.55;
+        resize: vertical;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .aud-status-reason-box textarea:focus {
+        border-color: #237c4d;
+        box-shadow: 0 0 0 3px rgba(35, 124, 77, .12);
+    }
+
+    .aud-status-reason-box textarea.is-invalid {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, .12);
+    }
+
+    .aud-status-reason-err {
+        margin-top: 6px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #dc2626;
+    }
+
+    .aud-status-reason-err[hidden] {
+        display: none !important;
+    }
+
     .aud-status-modal-actions { display: flex; justify-content: flex-end; gap: 9px; }
-    .aud-status-cancel { background: #edf1ee; color: #294735; border: 1px solid #dce5de; }
-    .aud-status-confirm { background: #237c4d; color: #fff; border: 1px solid #237c4d; }
+    .aud-status-cancel { background: #edf1ee; color: #294735; border: 1px solid #dce5de; padding: 9px 15px; border-radius: 10px; }
+    .aud-status-confirm { background: #237c4d; color: #fff; border: 1px solid #237c4d; padding: 9px 16px; border-radius: 10px; }
     .aud-status-confirm.is-deactivate { background: #dc2626; border-color: #dc2626; }
 
     /* RESPONSIF TABLET */
@@ -1106,6 +1220,9 @@
                         $jamOperasionalText = ($jamMulaiFmt && $jamSelesaiFmt)
                             ? ($jamMulaiFmt . ' - ' . $jamSelesaiFmt)
                             : 'Belum diisi';
+
+                        $lokasiKampusDisplay = $a->lokasi_kampus ?: ($a->location ?: '');
+                        $deactivationReasonText = trim((string) ($a->deactivation_reason ?? $a->keterangan_nonaktif ?? ''));
                     @endphp
                     <div class="auditorium-card" id="auditoriumCard-{{ $a->id }}">
                         <div>
@@ -1170,7 +1287,7 @@
                                     <div class="auditorium-info">
                                         <div>
                                             <strong>Lokasi Kampus:</strong>
-                                            {{ $a->lokasi_kampus ?: ($a->location ?: 'Belum diisi') }}
+                                            {{ $lokasiKampusDisplay ?: 'Belum diisi' }}
                                         </div>
                                         <div>
                                             <strong>Lokasi Gedung:</strong>
@@ -1192,6 +1309,11 @@
                                             <strong>Deskripsi:</strong>
                                             {{ $a->description ?: 'Belum ada deskripsi' }}
                                         </div>
+                                        @if(!$a->is_active && $deactivationReasonText !== '')
+                                            <div class="aud-deactivation-note">
+                                                <strong>Keterangan Nonaktif:</strong> {{ $deactivationReasonText }}
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -1220,7 +1342,7 @@
                                         data-card-id="auditoriumCard-{{ $a->id }}"
                                         data-update-url="{{ route('admin.auditoriums.update', $a->id) }}"
                                         data-name="{{ $a->name }}"
-                                        data-lokasi-kampus="{{ $a->lokasi_kampus }}"
+                                        data-lokasi-kampus="{{ $lokasiKampusDisplay }}"
                                         data-lokasi-gedung="{{ $a->lokasi_gedung }}"
                                         data-jam-mulai="{{ $jamMulaiFmt }}"
                                         data-jam-selesai="{{ $jamSelesaiFmt }}"
@@ -1330,11 +1452,11 @@
             <div class="aud-form-row">
                 <div>
                     <label for="audJamMulaiInput" class="aud-sub-label">Jam Mulai <span class="aud-req-star">*</span></label>
-                    <input type="time" id="audJamMulaiInput" name="jam_mulai" value="{{ old('jam_mulai', '08:00') }}" required>
+                    <input type="time" id="audJamMulaiInput" name="jam_mulai" value="{{ old('jam_mulai', '07:00') }}" required>
                 </div>
                 <div>
                     <label for="audJamSelesaiInput" class="aud-sub-label">Jam Selesai <span class="aud-req-star">*</span></label>
-                    <input type="time" id="audJamSelesaiInput" name="jam_selesai" value="{{ old('jam_selesai', '16:00') }}" required>
+                    <input type="time" id="audJamSelesaiInput" name="jam_selesai" value="{{ old('jam_selesai', '17:00') }}" required>
                 </div>
             </div>
 
@@ -1412,6 +1534,13 @@
     <div class="aud-status-dialog" role="dialog" aria-modal="true" aria-labelledby="audStatusTitle">
         <h3 id="audStatusTitle">Konfirmasi Perubahan Status</h3>
         <p id="audStatusMessage">Apakah kamu yakin ingin mengubah status auditorium ini?</p>
+
+        <div class="aud-status-reason-box" id="audStatusReasonBox" hidden>
+            <label for="audStatusReasonInput">Keterangan Nonaktif <span class="aud-req-star">*</span></label>
+            <textarea id="audStatusReasonInput" placeholder="Tuliskan alasan mengapa auditorium ini dinonaktifkan (contoh: Renovasi ruang, perbaikan AC, dll.)..."></textarea>
+            <div class="aud-status-reason-err" id="audStatusReasonErr" hidden>Keterangan penonaktifan wajib diisi.</div>
+        </div>
+
         <div class="aud-status-modal-actions">
             <button type="button" class="aud-btn aud-status-cancel" id="audStatusCancel">Tidak</button>
             <button type="button" class="aud-btn aud-status-confirm" id="audStatusConfirm">Ya, Lanjutkan</button>
@@ -1421,6 +1550,7 @@
 <form method="POST" id="auditoriumStatusForm" style="display:none;">
     @csrf
     @method('PATCH')
+    <input type="hidden" name="deactivation_reason" id="audDeactivationReasonHidden" value="">
 </form>
 
 <script>
@@ -1428,6 +1558,14 @@ const audSaveRoute = "{{ route('admin.auditoriums.save') }}";
 const AUD_SLIDE_INTERVAL = 4000;
 const AUD_MAX_FILE_BYTES = 2 * 1024 * 1024; // 2 MB per foto
 let audStagedFiles = []; // Menyimpan seluruh foto baru yang ditambahkan secara bertahap
+
+function normalizeCampusLocation(val) {
+    const raw = (val || '').trim();
+    if (!raw) return '';
+    if (/pondok\s*labu/i.test(raw)) return 'UPNVJ - Kampus Pondok Labu';
+    if (/limo/i.test(raw)) return 'UPNVJ - Kampus Limo';
+    return raw;
+}
 
 /* CUSTOM GLASSMORPHISM DROPDOWN (SAMA DENGAN HALAMAN PROFILE) */
 function closeAllGlassSelects(exceptSelect) {
@@ -1746,8 +1884,8 @@ function openAddAuditoriumPanel() {
     document.getElementById('audNameInput').value = '';
     setGlassSelectValue(document.querySelector('[data-glass-select="lokasi_kampus"]'), '');
     document.getElementById('audLokasiGedungInput').value = '';
-    document.getElementById('audJamMulaiInput').value = '08:00';
-    document.getElementById('audJamSelesaiInput').value = '16:00';
+    document.getElementById('audJamMulaiInput').value = '07:00';
+    document.getElementById('audJamSelesaiInput').value = '17:00';
     document.getElementById('audCapacityInput').value = '';
     document.getElementById('audFacilitiesInput').value = '';
     document.getElementById('audDescriptionInput').value = '';
@@ -1786,11 +1924,11 @@ function openEditAuditoriumPanel(btn) {
     document.getElementById('audNameInput').value = btn.dataset.name || '';
     setGlassSelectValue(
         document.querySelector('[data-glass-select="lokasi_kampus"]'),
-        btn.dataset.lokasiKampus || ''
+        normalizeCampusLocation(btn.dataset.lokasiKampus)
     );
     document.getElementById('audLokasiGedungInput').value = btn.dataset.lokasiGedung || '';
-    document.getElementById('audJamMulaiInput').value = btn.dataset.jamMulai || '';
-    document.getElementById('audJamSelesaiInput').value = btn.dataset.jamSelesai || '';
+    document.getElementById('audJamMulaiInput').value = btn.dataset.jamMulai || '07:00';
+    document.getElementById('audJamSelesaiInput').value = btn.dataset.jamSelesai || '17:00';
     document.getElementById('audCapacityInput').value = btn.dataset.capacity || '';
     document.getElementById('audFacilitiesInput').value = btn.dataset.facilities || '';
     document.getElementById('audDescriptionInput').value = btn.dataset.description || '';
@@ -2010,16 +2148,64 @@ document.addEventListener('DOMContentLoaded', function () {
         startAudSliderAutoplay(slider);
     });
 
+    // MODAL KONFIRMASI STATUS + FORM KETERANGAN PENONAKTIFAN
     const modal = document.getElementById('auditoriumStatusModal');
+    const titleEl = document.getElementById('audStatusTitle');
     const message = document.getElementById('audStatusMessage');
+    const reasonBox = document.getElementById('audStatusReasonBox');
+    const reasonInput = document.getElementById('audStatusReasonInput');
+    const reasonErr = document.getElementById('audStatusReasonErr');
+    const reasonHidden = document.getElementById('audDeactivationReasonHidden');
     const confirmButton = document.getElementById('audStatusConfirm');
     const cancelButton = document.getElementById('audStatusCancel');
     const form = document.getElementById('auditoriumStatusForm');
     let pendingSwitch = null;
+    let statusStep = 'confirm'; // 'confirm' | 'reason'
+
+    // Pindahkan modal ke root <body> agar backdrop blur menutupi seluruh layar (termasuk topbar) tanpa menggeser layout
+    if (modal) {
+        document.body.appendChild(modal);
+
+        modal.addEventListener('wheel', function (e) {
+            if (e.target !== reasonInput) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        modal.addEventListener('touchmove', function (e) {
+            if (e.target !== reasonInput) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    }
+
+    if (reasonInput) {
+        reasonInput.addEventListener('input', function () {
+            if (reasonInput.value.trim() !== '') {
+                reasonInput.classList.remove('is-invalid');
+                if (reasonErr) reasonErr.hidden = true;
+            }
+        });
+    }
+
+    function resetStatusModalState() {
+        statusStep = 'confirm';
+        if (titleEl) titleEl.textContent = 'Konfirmasi Perubahan Status';
+        if (reasonBox) reasonBox.hidden = true;
+        if (reasonInput) {
+            reasonInput.value = '';
+            reasonInput.classList.remove('is-invalid');
+        }
+        if (reasonErr) reasonErr.hidden = true;
+        if (reasonHidden) reasonHidden.value = '';
+        if (cancelButton) cancelButton.textContent = 'Tidak';
+    }
 
     document.querySelectorAll('[data-auditorium-toggle]').forEach(function (toggle) {
         toggle.addEventListener('change', function () {
             pendingSwitch = toggle;
+            resetStatusModalState();
+
             const willActivate = toggle.checked;
             const auditoriumName = toggle.dataset.auditoriumName || 'auditorium ini';
             message.textContent = willActivate
@@ -2029,7 +2215,7 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmButton.classList.toggle('is-deactivate', !willActivate);
             modal.classList.add('is-open');
             modal.setAttribute('aria-hidden', 'false');
-            confirmButton.focus();
+            confirmButton.focus({ preventScroll: true });
         });
     });
 
@@ -2040,6 +2226,7 @@ document.addEventListener('DOMContentLoaded', function () {
             pendingSwitch.checked = pendingSwitch.dataset.currentStatus === '1';
         }
         pendingSwitch = null;
+        resetStatusModalState();
     }
 
     cancelButton.addEventListener('click', function () { closeModal(true); });
@@ -2058,6 +2245,40 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     confirmButton.addEventListener('click', function () {
         if (!pendingSwitch) return;
+
+        const willActivate = pendingSwitch.checked;
+        const auditoriumName = pendingSwitch.dataset.auditoriumName || 'auditorium ini';
+
+        // Langkah 1 -> Langkah 2 khusus saat menonaktifkan: tampilkan input keterangan wajib
+        if (!willActivate && statusStep === 'confirm') {
+            statusStep = 'reason';
+            titleEl.textContent = 'Keterangan Penonaktifan';
+            message.textContent = 'Berikan alasan mengapa ' + auditoriumName + ' dinonaktifkan agar dapat diketahui pengguna.';
+            reasonBox.hidden = false;
+            reasonInput.value = '';
+            reasonInput.classList.remove('is-invalid');
+            reasonErr.hidden = true;
+            cancelButton.textContent = 'Batal';
+            confirmButton.textContent = 'Simpan & Nonaktifkan';
+            confirmButton.classList.add('is-deactivate');
+            setTimeout(() => reasonInput.focus({ preventScroll: true }), 60);
+            return;
+        }
+
+        // Validasi & submit keterangan penonaktifan
+        if (!willActivate && statusStep === 'reason') {
+            const reasonVal = (reasonInput.value || '').trim();
+            if (!reasonVal) {
+                reasonInput.classList.add('is-invalid');
+                reasonErr.hidden = false;
+                reasonInput.focus({ preventScroll: true });
+                return;
+            }
+            reasonHidden.value = reasonVal;
+        } else {
+            reasonHidden.value = '';
+        }
+
         form.action = pendingSwitch.dataset.toggleUrl;
         form.submit();
     });

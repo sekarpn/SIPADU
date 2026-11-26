@@ -7,6 +7,7 @@ use App\Models\SiteContent;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,69 +27,51 @@ class DatabaseSeeder extends Seeder
         );
 
         /* data auditorium */
-        Auditorium::firstOrCreate(
+        $auditoriums = [
             [
                 'name' => 'Auditorium Bhineka Tunggal Ika (BTI)',
+                'lokasi_kampus' => 'UPNVJ - Kampus Pondok Labu',
             ],
-            [
-                'location' => 'UPN Veteran Jakarta - Kampus Pondok Labu',
-                'capacity' => null,
-                'description' =>
-                    'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
-                'facilities' => [
-                    'Informasi menyusul',
-                ],
-                'is_active' => true,
-            ]
-        );
-
-       Auditorium::firstOrCreate(
             [
                 'name' => 'Auditorium Gd. Dr. Wahidin Sudiro Husodo',
+                'lokasi_kampus' => 'UPNVJ - Kampus Pondok Labu',
             ],
-            [
-                'location' => 'UPN Veteran Jakarta - Kampus Pondok Labu',
-                'capacity' => null,
-                'description' =>
-                    'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
-                'facilities' => [
-                    'Informasi menyusul',
-                ],
-                'is_active' => true,
-            ]
-        );
-
-       Auditorium::firstOrCreate(
             [
                 'name' => 'Auditorium MERCe',
+                'lokasi_kampus' => 'UPNVJ - Kampus Limo',
             ],
-            [
-                'location' => 'UPN Veteran Jakarta - Kampus Limo',
-                'capacity' => null,
-                'description' =>
-                    'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
-                'facilities' => [
-                    'Informasi menyusul',
-                ],
-                'is_active' => true,
-            ]
-        );
-
-       Auditorium::firstOrCreate(
             [
                 'name' => 'Auditorium Tanah Airku',
+                'lokasi_kampus' => 'UPNVJ - Kampus Limo',
             ],
-            [
-                'location' => 'UPN Veteran Jakarta - Kampus Limo',
+        ];
+
+        $hasLocationColumn = Schema::hasColumn('auditoriums', 'location');
+
+        foreach ($auditoriums as $item) {
+            $attributes = [
+                'lokasi_kampus' => $item['lokasi_kampus'],
+                'jam_mulai' => '07:00:00',
+                'jam_selesai' => '17:00:00',
                 'capacity' => null,
-                'description' =>
-                    'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
+                'description' => 'Informasi kapasitas dan fasilitas menunggu konfirmasi pengelola.',
                 'facilities' => [
                     'Informasi menyusul',
                 ],
                 'is_active' => true,
-            ]
-        );
+            ];
+
+            if ($hasLocationColumn) {
+                $attributes['location'] = $item['lokasi_kampus'];
+            }
+
+            Auditorium::updateOrCreate(
+                [
+                    'name' => $item['name'],
+                ],
+                $attributes
+            );
+        }
 
         /* konten sipadu */
         $contents = [
