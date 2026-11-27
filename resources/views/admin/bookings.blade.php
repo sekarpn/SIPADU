@@ -1333,10 +1333,37 @@ body.bp-drawer-open {
         </a>
     </div>
 
+    {{-- HEADER --}}
+    <div class="bp-heading">
+        <div>
+            <h1>Kelola Peminjaman Auditorium</h1>
+            <p>Kelola pengajuan peminjaman, periksa jadwal, dan tentukan keputusan untuk setiap permohonan.</p>
+        </div>
+
+        <a
+            href="{{ route('admin.bookings.export', request()->query()) }}"
+            class="bp-download-btn"
+            id="exportBookingBtn"
+            title="Unduh rekap data peminjaman (CSV/Excel)"
+        >
+            <i data-lucide="download"></i>
+            <span>Download Data</span>
+        </a>
+    </div>
+
     {{-- STATISTIK --}}
     <div class="bp-stats">
-        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Pending'])) }}"
-           class="bp-stat {{ request('status') === 'Pending' ? 'is-active' : '' }}">
+        <a href="{{ route('admin.bookings', request()->except('status', 'page')) }}" class="bp-stat">
+            <div class="bp-stat-icon">
+                <i data-lucide="clipboard-list"></i>
+            </div>
+            <div>
+                <small>Total Pengajuan</small>
+                <strong>{{ $stats['total'] }}</strong>
+            </div>
+        </a>
+
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Pending'])) }}" class="bp-stat">
             <div class="bp-stat-icon is-warning">
                 <i data-lucide="clock"></i>
             </div>
@@ -1346,8 +1373,7 @@ body.bp-drawer-open {
             </div>
         </a>
 
-        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Disetujui'])) }}"
-           class="bp-stat {{ request('status') === 'Disetujui' ? 'is-active' : '' }}">
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Disetujui'])) }}" class="bp-stat">
             <div class="bp-stat-icon">
                 <i data-lucide="check-circle-2"></i>
             </div>
@@ -1357,8 +1383,7 @@ body.bp-drawer-open {
             </div>
         </a>
 
-        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Ditolak'])) }}"
-           class="bp-stat {{ request('status') === 'Ditolak' ? 'is-active' : '' }}">
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Ditolak'])) }}" class="bp-stat">
             <div class="bp-stat-icon is-danger">
                 <i data-lucide="x-circle"></i>
             </div>
@@ -1368,8 +1393,7 @@ body.bp-drawer-open {
             </div>
         </a>
 
-        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Perlu Revisi'])) }}"
-           class="bp-stat {{ request('status') === 'Perlu Revisi' ? 'is-active' : '' }}">
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Perlu Revisi'])) }}" class="bp-stat">
             <div class="bp-stat-icon is-warning">
                 <i data-lucide="rotate-ccw"></i>
             </div>
