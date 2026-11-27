@@ -161,6 +161,8 @@
     --bp-glass-border: 1px solid rgba(255, 255, 255, .55);
     --bp-glass-shadow: 0 8px 28px rgba(22, 54, 38, .06);
     color: var(--bp-ink);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .booking-page,
@@ -204,22 +206,22 @@
     gap: 8px;
     padding: 10px 16px;
     border-radius: 12px;
-    background: #237c4d;
+    background: #1f7a49;
     color: #ffffff !important;
     font-size: 12.5px;
     font-weight: 700;
     text-decoration: none !important;
     border: 1px solid rgba(255, 255, 255, .28);
-    box-shadow: 0 4px 14px rgba(35, 124, 77, .22);
+    box-shadow: 0 4px 14px rgba(31, 122, 73, .22);
     white-space: nowrap;
     flex-shrink: 0;
     transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 
 .booking-page .bp-primary-cta:hover {
-    background: #1b633d;
+    background: #176139;
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(35, 124, 77, .28);
+    box-shadow: 0 6px 18px rgba(31, 122, 73, .28);
 }
 
 .booking-page .bp-primary-cta svg {
@@ -262,7 +264,7 @@
     border-radius: 12px;
     display: grid;
     place-items: center;
-    background: rgba(33, 128, 77, .14);
+    background: rgba(31, 122, 73, .14);
     color: var(--bp-green);
     border: 1px solid rgba(255, 255, 255, .45);
     flex-shrink: 0;
@@ -309,7 +311,7 @@
 }
 
 .booking-page .bp-alert.is-success {
-    background: rgba(220, 252, 231, .85);
+    background: rgba(220, 252, 231, .88);
     color: #166534;
     border: 1px solid rgba(74, 222, 128, .35);
     font-weight: 600;
@@ -441,61 +443,73 @@
 }
 
 .booking-page .bp-reset:hover {
-    background: rgba(33, 128, 77, .12);
+    background: rgba(31, 122, 73, .12);
 }
 
-/* STATUS FILTER TABS */
+/* STATUS FILTER TABS (SELARAS DENGAN ADMIN) */
 .booking-page .bp-tabs {
     display: flex;
+    align-items: center;
     gap: 8px;
     overflow-x: auto;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--bp-line);
+    padding: 0 18px;
+    border-bottom: 1px solid rgba(22, 54, 38, .12);
+    background: rgba(255, 255, 255, .18);
 }
 
 .booking-page .bp-tab {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    border: 1px solid transparent;
-    border-radius: 11px;
-    padding: 8px 13px;
-    font-size: 12px;
-    font-weight: 700;
+    justify-content: center;
+    gap: 5px;
+    padding: 14px 16px;
+    margin: 0;
+    border: 0;
+    border-bottom: 2.5px solid transparent;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--bp-muted);
     white-space: nowrap;
-    background: transparent;
     cursor: pointer;
-    transition: background .2s ease, color .2s ease, border-color .2s ease;
+    transition: color .2s ease, border-color .2s ease;
 }
 
 .booking-page .bp-tab:hover:not(.active) {
-    background: rgba(255, 255, 255, .55);
     color: var(--bp-ink);
 }
 
 .booking-page .bp-tab.active {
-    background: rgba(33, 128, 77, .16);
-    color: var(--bp-green);
-    border-color: rgba(33, 128, 77, .24);
+    color: var(--bp-ink);
+    font-weight: 700;
+    border-bottom-color: #237c4d;
 }
 
 .booking-page .bp-tab span {
-    padding: 1px 7px;
-    border-radius: 999px;
-    background: rgba(22, 54, 38, .07);
-    font-size: 11px;
-    font-weight: 800;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bp-subtle);
+}
+
+.booking-page .bp-tab span::before {
+    content: "(";
+}
+
+.booking-page .bp-tab span::after {
+    content: ")";
 }
 
 .booking-page .bp-tab.active span {
-    background: rgba(31, 122, 73, .16);
-    color: var(--bp-green);
+    color: #237c4d;
+    font-weight: 700;
 }
 
-/* TABLE STYLING */
+/* TABLE STYLING (PROPORSI KOLOM RAPI & SEIMBANG) */
 .booking-page .bp-table-wrap {
+    width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .booking-page table {
@@ -506,9 +520,9 @@
 }
 
 .booking-page th {
-    padding: 13px 18px;
+    padding: 13px 20px;
     text-align: left;
-    background: rgba(255, 255, 255, .36);
+    background: rgba(255, 255, 255, .44);
     border-bottom: 1px solid var(--bp-line);
     font-size: 10.5px;
     font-weight: 800;
@@ -519,7 +533,7 @@
 }
 
 .booking-page td {
-    padding: 15px 18px;
+    padding: 16px 20px;
     border-bottom: 1px solid rgba(22, 54, 38, .06);
     vertical-align: middle;
     font-size: 12.5px;
@@ -528,8 +542,39 @@
     transition: background .18s ease;
 }
 
+/* PROPORSI LEBAR SETIAP KOLOM */
+.booking-page th:nth-child(1),
+.booking-page td:nth-child(1) {
+    width: 24%;
+}
+
+.booking-page th:nth-child(2),
+.booking-page td:nth-child(2) {
+    width: 27%;
+}
+
+.booking-page th:nth-child(3),
+.booking-page td:nth-child(3) {
+    width: 12%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.booking-page th:nth-child(4),
+.booking-page td:nth-child(4) {
+    width: 23%;
+}
+
+.booking-page th:last-child,
+.booking-page td:last-child {
+    width: 14%;
+    text-align: right;
+    white-space: nowrap;
+    padding-right: 20px;
+}
+
 .booking-page tbody tr:hover td {
-    background: rgba(255, 255, 255, .42);
+    background: rgba(255, 255, 255, .52);
 }
 
 .booking-page tbody tr:last-child td {
@@ -548,7 +593,7 @@
     font-weight: 700;
     color: var(--bp-ink);
     display: block;
-    max-width: 240px;
+    max-width: 260px;
     white-space: normal;
     line-height: 1.45;
     margin-top: 2px;
@@ -568,8 +613,8 @@
     display: flex;
     flex-direction: column;
     gap: 7px;
-    min-width: 220px;
-    max-width: 310px;
+    min-width: 200px;
+    max-width: 290px;
 }
 
 .bp-note-box {
@@ -626,7 +671,6 @@
     border-radius: 999px;
     font-size: 11px;
     font-weight: 800;
-    white-space: nowrap;
 }
 
 .bp-status > span:not(.bp-status-dot) {
@@ -645,26 +689,31 @@
 .st-pending {
     background: #fef3c7;
     color: #92400e;
+    border: 1px solid rgba(217, 119, 6, .2);
 }
 
 .st-approved {
     background: #dcfce7;
     color: #166534;
+    border: 1px solid rgba(22, 163, 74, .2);
 }
 
 .st-rejected {
     background: #fee2e2;
     color: #991b1b;
+    border: 1px solid rgba(220, 38, 38, .2);
 }
 
 .st-revision {
     background: #ffedd5;
     color: #9a3412;
+    border: 1px solid rgba(234, 88, 12, .2);
 }
 
 .st-cancelled {
     background: #f1f5f9;
     color: #475569;
+    border: 1px solid rgba(71, 85, 105, .18);
 }
 
 /* BUTTONS */
@@ -675,18 +724,20 @@
     gap: 6px;
     border: 1px solid transparent;
     border-radius: 11px;
-    padding: 8px 13px;
+    padding: 8px 14px;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
     white-space: nowrap;
+    flex-shrink: 0;
     transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
 }
 
 .bp-btn svg {
     width: 14px;
     height: 14px;
+    flex-shrink: 0;
 }
 
 .bp-btn:hover {
@@ -694,21 +745,21 @@
 }
 
 .bp-view {
-    background: #dcfce7;
-    border-color: rgba(22, 163, 74, .28);
-    color: #15803d;
+    background: #e3f5ea;
+    border-color: rgba(31, 122, 73, .22);
+    color: #1f7a49;
 }
 
 .bp-view:hover {
-    background: #bbf7d0;
-    border-color: rgba(21, 128, 61, .38);
-    color: #166534;
+    background: #d1eedc;
+    border-color: rgba(31, 122, 73, .34);
+    color: #155934;
 }
 
 .bp-reject {
     background: #fee2e2;
-    border-color: rgba(220, 38, 38, .25);
-    color: #991b1b;
+    border-color: rgba(220, 38, 38, .22);
+    color: #b91c1c;
 }
 
 .bp-reject:hover {
@@ -718,6 +769,7 @@
 .bp-action-row {
     display: inline-flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 7px;
     white-space: nowrap;
 }
@@ -736,7 +788,7 @@
     border-radius: 14px;
     display: grid;
     place-items: center;
-    background: rgba(33, 128, 77, .12);
+    background: rgba(31, 122, 73, .12);
     color: var(--bp-green);
 }
 
@@ -773,14 +825,14 @@
 }
 
 .bp-page-btn:hover:not(:disabled) {
-    background: rgba(33, 128, 77, .12);
+    background: rgba(31, 122, 73, .12);
     border-color: var(--bp-green);
     color: var(--bp-green);
 }
 
 .bp-page-btn.active {
-    background: #237c4d;
-    border-color: #237c4d;
+    background: #1f7a49;
+    border-color: #1f7a49;
     color: #ffffff;
 }
 
@@ -789,12 +841,16 @@
     cursor: not-allowed;
 }
 
-/* DRAWER DETAIL PENGAJUAN */
+/* ==========================================================================
+   POPUP / DRAWER DETAIL PENGAJUAN + BACKDROP BLUR (IDENTIK KELOLA PENGAJUAN)
+   ========================================================================== */
 .sipadu-booking-overlay {
     position: fixed;
     inset: 0;
     z-index: 99990;
-    background: rgba(15, 32, 23, .45);
+    background: rgba(15, 32, 23, .36);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     display: none;
 }
 
@@ -804,30 +860,32 @@
 
 .sipadu-booking-panel {
     position: fixed;
-    top: 0;
+    top: 12px;
     right: -540px;
-    bottom: 0;
+    bottom: 12px;
     z-index: 99995;
-    width: min(500px, 100vw);
-    background: #f8fbf9;
-    box-shadow: -18px 0 55px rgba(12, 32, 21, .22);
+    width: min(490px, calc(100vw - 24px));
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: -14px 0 44px rgba(12, 32, 21, .2);
     display: flex;
     flex-direction: column;
-    transition: right .26s ease;
+    overflow: hidden;
+    transition: right .26s cubic-bezier(.22, .61, .36, 1);
     color: #163626;
 }
 
 .sipadu-booking-panel.is-open {
-    right: 0;
+    right: 12px;
 }
 
 .sipadu-booking-panel-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
-    padding: 18px 24px 16px;
-    background: #fff;
+    gap: 14px;
+    padding: 20px 22px 15px;
+    background: #ffffff;
     border-bottom: 1px solid rgba(22, 54, 38, .08);
     flex-shrink: 0;
 }
@@ -835,37 +893,39 @@
 .sipadu-booking-panel-header h2 {
     margin: 0;
     color: #163626;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     letter-spacing: -.02em;
+    line-height: 1.25;
 }
 
 .sipadu-booking-panel-header p {
     margin: 4px 0 0;
-    color: #64786c;
-    font-size: 12px;
+    color: #6b7f73;
+    font-size: 11.5px;
+    font-weight: 500;
 }
 
 .sipadu-booking-panel-close {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     flex-shrink: 0;
     border: 1px solid rgba(22, 54, 38, .12);
-    border-radius: 50%;
-    background: #fff;
-    color: #4c6456;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #52665a;
     line-height: 0;
     cursor: pointer;
     transition: background .2s ease, color .2s ease;
 }
 
 .sipadu-booking-panel-close svg {
-    width: 17px;
-    height: 17px;
+    width: 15px;
+    height: 15px;
     display: block;
 }
 
@@ -877,9 +937,10 @@
 .sipadu-booking-panel-body {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 24px 0;
+    padding: 18px 22px 0;
     display: flex;
     flex-direction: column;
+    background: #ffffff;
 }
 
 .bp-drawer-content {
@@ -887,17 +948,18 @@
     padding-bottom: 20px;
 }
 
+/* KARTU UTAMA PENGAJUAN */
 .bp-drawer-summary {
-    padding: 20px;
-    border: 1px solid rgba(22, 54, 38, .10);
+    padding: 18px 18px 16px;
+    border: 1px solid rgba(22, 54, 38, .12);
     border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 4px 18px rgba(22, 54, 38, .04);
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(31, 122, 73, .05);
 }
 
 .bp-drawer-summary.is-pending {
-    border: 2px solid #237c4d;
-    box-shadow: 0 6px 20px rgba(35, 124, 77, .09);
+    border: 1.5px solid #2b8a57;
+    box-shadow: 0 6px 20px rgba(31, 122, 73, .08);
 }
 
 .bp-drawer-summary-top {
@@ -909,18 +971,18 @@
 }
 
 .bp-drawer-summary h3 {
-    margin: 13px 0 5px;
+    margin: 11px 0 4px;
     color: #163626;
     font-size: 17px;
-    line-height: 1.38;
+    line-height: 1.35;
     font-weight: 800;
-    letter-spacing: -.02em;
+    letter-spacing: -.015em;
 }
 
 .bp-drawer-date {
     margin: 0;
-    color: #64786c;
-    font-size: 12.5px;
+    color: #52665a;
+    font-size: 12px;
     font-weight: 500;
 }
 
@@ -928,14 +990,16 @@
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
-    margin-top: 13px;
+    margin-top: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(22, 54, 38, .08);
 }
 
 .bp-drawer-tags span {
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-radius: 8px;
-    background: rgba(33, 128, 77, .12);
-    color: #1f7a49;
+    background: #f1f6f3;
+    color: #2c5e43;
     font-size: 11px;
     font-weight: 700;
 }
@@ -943,55 +1007,57 @@
 .bp-drawer-info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px 20px;
-    padding: 18px 0 16px;
+    gap: 14px 18px;
+    padding: 14px 0 16px;
 }
 
 .bp-drawer-info-grid small,
 .bp-drawer-description small {
     display: block;
-    margin-bottom: 3px;
-    color: #64786c;
+    margin-bottom: 2px;
+    color: #6b7f73;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .bp-drawer-info-grid strong {
     display: block;
     color: #163626;
     font-size: 12.5px;
-    font-weight: 800;
-    line-height: 1.45;
+    font-weight: 700;
+    line-height: 1.4;
 }
 
 .bp-drawer-info-grid span {
     display: block;
-    color: #64786c;
-    font-size: 11px;
-    margin-top: 2px;
+    color: #52665a;
+    font-size: 11.5px;
+    font-weight: 500;
+    margin-top: 1px;
 }
 
+/* KELENGKAPAN PERIZINAN */
 .bp-drawer-check {
     display: flex;
     align-items: flex-start;
-    gap: 11px;
-    padding: 14px;
-    border: 1px solid rgba(22, 54, 38, .10);
+    gap: 10px;
+    padding: 13px 14px;
+    border: 1px solid rgba(31, 122, 73, .14);
     border-radius: 12px;
-    background: #f6faf7;
+    background: #f2f9f5;
 }
 
 .bp-check-icon {
     display: grid;
     place-items: center;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     margin-top: 1px;
     flex-shrink: 0;
     border-radius: 6px;
-    background: #237c4d;
-    color: #fff;
-    font-size: 12px;
+    background: #1f7a49;
+    color: #ffffff;
+    font-size: 11.5px;
     font-weight: 800;
 }
 
@@ -1001,21 +1067,22 @@
 
 .bp-drawer-check p {
     margin: 0;
-    color: #3c5446;
-    font-size: 12px;
-    line-height: 1.55;
+    color: #294735;
+    font-size: 11.5px;
+    line-height: 1.5;
 }
 
 .bp-drawer-check p strong {
     color: #163626;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .bp-drawer-description {
-    margin-top: 13px;
+    margin-top: 12px;
     padding: 12px 14px;
     border-radius: 12px;
     background: #f6faf7;
+    border: 1px solid rgba(22, 54, 38, .08);
 }
 
 .bp-drawer-description p {
@@ -1025,6 +1092,7 @@
     line-height: 1.55;
 }
 
+/* RIWAYAT KEPUTUSAN */
 .bp-drawer-history {
     margin-top: 18px;
     padding-top: 14px;
@@ -1043,7 +1111,7 @@
     padding: 11px 13px;
     border: 1px solid rgba(22, 54, 38, .09);
     border-radius: 12px;
-    background: #fff;
+    background: #fcfefd;
 }
 
 .bp-history-item span {
@@ -1067,13 +1135,14 @@
     line-height: 1.5;
 }
 
+/* FOOTER TOMBOL BATALKAN DRAWER */
 .bp-drawer-actions {
     position: sticky;
     bottom: 0;
-    margin: 0 -24px;
-    padding: 16px 24px 20px;
+    margin: 0 -22px;
+    padding: 14px 22px 18px;
     border-top: 1px solid rgba(22, 54, 38, .08);
-    background: #fff;
+    background: #ffffff;
     flex-shrink: 0;
 }
 
@@ -1082,6 +1151,7 @@
     min-height: 42px;
     border-radius: 12px;
     font-size: 12.5px;
+    font-weight: 700;
 }
 
 body.bp-drawer-open {
@@ -1108,7 +1178,14 @@ body.bp-drawer-open {
 
 @media (max-width: 600px) {
     .sipadu-booking-panel {
+        top: 0;
+        bottom: 0;
         width: 100vw;
+        border-radius: 0;
+    }
+
+    .sipadu-booking-panel.is-open {
+        right: 0;
     }
 
     .sipadu-booking-panel-header {
@@ -1176,7 +1253,7 @@ body.bp-drawer-open {
         </a>
     </div>
 
-    {{-- STATISTIK (5 SCORECARDS SEPERTI ADMIN) --}}
+    {{-- STATISTIK (5 SCORECARDS) --}}
     <div class="bp-stats">
         <div class="bp-stat" onclick="setBorrowerStatusTab('Pending')">
             <div class="bp-stat-icon is-warning">
@@ -1420,7 +1497,7 @@ body.bp-drawer-open {
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5">
+                        <td colspan="5" style="text-align: center; width: auto; white-space: normal;">
                             <div class="bp-empty">
                                 <div class="bp-empty-icon">
                                     <i data-lucide="inbox"></i>
@@ -1436,7 +1513,7 @@ body.bp-drawer-open {
 
                 @if($allUserBookings->isNotEmpty())
                     <tr id="borrowerFilterEmptyRow" style="display: none;">
-                        <td colspan="5">
+                        <td colspan="5" style="text-align: center; width: auto; white-space: normal;">
                             <div class="bp-empty">
                                 <div class="bp-empty-icon">
                                     <i data-lucide="inbox"></i>
@@ -1545,7 +1622,7 @@ body.bp-drawer-open {
 
                         {{-- CATATAN ADMIN (MUNCUL SEMUA: REVISI & BENTROK/PENOLAKAN) --}}
                         <div style="margin-top: 14px;">
-                            <small style="display:block; margin-bottom:6px; color:#64786c; font-size:11px; font-weight:700;">
+                            <small style="display:block; margin-bottom:6px; color:#6b7f73; font-size:11px; font-weight:700;">
                                 Catatan dari Admin
                             </small>
 
@@ -1823,7 +1900,7 @@ body.bp-drawer-open {
                         borrowerPage = Math.floor(rowIndex / borrowerPerPage) + 1;
                         renderBorrowerBookings();
                     }
-                    targetRow.style.backgroundColor = 'rgba(35, 124, 77, 0.12)';
+                    targetRow.style.backgroundColor = 'rgba(31, 122, 73, 0.12)';
                     targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
 
