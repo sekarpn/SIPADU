@@ -565,6 +565,8 @@
     padding: 9px 14px;
     font-size: 12px;
     font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
     cursor: pointer;
     text-decoration: none;
     transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
@@ -573,8 +575,8 @@
 .bp-btn svg {
     width: 15px;
     height: 15px;
+    flex-shrink: 0;
 }
-
 .bp-btn:hover {
     transform: translateY(-1px);
 }
@@ -652,10 +654,13 @@
 }
 
 .booking-page .bp-detail-open {
-    min-width: 82px;
+    width: max-content;
+    min-width: max-content;
     min-height: 36px;
+    padding: 8px 15px;
     border-radius: 11px;
     font-size: 12px;
+    white-space: nowrap;
 }
 
 .booking-page .bp-conflict-chip {
