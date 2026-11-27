@@ -433,7 +433,14 @@
                 type="date"
                 name="booking_date"
                 id="bookingDateInput"
-                min="{{ date('Y-m-d', strtotime('+7 days')) }}"
+                min="{{ \Carbon\Carbon::now('Asia/Jakarta')->addDays(7)->toDateString() }}"
+                value="{{ old('booking_date') }}"
+                required
+            >
+            <p id="bookingDateWarning" class="notice" style="display:none;" role="alert">
+                Tanggal acara harus minimal 7 hari dari tanggal pengajuan. Silakan pilih tanggal yang memenuhi batas H-7.
+            </p>
+            @error('booking_date') <p class="notice">{{ $message }}</p> @enderror
                 value="{{ old('booking_date') }}"
                 required
             >
@@ -883,7 +890,24 @@
 
     // EVENT LISTENERS LIVE UPDATE
     auditoriumSelect.addEventListener('change', updateAuditoriumPreview);
-    bookingDateInput.addEventListener('change', updateSummarySchedule);
+    const bookingDateWarning = document.getElementById('bookingDateWarning');
+    function validateBookingDateSelection() {
+        const selectedDate = bookingDateInput.value;
+        const minimumDate = bookingDateInput.min;
+        if (selectedDate && minimumDate && selectedDate < minimumDate) {
+            bookingDateInput.value = '';
+            bookingDateWarning.style.display = 'block';
+            bookingDateWarning.textContent = 'Tanggal acara terlalu dekat. Pengajuan wajib dilakukan minimal H-7 dari tanggal acara. Pilih tanggal ' + minimumDate + ' atau setelahnya.';
+            alert('Tanggal acara tidak dapat dipilih. Pengajuan peminjaman harus dilakukan minimal 7 hari sebelum acara (H-7).');
+            updateSummarySchedule();
+            return false;
+        }
+        bookingDateWarning.style.display = 'none';
+        updateSummarySchedule();
+        return true;
+    }
+    bookingDateInput.addEventListener('change', validateBookingDateSelection);
+    bookingDateInput.addEventListener('input', validateBookingDateSelection);
     eventNameInput.addEventListener('input', () => updateSummaryInputs(true));
     organizationInput.addEventListener('input', () => updateSummaryInputs(true));
     picNameInput.addEventListener('input', () => updateSummaryInputs(true));
@@ -936,6 +960,12 @@
 
     // VALIDASI SEBELUM FORM DIKIRIM
     bookingForm.addEventListener('submit', function (event) {
+        if (!validateBookingDateSelection() || !bookingDateInput.value) {
+            event.preventDefault();
+            bookingDateWarning.style.display = 'block';
+            bookingDateWarning.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
         if (!startTimeInput.value || !endTimeInput.value) {
             event.preventDefault();
             sessionError.style.display = 'block';

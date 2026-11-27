@@ -68,8 +68,6 @@ class BookingController extends Controller
             return $this->redirectToIncompleteProfile($r->user());
         }
 
-        $minimumBookingDate = date('Y-m-d', strtotime('+7 days'));
-
         $data = $r->validate([
             'auditorium_id' => 'required|exists:auditoriums,id',
             'event_name' => 'required|string|max:255',
@@ -77,11 +75,31 @@ class BookingController extends Controller
             'organization' => 'required|string|max:255',
             'pic_name' => 'required|string|max:255',
             'pic_phone' => 'required|string|max:30',
-            'booking_date' => 'required|date|after_or_equal:' . $minimumBookingDate,
+            'booking_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'surat' => 'required|file|mimes:pdf|max:5120',
         ]);
+
+        // Tolak tanggal acara yang kurang dari 7 hari kalender penuh dari tanggal pengajuan (WIB).
+        $requestedBookingDate = \Carbon\Carbon::parse($data['booking_date'], 'Asia/Jakarta')->startOfDay();
+        $minimumDate = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay()->addDays(7);
+        if ($requestedBookingDate->lt($minimumDate)) {
+            return back()->withInput()->withErrors([
+                'booking_date' => 'Tanggal acara wajib minimal 7 hari dari tanggal pengajuan (H-7). Silakan pilih tanggal ' . $minimumDate->toDateString() . ' atau setelahnya.',
+            ]);
+        }
+
+        // Validasi waktu harus cocok dengan salah satu sesi pada konfigurasi pusat.
+        $sessionMatches = collect(config('booking_sessions.sessions'))->contains(function ($session) use ($data) {
+            return $session['start'] === $data['start_time'] && $session['end'] === $data['end_time'];
+        });
+
+        if (!$sessionMatches) {
+            return back()->withInput()->withErrors([
+                'start_time' => 'Sesi peminjaman tidak valid. Silakan pilih salah satu sesi yang tersedia.',
+            ]);
+        }
 
         // Pastikan auditorium masih aktif saat pengajuan dikirim
         $auditorium = Auditorium::findOrFail($data['auditorium_id']);

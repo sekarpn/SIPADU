@@ -400,7 +400,7 @@
         {{-- KOLOM KIRI: FORM PENGAJUAN --}}
         <form class="form-card booking-form booking-form-col"
               method="POST"
-              action="{{ route('pegawai.booking.store') }}"
+              action="{{ route('borrower.booking.store') }}"
               enctype="multipart/form-data">
 
             @csrf
@@ -433,33 +433,27 @@
                 type="date"
                 name="booking_date"
                 id="bookingDateInput"
-                min="{{ date('Y-m-d', strtotime('+7 days')) }}"
+                min="{{ \Carbon\Carbon::now('Asia/Jakarta')->addDays(7)->toDateString() }}"
                 value="{{ old('booking_date') }}"
                 required
             >
+            <p id="bookingDateWarning" class="notice" style="display:none;" role="alert">
+                Tanggal acara harus minimal 7 hari dari tanggal pengajuan. Silakan pilih tanggal yang memenuhi batas H-7.
+            </p>
+            @error('booking_date') <p class="notice">{{ $message }}</p> @enderror
 
             {{-- PILIHAN SESI --}}
             <label>Pilih Sesi Peminjaman *</label>
             <p class="session-help">Pilih salah satu sesi waktu yang tersedia.</p>
 
             <div class="session-grid">
-                <button type="button" class="session-card" data-label="Sesi Pagi" data-start="08:00" data-end="12:00">
-                    <span class="session-check">✓</span>
-                    <strong>Sesi Pagi</strong>
-                    <span>08:00 - 12:00</span>
-                </button>
-
-                <button type="button" class="session-card" data-label="Sesi Siang" data-start="13:00" data-end="17:00">
-                    <span class="session-check">✓</span>
-                    <strong>Sesi Siang</strong>
-                    <span>13:00 - 17:00</span>
-                </button>
-
-                <button type="button" class="session-card" data-label="Full Day" data-start="08:00" data-end="17:00">
-                    <span class="session-check">✓</span>
-                    <strong>Full Day</strong>
-                    <span>08:00 - 17:00</span>
-                </button>
+                @foreach (config('booking_sessions.sessions') as $session)
+                    <button type="button" class="session-card" data-label="{{ $session['label'] }}" data-start="{{ $session['start'] }}" data-end="{{ $session['end'] }}">
+                        <span class="session-check">✓</span>
+                        <strong>{{ $session['label'] }}</strong>
+                        <span>{{ $session['start'] }} - {{ $session['end'] }}</span>
+                    </button>
+                @endforeach
             </div>
 
             <input type="hidden" name="start_time" id="start_time" value="{{ old('start_time') }}">
@@ -514,7 +508,7 @@
                         <strong>Belum punya format Surat Peminjaman?</strong>
                         <span>Unduh template resmi UPNVJ, isi detail acara, dan mintakan tanda tangan sebelum diunggah.</span>
                     </div>
-                    <a href="{{ route('pegawai.booking.template') }}" class="btn-template">
+                    <a href="{{ route('borrower.booking.template') }}" class="btn-template">
                         ↓ Download Template Surat
                     </a>
                 </div>
@@ -601,7 +595,7 @@
                 <p>
                     Sebelum mengajukan peminjaman auditorium, lengkapi data identitas pada profil akun Anda terlebih dahulu.
                 </p>
-                <a href="{{ route('pegawai.profile') }}" class="profile-required-button">
+                <a href="{{ route('borrower.profile') }}" class="profile-required-button">
                     Lengkapi Profil
                 </a>
             </div>
@@ -893,7 +887,24 @@
 
     // EVENT LISTENERS LIVE UPDATE
     auditoriumSelect.addEventListener('change', updateAuditoriumPreview);
-    bookingDateInput.addEventListener('change', updateSummarySchedule);
+    const bookingDateWarning = document.getElementById('bookingDateWarning');
+    function validateBookingDateSelection() {
+        const selectedDate = bookingDateInput.value;
+        const minimumDate = bookingDateInput.min;
+        if (selectedDate && minimumDate && selectedDate < minimumDate) {
+            bookingDateInput.value = '';
+            bookingDateWarning.style.display = 'block';
+            bookingDateWarning.textContent = 'Tanggal acara terlalu dekat. Pengajuan wajib dilakukan minimal H-7 dari tanggal acara. Pilih tanggal ' + minimumDate + ' atau setelahnya.';
+            alert('Tanggal acara tidak dapat dipilih. Pengajuan peminjaman harus dilakukan minimal 7 hari sebelum acara (H-7).');
+            updateSummarySchedule();
+            return false;
+        }
+        bookingDateWarning.style.display = 'none';
+        updateSummarySchedule();
+        return true;
+    }
+    bookingDateInput.addEventListener('change', validateBookingDateSelection);
+    bookingDateInput.addEventListener('input', validateBookingDateSelection);
     eventNameInput.addEventListener('input', () => updateSummaryInputs(true));
     organizationInput.addEventListener('input', () => updateSummaryInputs(true));
     picNameInput.addEventListener('input', () => updateSummaryInputs(true));
@@ -946,6 +957,12 @@
 
     // VALIDASI SEBELUM FORM DIKIRIM
     bookingForm.addEventListener('submit', function (event) {
+        if (!validateBookingDateSelection() || !bookingDateInput.value) {
+            event.preventDefault();
+            bookingDateWarning.style.display = 'block';
+            bookingDateWarning.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
         if (!startTimeInput.value || !endTimeInput.value) {
             event.preventDefault();
             sessionError.style.display = 'block';
