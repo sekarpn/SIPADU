@@ -95,10 +95,6 @@
     }
 
     .stat-card {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-        cursor: pointer;
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.42) 100%) !important;
         backdrop-filter: blur(18px) saturate(150%) !important;
         -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
@@ -106,14 +102,6 @@
         border-radius: 16px;
         padding: 17px 18px;
         box-shadow: 0 8px 28px rgba(22, 54, 38, 0.06) !important;
-        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 100%) !important;
-        border-color: rgba(35, 124, 77, 0.35) !important;
-        box-shadow: 0 12px 32px rgba(22, 54, 38, 0.1) !important;
     }
 
     .stat-top {
@@ -233,7 +221,6 @@
         position: relative;
         border-radius: 50%;
         flex-shrink: 0;
-        cursor: pointer;
         box-shadow: 0 8px 24px rgba(22, 54, 38, 0.08);
         transition: transform .3s ease;
     }
@@ -318,8 +305,6 @@
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.48);
         border: 1px solid rgba(255, 255, 255, 0.45);
-        text-decoration: none;
-        color: inherit;
         transition: background .2s ease, transform .2s ease;
         cursor: pointer;
     }
@@ -700,7 +685,6 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .stat-card,
         .pie-chart,
         .legend-item,
         .pie-tooltip,
@@ -727,7 +711,7 @@
 
     {{-- STATISTIK --}}
     <div class="stats">
-        <a href="{{ route('admin.bookings') }}" class="stat-card">
+        <div class="stat-card">
             <div class="stat-top">
                 <small>Total Pengajuan</small>
                 <span class="stat-icon blue">
@@ -736,9 +720,9 @@
             </div>
             <strong>{{ $stats['total'] }}</strong>
             <p>Seluruh pengajuan masuk</p>
-        </a>
+        </div>
 
-        <a href="{{ route('admin.bookings', ['status' => 'Pending']) }}" class="stat-card">
+        <div class="stat-card">
             <div class="stat-top">
                 <small>Pending</small>
                 <span class="stat-icon amber">
@@ -747,9 +731,9 @@
             </div>
             <strong>{{ $stats['pending'] }}</strong>
             <p>Menunggu verifikasi Admin</p>
-        </a>
+        </div>
 
-        <a href="{{ route('admin.bookings', ['status' => 'Disetujui']) }}" class="stat-card">
+        <div class="stat-card">
             <div class="stat-top">
                 <small>Disetujui</small>
                 <span class="stat-icon green">
@@ -758,9 +742,9 @@
             </div>
             <strong>{{ $stats['approved'] }}</strong>
             <p>Pengajuan telah disetujui</p>
-        </a>
+        </div>
 
-        <a href="{{ route('admin.bookings', ['status' => 'Ditolak']) }}" class="stat-card">
+        <div class="stat-card">
             <div class="stat-top">
                 <small>Ditolak</small>
                 <span class="stat-icon red">
@@ -769,7 +753,7 @@
             </div>
             <strong>{{ $stats['rejected'] }}</strong>
             <p>Pengajuan ditolak Admin</p>
-        </a>
+        </div>
     </div>
 
     {{-- DIAGRAM PIE --}}
@@ -777,7 +761,7 @@
         <div class="section-head">
             <div>
                 <h2>Statistik Pengajuan</h2>
-                <p>Arahkan kursor atau klik diagram dan kategori untuk membuka halaman kelola pengajuan.</p>
+                <p>Arahkan kursor ke diagram atau kategori untuk melihat detail.</p>
             </div>
         </div>
 
@@ -785,8 +769,7 @@
             <div class="chart-content">
                 <div class="pie-chart"
                      id="bookingPie"
-                     data-total="{{ $total }}"
-                     data-base-url="{{ route('admin.bookings') }}">
+                     data-total="{{ $total }}">
 
                     <div class="pie-tooltip" id="pieTooltip"></div>
 
@@ -797,12 +780,10 @@
                 </div>
 
                 <div class="chart-legend">
-                    <a href="{{ route('admin.bookings', ['status' => 'Pending']) }}"
-                       class="legend-item"
-                       data-name="Pending"
-                       data-url="{{ route('admin.bookings', ['status' => 'Pending']) }}"
-                       data-value="{{ $stats['pending'] }}"
-                       data-percent="{{ number_format($pendingPercent, 1, '.', '') }}">
+                    <div class="legend-item"
+                         data-name="Pending"
+                         data-value="{{ $stats['pending'] }}"
+                         data-percent="{{ number_format($pendingPercent, 1, '.', '') }}">
 
                         <div class="legend-label">
                             <span class="legend-color pending"></span>
@@ -810,14 +791,12 @@
                         </div>
 
                         <strong>{{ $stats['pending'] }} pengajuan</strong>
-                    </a>
+                    </div>
 
-                    <a href="{{ route('admin.bookings', ['status' => 'Disetujui']) }}"
-                       class="legend-item"
-                       data-name="Disetujui"
-                       data-url="{{ route('admin.bookings', ['status' => 'Disetujui']) }}"
-                       data-value="{{ $stats['approved'] }}"
-                       data-percent="{{ number_format($approvedPercent, 1, '.', '') }}">
+                    <div class="legend-item"
+                         data-name="Disetujui"
+                         data-value="{{ $stats['approved'] }}"
+                         data-percent="{{ number_format($approvedPercent, 1, '.', '') }}">
 
                         <div class="legend-label">
                             <span class="legend-color approved"></span>
@@ -825,14 +804,12 @@
                         </div>
 
                         <strong>{{ $stats['approved'] }} pengajuan</strong>
-                    </a>
+                    </div>
 
-                    <a href="{{ route('admin.bookings', ['status' => 'Ditolak']) }}"
-                       class="legend-item"
-                       data-name="Ditolak"
-                       data-url="{{ route('admin.bookings', ['status' => 'Ditolak']) }}"
-                       data-value="{{ $stats['rejected'] }}"
-                       data-percent="{{ number_format($rejectedPercent, 1, '.', '') }}">
+                    <div class="legend-item"
+                         data-name="Ditolak"
+                         data-value="{{ $stats['rejected'] }}"
+                         data-percent="{{ number_format($rejectedPercent, 1, '.', '') }}">
 
                         <div class="legend-label">
                             <span class="legend-color rejected"></span>
@@ -840,14 +817,12 @@
                         </div>
 
                         <strong>{{ $stats['rejected'] }} pengajuan</strong>
-                    </a>
+                    </div>
 
-                    <a href="{{ route('admin.bookings', ['status' => 'Dibatalkan']) }}"
-                       class="legend-item"
-                       data-name="Dibatalkan"
-                       data-url="{{ route('admin.bookings', ['status' => 'Dibatalkan']) }}"
-                       data-value="{{ $cancelled }}"
-                       data-percent="{{ number_format($cancelledPercent, 1, '.', '') }}">
+                    <div class="legend-item"
+                         data-name="Dibatalkan"
+                         data-value="{{ $cancelled }}"
+                         data-percent="{{ number_format($cancelledPercent, 1, '.', '') }}">
 
                         <div class="legend-label">
                             <span class="legend-color cancelled"></span>
@@ -855,7 +830,7 @@
                         </div>
 
                         <strong>{{ $cancelled }} pengajuan</strong>
-                    </a>
+                    </div>
                 </div>
             </div>
         @else
@@ -1027,7 +1002,6 @@
         if (!pie || !tooltip) return;
 
         const total = pie.dataset.total;
-        const baseUrl = pie.dataset.baseUrl;
 
         const colors = [
             '#f59e0b',
@@ -1082,7 +1056,7 @@
             });
         }
 
-        function getPieSectionItem(event) {
+        function selectPieSection(event) {
             const rect = pie.getBoundingClientRect();
 
             const centerX = rect.left + rect.width / 2;
@@ -1096,7 +1070,8 @@
             const innerRadius = radius * 0.58;
 
             if (distance < innerRadius) {
-                return null;
+                resetDetail();
+                return;
             }
 
             let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
@@ -1106,48 +1081,41 @@
             }
 
             const percent = (angle / 360) * 100;
-            let acc = 0;
+            let accumulated = 0;
 
             for (const item of legendItems) {
-                const itemPercent = parseFloat(item.dataset.percent) || 0;
-                if (itemPercent > 0 && percent >= acc && percent <= acc + itemPercent) {
-                    return item;
+                const value = parseFloat(item.dataset.percent) || 0;
+
+                if (value <= 0) continue;
+
+                accumulated += value;
+
+                if (percent <= accumulated) {
+                    showDetail(item);
+                    return;
                 }
-                acc += itemPercent;
             }
 
-            return null;
+            resetDetail();
         }
 
-        // Hover pada diagram pie
-        pie.addEventListener('mousemove', function (event) {
-            const matchedItem = getPieSectionItem(event);
-            if (matchedItem) {
-                showDetail(matchedItem);
-            } else {
-                resetDetail();
-            }
-        });
-
-        pie.addEventListener('mouseleave', resetDetail);
-
-        // Klik pada diagram pie langsung mengarah ke Kelola Pengajuan
-        pie.addEventListener('click', function (event) {
-            const matchedItem = getPieSectionItem(event);
-            if (matchedItem && matchedItem.dataset.url) {
-                window.location.href = matchedItem.dataset.url;
-            } else if (baseUrl) {
-                window.location.href = baseUrl;
-            }
-        });
-
-        // Hover pada legenda di samping diagram
         legendItems.forEach(function (item) {
             item.addEventListener('mouseenter', function () {
                 showDetail(item);
             });
+
             item.addEventListener('mouseleave', resetDetail);
+
+            item.addEventListener('focus', function () {
+                showDetail(item);
+            });
+
+            item.addEventListener('blur', resetDetail);
         });
+
+        pie.addEventListener('mousemove', selectPieSection);
+        pie.addEventListener('mouseleave', resetDetail);
+        pie.addEventListener('click', selectPieSection);
     });
 </script>
 
