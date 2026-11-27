@@ -433,7 +433,7 @@
                 type="date"
                 name="booking_date"
                 id="bookingDateInput"
-                min="{{ date('Y-m-d') }}"
+                min="{{ date('Y-m-d', strtotime('+7 days')) }}"
                 value="{{ old('booking_date') }}"
                 required
             >
@@ -475,7 +475,7 @@
             <h3>Data Pemohon</h3>
             <div class="form-card" style="margin:0 0 18px;padding:14px 16px;background:#f5faf6;border:1px solid #dcebe0;border-radius:10px;">
                 <p style="margin:0 0 6px;"><strong>Nama:</strong> {{ auth()->user()->name }}</p>
-                <p style="margin:0 0 6px;"><strong>Jenis Akun:</strong> {{ auth()->user()->role === 'pegawai' ? 'Pegawai' : 'Mahasiswa' }}</p>
+                <p style="margin:0 0 6px;"><strong>Jenis Akun:</strong> {{ auth()->user()->role === 'pegawai' ? 'Dosen & Tendik' : 'Mahasiswa' }}</p>
                 <p style="margin:0 0 6px;"><strong>{{ auth()->user()->role === 'pegawai' ? 'NIP' : 'NIM' }}:</strong> {{ auth()->user()->nim_nip }}</p>
                 @if(auth()->user()->role === 'pegawai')
                     <p style="margin:0 0 6px;"><strong>Unit / Biro:</strong> {{ auth()->user()->employee_unit ?: 'Belum diisi pada profil' }}</p>

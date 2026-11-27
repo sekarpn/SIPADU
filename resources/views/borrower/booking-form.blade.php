@@ -433,7 +433,7 @@
                 type="date"
                 name="booking_date"
                 id="bookingDateInput"
-                min="{{ date('Y-m-d') }}"
+                min="{{ date('Y-m-d', strtotime('+7 days')) }}"
                 value="{{ old('booking_date') }}"
                 required
             >
@@ -443,23 +443,13 @@
             <p class="session-help">Pilih salah satu sesi waktu yang tersedia.</p>
 
             <div class="session-grid">
-                <button type="button" class="session-card" data-label="Sesi Pagi" data-start="08:00" data-end="12:00">
-                    <span class="session-check">✓</span>
-                    <strong>Sesi Pagi</strong>
-                    <span>08:00 - 12:00</span>
-                </button>
-
-                <button type="button" class="session-card" data-label="Sesi Siang" data-start="13:00" data-end="17:00">
-                    <span class="session-check">✓</span>
-                    <strong>Sesi Siang</strong>
-                    <span>13:00 - 17:00</span>
-                </button>
-
-                <button type="button" class="session-card" data-label="Full Day" data-start="08:00" data-end="17:00">
-                    <span class="session-check">✓</span>
-                    <strong>Full Day</strong>
-                    <span>08:00 - 17:00</span>
-                </button>
+                @foreach (config('booking_sessions.sessions') as $session)
+                    <button type="button" class="session-card" data-label="{{ $session['label'] }}" data-start="{{ $session['start'] }}" data-end="{{ $session['end'] }}">
+                        <span class="session-check">✓</span>
+                        <strong>{{ $session['label'] }}</strong>
+                        <span>{{ $session['start'] }} - {{ $session['end'] }}</span>
+                    </button>
+                @endforeach
             </div>
 
             <input type="hidden" name="start_time" id="start_time" value="{{ old('start_time') }}">
@@ -475,7 +465,7 @@
             <h3>Data Pemohon</h3>
             <div class="form-card" style="margin:0 0 18px;padding:14px 16px;background:#f5faf6;border:1px solid #dcebe0;border-radius:10px;">
                 <p style="margin:0 0 6px;"><strong>Nama:</strong> {{ auth()->user()->name }}</p>
-                <p style="margin:0 0 6px;"><strong>Jenis Akun:</strong> {{ auth()->user()->role === 'pegawai' ? 'Pegawai' : 'Mahasiswa' }}</p>
+                <p style="margin:0 0 6px;"><strong>Jenis Akun:</strong> {{ auth()->user()->role === 'pegawai' ? 'Dosen & Tendik' : 'Mahasiswa' }}</p>
                 <p style="margin:0 0 6px;"><strong>{{ auth()->user()->role === 'pegawai' ? 'NIP' : 'NIM' }}:</strong> {{ auth()->user()->nim_nip }}</p>
                 @if(auth()->user()->role === 'pegawai')
                     <p style="margin:0 0 6px;"><strong>Unit / Biro:</strong> {{ auth()->user()->employee_unit ?: 'Belum diisi pada profil' }}</p>

@@ -727,7 +727,7 @@ body.user-drawer-open {
     <div class="up-heading">
         <div>
             <h1>Data Pengguna</h1>
-            <p>Kelola akun Mahasiswa, Pegawai, dan Administrator.</p>
+            <p>Kelola akun Mahasiswa, Dosen & Tendik, dan Administrator.</p>
         </div>
         <button class="up-btn primary" type="button" id="openAddUserDrawer">
             <i data-lucide="user-plus"></i>
@@ -781,7 +781,7 @@ body.user-drawer-open {
                 Mahasiswa <span id="roleCountMahasiswa">{{ $countMahasiswa }}</span>
             </button>
             <button type="button" class="up-tab {{ $activeRole === 'pegawai' ? 'active' : '' }}" data-role-tab="pegawai">
-                Pegawai <span id="roleCountPegawai">{{ $countPegawai }}</span>
+                Dosen & Tendik <span id="roleCountPegawai">{{ $countPegawai }}</span>
             </button>
             <button type="button" class="up-tab {{ $activeRole === 'admin' ? 'active' : '' }}" data-role-tab="admin">
                 Admin <span id="roleCountAdmin">{{ $countAdmin }}</span>
@@ -901,7 +901,7 @@ body.user-drawer-open {
                     <label for="newUserRole">Role</label>
                     <select id="newUserRole" name="role" required>
                         <option value="mahasiswa" @selected(old('role', 'mahasiswa') === 'mahasiswa')>Mahasiswa</option>
-                        <option value="pegawai" @selected(old('role') === 'pegawai')>Pegawai</option>
+                        <option value="pegawai" @selected(old('role') === 'pegawai')>Dosen & Tendik</option>
                         <option value="admin" @selected(old('role') === 'admin')>Admin</option>
                     </select>
                 </div>

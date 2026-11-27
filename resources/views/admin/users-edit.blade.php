@@ -353,7 +353,7 @@
                     <label for="editUserRole">Role Pengguna</label>
                     <select id="editUserRole" name="role" required>
                         <option value="mahasiswa" @selected($selectedRole === 'mahasiswa')>Mahasiswa</option>
-                        <option value="pegawai" @selected($selectedRole === 'pegawai')>Pegawai</option>
+                        <option value="pegawai" @selected($selectedRole === 'pegawai')>Dosen & Tendik</option>
                         <option value="admin" @selected($selectedRole === 'admin')>Admin</option>
                     </select>
                     @error('role')<div class="user-edit-field-error">{{ $message }}</div>@enderror

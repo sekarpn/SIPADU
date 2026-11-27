@@ -44,7 +44,7 @@
         }
     }
 
-    $roleBadgeLabel = $isAdmin ? 'ADMINISTRATOR' : ($isEmployee ? 'PEGAWAI' : 'MAHASISWA');
+    $roleBadgeLabel = $isAdmin ? 'ADMINISTRATOR' : ($isEmployee ? 'DOSEN & TENDIK' : 'MAHASISWA');
 
     $faculties = config('organization.faculties', []);
     $studyProgramsByFaculty = config('organization.study_programs', []);

@@ -18,7 +18,7 @@ class ChatbotController extends Controller
         $message    = strtolower($rawMessage);
         $action     = (string) $request->input('action', '');
 
-        $auditoriums = Auditorium::where('is_active', true)->get();
+        $auditoriums = Auditorium::where('is_active', true)->orderBy('name')->get();
 
         // 1. AKSI INTERAKTIF UI (DATE PICKER & CEK JADWAL LANGSUNG)
         if ($action === 'ask_date') {
@@ -250,10 +250,11 @@ PROMPT;
         $formattedDate = date('d M Y', strtotime($date));
         $bookingUrl = $this->resolveBookingUrl($room->id, $date);
 
+        $sessionTimes = config('booking_sessions.sessions');
         $reply = "Status ketersediaan **{$room->name}** pada **{$formattedDate}**:\n"
-               . "• Sesi Pagi (08:00 - 12:00): **{$pagiStatus}**\n"
-               . "• Sesi Siang (13:00 - 17:00): **{$siangStatus}**\n"
-               . "• Full Day (08:00 - 17:00): **{$fullStatus}**";
+               . "• {$sessionTimes['pagi']['label']} ({$sessionTimes['pagi']['start']} - {$sessionTimes['pagi']['end']}): **{$pagiStatus}**\n"
+               . "• {$sessionTimes['siang']['label']} ({$sessionTimes['siang']['start']} - {$sessionTimes['siang']['end']}): **{$siangStatus}**\n"
+               . "• {$sessionTimes['full_day']['label']} ({$sessionTimes['full_day']['start']} - {$sessionTimes['full_day']['end']}): **{$fullStatus}**";
 
         $quickReplies = [];
         if (!$isFullDayBlocked) {
