@@ -476,8 +476,17 @@
             href="{{ route('admin.contents') }}"
             title="Konten Informasi"
         >
-            <i data-lucide="file-text"></i>
+            <i data-lucide="book-open"></i>
             <span>Konten Informasi</span>
+        </a>
+
+        <a
+            class="nav-link {{ request()->routeIs('admin.reports*') ? 'active' : '' }}"
+            href="{{ route('admin.reports') }}"
+            title="Laporan Riwayat Peminjaman"
+        >
+            <i data-lucide="file-text"></i>
+            <span>Laporan</span>
         </a>
 
     {{-- MENU PEMINJAM (MAHASISWA & PEGAWAI) --}}

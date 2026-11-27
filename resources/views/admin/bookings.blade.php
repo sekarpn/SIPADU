@@ -103,36 +103,6 @@
     line-height: 1.55;
 }
 
-/* TOMBOL DOWNLOAD DATA */
-.booking-page .bp-download-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 12px;
-    background: #1f7a49;
-    color: #ffffff !important;
-    font-size: 12.5px;
-    font-weight: 700;
-    text-decoration: none !important;
-    border: 1px solid rgba(255, 255, 255, .28);
-    box-shadow: 0 4px 14px rgba(31, 122, 73, .22);
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
-}
-
-.booking-page .bp-download-btn:hover {
-    background: #176139;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(31, 122, 73, .28);
-}
-
-.booking-page .bp-download-btn svg {
-    width: 16px;
-    height: 16px;
-}
-
 /* SCORECARDS */
 .booking-page .bp-stats {
     display: grid;
@@ -236,6 +206,7 @@
     border-radius: 16px;
     overflow: hidden;
 }
+
 
 .booking-page .bp-toolbar {
     padding: 16px 18px;
@@ -698,10 +669,81 @@
     color: var(--bp-green);
 }
 
+/* PAGINATION */
 .booking-page .bp-pagination {
     padding: 14px 18px;
     border-top: 1px solid var(--bp-line);
     background: rgba(255, 255, 255, .25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.booking-page .bp-pagination-info {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--bp-muted);
+}
+
+.booking-page .bp-pagination-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.booking-page .bp-page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 9px;
+    border-radius: 9px;
+    border: 1px solid rgba(22, 54, 38, .10);
+    background: #ffffff;
+    color: var(--bp-ink);
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: none;
+    transition: background .18s ease, color .18s ease, border-color .18s ease;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.booking-page .bp-page-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.booking-page a.bp-page-btn:hover {
+    background: #f2f8f4;
+    border-color: rgba(31, 122, 73, .32);
+    color: var(--bp-green);
+}
+
+.booking-page .bp-page-btn.is-active {
+    background: #1f7a49;
+    border-color: #1f7a49;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: none;
+    cursor: default;
+}
+
+.booking-page .bp-page-btn.is-disabled {
+    opacity: .42;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, .65);
+    box-shadow: none;
+}
+
+.booking-page .bp-page-btn.is-dots {
+    cursor: default;
+    color: var(--bp-muted);
 }
 
 .booking-page .bp-detail-open {
@@ -739,9 +781,9 @@
     position: fixed;
     inset: 0;
     z-index: 99990;
-    background: rgba(15, 32, 23, .36);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background: rgba(12, 28, 19, 0.36);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
     display: none;
 }
 
@@ -1412,6 +1454,53 @@ body.bp-drawer-open {
         width: 100%;
     }
 }
+
+/* SCORECARDS: mengikuti tampilan Dashboard Admin */
+.booking-page .bp-stats-scorecard {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0 0 20px;
+}
+.booking-page .bp-stats-scorecard .bp-stat {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 132px;
+    padding: 20px;
+    background: var(--bp-glass-bg);
+    border: var(--bp-glass-border);
+    border-radius: 18px;
+    box-shadow: var(--bp-glass-shadow);
+    box-sizing: border-box;
+}
+.booking-page .bp-stats-scorecard .bp-stat > div:last-child { padding-right: 48px; }
+.booking-page .bp-stats-scorecard .bp-stat small { font-size: 12px; font-weight: 700; color: var(--bp-ink); }
+.booking-page .bp-stats-scorecard .bp-stat strong { font-size: 28px; margin-top: 8px; }
+.booking-page .bp-stats-scorecard .bp-stat p { display: block; font-size: 11px; color: var(--bp-muted); margin: 4px 0 0; }
+.booking-page .bp-stats-scorecard .bp-stat-icon {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    box-shadow: none;
+}
+.booking-page .bp-toolbar .bp-btn { box-shadow: none !important; filter: none !important; }
+.booking-page .bp-filter-actions { display: flex; gap: 8px; align-items: center; }
+.booking-page .bp-filter-actions .bp-btn { box-shadow: none !important; }
+.booking-page .bp-table-heading { display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:16px 18px 8px; }
+.booking-page .bp-table-heading h2 { margin:0; font-size:15px; font-weight:800; color:var(--bp-ink); }
+.booking-page .bp-table-heading .bp-status { margin:0; }
+@media (max-width: 768px) {
+    .booking-page .bp-stats-scorecard { grid-template-columns: 1fr; }
+    .booking-page .bp-stats-scorecard .bp-stat { min-height:118px; }
+    .booking-page .bp-table-heading { flex-wrap:wrap; }
+}
+
 </style>
 
 <div class="booking-page">
@@ -1422,70 +1511,30 @@ body.bp-drawer-open {
             <h1>Kelola Peminjaman Auditorium</h1>
             <p>Kelola pengajuan peminjaman, periksa jadwal, dan tentukan keputusan untuk setiap permohonan.</p>
         </div>
-
-        <a
-            href="{{ route('admin.bookings.export', request()->query()) }}"
-            class="bp-download-btn"
-            id="exportBookingBtn"
-            title="Unduh rekap data peminjaman (CSV/Excel)"
-        >
-            <i data-lucide="download"></i>
-            <span>Download Data</span>
-        </a>
     </div>
 
-    {{-- STATISTIK --}}
-    <div class="bp-stats">
-        <div class="bp-stat">
-            <div class="bp-stat-icon is-warning">
-                <i data-lucide="clock"></i>
-            </div>
-            <div>
-                <small>Pending</small>
-                <strong>{{ $stats['pending'] }}</strong>
-            </div>
+    {{-- SCORECARD --}}
+    @php
+        $scorecardTotal = $stats['total'] ?? ($bookings->total() ?? 0);
+        $scorecardPending = $stats['pending'] ?? 0;
+        $scorecardToday = $stats['today'] ?? 0;
+    @endphp
+    <section class="bp-scorecard" aria-label="Ringkasan pengajuan">
+        <div class="bp-stats bp-stats-scorecard">
+            <article class="bp-stat">
+                <div class="bp-stat-icon"><i data-lucide="clipboard-list"></i></div>
+                <div><small>Total Pengajuan</small><strong>{{ $scorecardTotal }}</strong><p>Seluruh pengajuan masuk</p></div>
+            </article>
+            <article class="bp-stat">
+                <div class="bp-stat-icon is-warning"><i data-lucide="clock"></i></div>
+                <div><small>Pending</small><strong>{{ $scorecardPending }}</strong><p>Menunggu verifikasi Admin</p></div>
+            </article>
+            <article class="bp-stat">
+                <div class="bp-stat-icon"><i data-lucide="calendar-days"></i></div>
+                <div><small>Pengajuan Hari Ini</small><strong>{{ $scorecardToday }}</strong><p>Pengajuan masuk hari ini</p></div>
+            </article>
         </div>
-
-        <div class="bp-stat">
-            <div class="bp-stat-icon">
-                <i data-lucide="check-circle-2"></i>
-            </div>
-            <div>
-                <small>Disetujui</small>
-                <strong>{{ $stats['approved'] }}</strong>
-            </div>
-        </div>
-
-        <div class="bp-stat">
-            <div class="bp-stat-icon is-danger">
-                <i data-lucide="x-circle"></i>
-            </div>
-            <div>
-                <small>Ditolak</small>
-                <strong>{{ $stats['rejected'] }}</strong>
-            </div>
-        </div>
-
-        <div class="bp-stat">
-            <div class="bp-stat-icon">
-                <i data-lucide="clipboard-list"></i>
-            </div>
-            <div>
-                <small>Total Pengajuan</small>
-                <strong>{{ $stats['total'] }}</strong>
-            </div>
-        </div>
-
-        <div class="bp-stat">
-            <div class="bp-stat-icon is-warning">
-                <i data-lucide="rotate-ccw"></i>
-            </div>
-            <div>
-                <small>Perlu Revisi</small>
-                <strong>{{ $stats['revision'] }}</strong>
-            </div>
-        </div>
-    </div>
+    </section>
 
     {{-- PESAN VALIDASI --}}
     @if($errors->any())
@@ -1507,7 +1556,6 @@ body.bp-drawer-open {
 
     {{-- TABEL PENGELOLAAN --}}
     <div class="bp-card">
-
         {{-- FILTER DAN PENCARIAN --}}
         <form method="GET" action="{{ route('admin.bookings') }}" class="bp-toolbar" id="bookingFilterForm">
             <div class="bp-search">
@@ -1534,21 +1582,9 @@ body.bp-drawer-open {
                 </button>
             </div>
 
-            @if(request('status'))
-                <input type="hidden" name="status" value="{{ request('status') }}">
-            @endif
+            <input type="hidden" name="status" value="Pending">
 
-            <select class="bp-filter" name="auditorium">
-                <option value="">Semua Auditorium</option>
-                @foreach($auditoriums as $auditorium)
-                    <option
-                        value="{{ $auditorium->id }}"
-                        @selected((string) request('auditorium') === (string) $auditorium->id)
-                    >
-                        {{ $auditorium->name }}
-                    </option>
-                @endforeach
-            </select>
+
 
             <input
                 class="bp-filter"
@@ -1558,60 +1594,14 @@ body.bp-drawer-open {
                 aria-label="Filter tanggal"
             >
 
-            <button class="bp-btn bp-approve" type="submit">
-                <i data-lucide="sliders-horizontal"></i>
-                Terapkan Filter
-            </button>
-
-            <a class="bp-reset" href="{{ route('admin.bookings') }}" id="resetBookingFilter">
-                Reset
-            </a>
+            <div class="bp-filter-actions">
+                <button class="bp-btn bp-approve" type="submit">
+                    <i data-lucide="filter"></i>
+                    Terapkan Filter
+                </button>
+                <a class="bp-reset" href="{{ route('admin.bookings') }}" id="resetBookingFilter">Reset</a>
+            </div>
         </form>
-
-        {{-- TAB STATUS --}}
-        <div class="bp-tabs" id="bookingStatusTabs">
-            <a
-                class="bp-tab {{ !request('status') ? 'active' : '' }}"
-                href="{{ route('admin.bookings', request()->except('status', 'page')) }}"
-            >
-                Semua <span>{{ $stats['total'] }}</span>
-            </a>
-
-            <a
-                class="bp-tab {{ request('status') === 'Pending' ? 'active' : '' }}"
-                href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Pending'])) }}"
-            >
-                Pending <span>{{ $stats['pending'] }}</span>
-            </a>
-
-            <a
-                class="bp-tab {{ request('status') === 'Disetujui' ? 'active' : '' }}"
-                href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Disetujui'])) }}"
-            >
-                Disetujui <span>{{ $stats['approved'] }}</span>
-            </a>
-
-            <a
-                class="bp-tab {{ request('status') === 'Ditolak' ? 'active' : '' }}"
-                href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Ditolak'])) }}"
-            >
-                Ditolak <span>{{ $stats['rejected'] }}</span>
-            </a>
-
-            <a
-                class="bp-tab {{ request('status') === 'Perlu Revisi' ? 'active' : '' }}"
-                href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Perlu Revisi'])) }}"
-            >
-                Perlu Revisi <span>{{ $stats['revision'] }}</span>
-            </a>
-
-            <a
-                class="bp-tab {{ request('status') === 'Dibatalkan' ? 'active' : '' }}"
-                href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Dibatalkan'])) }}"
-            >
-                Dibatalkan <span>{{ $stats['cancelled'] }}</span>
-            </a>
-        </div>
 
         {{-- DAFTAR PENGAJUAN --}}
         <div class="bp-table-wrap" id="bookingTableWrap">
@@ -1702,8 +1692,80 @@ body.bp-drawer-open {
         </div>
 
         {{-- PAGINATION --}}
+        @php
+            $paginator = $bookings->withQueryString();
+            $currentPage = $paginator->currentPage();
+            $lastPage = $paginator->lastPage();
+            $pageItems = [];
+
+            if ($lastPage <= 5) {
+                $pageItems = range(1, max(1, $lastPage));
+            } else {
+                $pageItems[] = 1;
+                if ($currentPage > 3) {
+                    $pageItems[] = '...';
+                }
+
+                $startPage = $currentPage <= 3 ? 2 : max(2, $currentPage - 1);
+                $endPage = $currentPage <= 3 ? 3 : min($lastPage - 1, $currentPage + 1);
+
+                for ($p = $startPage; $p <= $endPage; $p++) {
+                    $pageItems[] = $p;
+                }
+
+                if ($currentPage < $lastPage - 2) {
+                    $pageItems[] = '...';
+                }
+                $pageItems[] = $lastPage;
+            }
+        @endphp
+
         <div class="bp-pagination" id="bookingPagination">
-            {{ $bookings->withQueryString()->links() }}
+            @if($paginator->total() > 0)
+                <div class="bp-pagination-info">
+                    Menampilkan {{ $paginator->firstItem() }}–{{ $paginator->lastItem() }} dari {{ $paginator->total() }} data
+                </div>
+
+                <nav class="bp-pagination-nav" aria-label="Navigasi Halaman">
+                    @if($paginator->onFirstPage())
+                        <span class="bp-page-btn is-disabled" aria-disabled="true" aria-label="Halaman sebelumnya">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m15 18-6-6 6-6"/>
+                            </svg>
+                        </span>
+                    @else
+                        <a class="bp-page-btn" href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="Halaman sebelumnya">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m15 18-6-6 6-6"/>
+                            </svg>
+                        </a>
+                    @endif
+
+                    @foreach($pageItems as $itemPage)
+                        @if($itemPage === '...')
+                            <span class="bp-page-btn is-dots">...</span>
+                        @elseif($itemPage === $currentPage)
+                            <span class="bp-page-btn is-active" aria-current="page">{{ $itemPage }}</span>
+                        @else
+                            <a class="bp-page-btn" href="{{ $paginator->url($itemPage) }}">{{ $itemPage }}</a>
+                        @endif
+                    @endforeach
+
+                    @if($paginator->hasMorePages())
+                        <a class="bp-page-btn" href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="Halaman berikutnya">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </a>
+                    @else
+                        <span class="bp-page-btn is-disabled" aria-disabled="true" aria-label="Halaman berikutnya">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </span>
+                    @endif
+                </nav>
+            @endif
         </div>
     </div>
 
@@ -2028,6 +2090,17 @@ body.bp-drawer-open {
 </div>
 
 <script>
+    function hideDuplicateTopPagination() {
+        document.querySelectorAll('div, nav, section, footer').forEach(function (el) {
+            if (el.id === 'bookingPagination' || el.closest('#bookingPagination')) return;
+            if (el.classList.contains('booking-page') || el.classList.contains('bp-card')) return;
+            const text = (el.textContent || '').trim();
+            if (/^Menampilkan\s+\d+\s*-\s*\d+\s+dari\s+\d+\s+data/i.test(text) && el.querySelectorAll('a, button, span').length <= 8) {
+                el.style.display = 'none';
+            }
+        });
+    }
+
     function openBookingDrawer(id, button) {
         const template = document.getElementById('booking-drawer-' + id);
         const overlay = document.getElementById('bookingOverlay');
@@ -2168,7 +2241,6 @@ body.bp-drawer-open {
         const searchInput = document.getElementById('bookingSearchInput');
         const clearBtn = document.getElementById('clearBookingSearch');
         const tableWrap = document.getElementById('bookingTableWrap');
-        const tabsWrap = document.getElementById('bookingStatusTabs');
         const paginationWrap = document.getElementById('bookingPagination');
         const templatesWrap = document.getElementById('bpDrawerTemplates');
         const exportBtn = document.getElementById('exportBookingBtn');
@@ -2197,7 +2269,7 @@ body.bp-drawer-open {
             const dateValue = applyPendingFilters
                 ? (form.elements.date ? form.elements.date.value : '')
                 : appliedFilters.date;
-            const statusValue = form.elements.status ? form.elements.status.value : '';
+            const statusValue = 'Pending';
 
             if (searchValue) url.searchParams.set('q', searchValue);
             if (auditoriumValue) url.searchParams.set('auditorium', auditoriumValue);
@@ -2230,14 +2302,14 @@ body.bp-drawer-open {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
 
                 const nextTable = doc.getElementById('bookingTableWrap');
-                const nextTabs = doc.getElementById('bookingStatusTabs');
                 const nextPagination = doc.getElementById('bookingPagination');
                 const nextTemplates = doc.getElementById('bpDrawerTemplates');
 
                 if (nextTable) tableWrap.innerHTML = nextTable.innerHTML;
-                if (nextTabs && tabsWrap) tabsWrap.innerHTML = nextTabs.innerHTML;
                 if (nextPagination && paginationWrap) paginationWrap.innerHTML = nextPagination.innerHTML;
                 if (nextTemplates && templatesWrap) templatesWrap.innerHTML = nextTemplates.innerHTML;
+
+                hideDuplicateTopPagination();
 
                 window.history.replaceState({}, '', targetUrl);
 
@@ -2348,6 +2420,7 @@ body.bp-drawer-open {
     });
 
     document.addEventListener('DOMContentLoaded', function () {
+        hideDuplicateTopPagination();
         if (window.lucide) {
             window.lucide.createIcons();
         }
