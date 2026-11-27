@@ -133,11 +133,9 @@ class BookingController extends Controller
     {
         abort_unless($booking->user_id === $r->user()->id, 403);
 
-        abort_unless(
-            $booking->status === 'Pending',
-            422,
-            'Hanya pengajuan Pending yang dapat dibatalkan.'
-        );
+        if ($booking->status !== 'Pending') {
+            return back()->with('warning', 'Pengajuan ini sudah berstatus ' . $booking->status . ' dan tidak dapat dibatalkan.');
+        }
 
         $booking->update(['status' => 'Dibatalkan']);
 
@@ -397,15 +395,20 @@ class BookingController extends Controller
             ]);
         }
 
-        abort_unless($booking->status === 'Pending', 422, 'Pengajuan ini sudah diproses.');
+        if ($booking->status !== 'Pending') {
+            return back()->with('warning', 'Pengajuan ini sudah diproses sebelumnya dengan status: ' . $booking->status . '.');
+        }
 
-        DB::transaction(function () use ($r, $booking, $data) {
+        $alreadyProcessedStatus = null;
+
+        DB::transaction(function () use ($r, $booking, $data, &$alreadyProcessedStatus) {
             $target = Booking::whereKey($booking->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
             if ($target->status !== 'Pending') {
-                abort(422, 'Pengajuan ini sudah diproses oleh admin lain.');
+                $alreadyProcessedStatus = $target->status;
+                return;
             }
 
             $overlapQuery = Booking::where('id', '!=', $target->id)
@@ -487,6 +490,10 @@ class BookingController extends Controller
                 'note' => $newNote,
             ]);
         });
+
+        if ($alreadyProcessedStatus !== null) {
+            return back()->with('warning', 'Pengajuan ini sudah diproses sebelumnya dengan status: ' . $alreadyProcessedStatus . '.');
+        }
 
         return back()->with('success', 'Keputusan pengajuan berhasil disimpan.');
     }

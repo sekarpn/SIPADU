@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Auditorium;
 use App\Models\SiteContent;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -15,13 +17,105 @@ class DashboardController extends Controller
         $q = Booking::where('user_id', $r->user()->id);
 
         $stats = [
-            'total' => (clone $q)->count(),
-            'pending' => (clone $q)->where('status', 'Pending')->count(),
+            'total'    => (clone $q)->count(),
+            'pending'  => (clone $q)->where('status', 'Pending')->count(),
             'approved' => (clone $q)->where('status', 'Disetujui')->count(),
             'rejected' => (clone $q)->where('status', 'Ditolak')->count(),
         ];
 
         $bookings = (clone $q)->with('auditorium')->latest()->take(6)->get();
+
+        // 1. DATA GRAFIK PEMINJAMAN PER TAHUN & BULAN (DISETUJUI & DITOLAK)
+        $now = Carbon::now('Asia/Jakarta');
+        $defaultChartYear = (int) $now->year;
+        $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+        $rawStats = Booking::select(
+                DB::raw('YEAR(booking_date) as tahun'),
+                DB::raw('MONTH(booking_date) as bulan'),
+                'status',
+                DB::raw('COUNT(*) as total')
+            )
+            ->whereNotNull('booking_date')
+            ->whereIn('status', ['Disetujui', 'Ditolak'])
+            ->groupBy('tahun', 'bulan', 'status')
+            ->get();
+
+        $yearsFromDb = $rawStats->pluck('tahun')
+            ->filter()
+            ->map(fn ($y) => (int) $y)
+            ->unique()
+            ->values()
+            ->all();
+
+        $availableYears = collect(array_merge($yearsFromDb, [$defaultChartYear]))
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        $chartByYear = [];
+        foreach ($availableYears as $yr) {
+            $chartByYear[(string) $yr] = [
+                'approved' => array_fill(0, 12, 0),
+                'rejected' => array_fill(0, 12, 0),
+            ];
+        }
+
+        foreach ($rawStats as $row) {
+            $yrKey = (string) ((int) $row->tahun);
+            $monthIdx = ((int) $row->bulan) - 1;
+            if (isset($chartByYear[$yrKey]) && $monthIdx >= 0 && $monthIdx < 12) {
+                if ($row->status === 'Disetujui') {
+                    $chartByYear[$yrKey]['approved'][$monthIdx] = (int) $row->total;
+                } elseif ($row->status === 'Ditolak') {
+                    $chartByYear[$yrKey]['rejected'][$monthIdx] = (int) $row->total;
+                }
+            }
+        }
+
+        // 2. DATA PEMINJAMAN MENDATANG (YANG SUDAH DISETUJUI & BELUM SELESAI)
+        $todayStr = $now->toDateString();
+        $currentTimeStr = $now->format('H:i:s');
+
+        $upcomingBookings = Booking::with(['auditorium', 'user'])
+            ->where('status', 'Disetujui')
+            ->where(function ($query) use ($todayStr, $currentTimeStr) {
+                $query->whereDate('booking_date', '>', $todayStr)
+                    ->orWhere(function ($sub) use ($todayStr, $currentTimeStr) {
+                        $sub->whereDate('booking_date', '=', $todayStr)
+                            ->where('end_time', '>=', $currentTimeStr);
+                    });
+            })
+            ->orderBy('booking_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->take(5)
+            ->get()
+            ->map(function ($booking) use ($now) {
+                $tglMulai = Carbon::parse($booking->booking_date, 'Asia/Jakarta');
+                $startDateTime = Carbon::parse($tglMulai->toDateString() . ' ' . $booking->start_time, 'Asia/Jakarta');
+                $endDateTime   = Carbon::parse($tglMulai->toDateString() . ' ' . $booking->end_time, 'Asia/Jakarta');
+
+                if ($now->between($startDateTime, $endDateTime)) {
+                    $booking->countdown_label = 'Berlangsung';
+                    $booking->countdown_type  = 'ongoing';
+                } elseif ($tglMulai->isToday()) {
+                    $booking->countdown_label = 'Hari ini';
+                    $booking->countdown_type  = 'upcoming';
+                } else {
+                    $selisihHari = (int) $now->copy()->startOfDay()->diffInDays($tglMulai->copy()->startOfDay());
+                    $booking->countdown_label = 'Dalam ' . $selisihHari . ' hari';
+                    $booking->countdown_type  = 'upcoming';
+                }
+
+                $booking->display_date       = $tglMulai;
+                $booking->display_start_time = Carbon::parse($booking->start_time)->format('H.i');
+                $booking->display_end_time   = Carbon::parse($booking->end_time)->format('H.i');
+                $booking->display_organizer  = $booking->organization
+                    ?: ($booking->user->employee_unit ?? $booking->user->faculty ?? $booking->user->name ?? '-');
+
+                return $booking;
+            });
 
         $auditoriums = Auditorium::orderByDesc('is_active')
             ->orderBy('name')
@@ -32,17 +126,22 @@ class DashboardController extends Controller
         return view($view, compact(
             'stats',
             'bookings',
-            'auditoriums'
+            'auditoriums',
+            'bulanLabels',
+            'chartByYear',
+            'availableYears',
+            'defaultChartYear',
+            'upcomingBookings'
         ));
     }
 
     public function admin()
     {
         $stats = [
-            'total' => Booking::count(),
-            'pending' => Booking::where('status', 'Pending')->count(),
-            'approved' => Booking::where('status', 'Disetujui')->count(),
-            'rejected' => Booking::where('status', 'Ditolak')->count(),
+            'total'     => Booking::count(),
+            'pending'   => Booking::where('status', 'Pending')->count(),
+            'approved'  => Booking::where('status', 'Disetujui')->count(),
+            'rejected'  => Booking::where('status', 'Ditolak')->count(),
             'cancelled' => Booking::where('status', 'Dibatalkan')->count(),
         ];
 

@@ -5,16 +5,46 @@
 @php
     $user = auth()->user();
     $hasActiveAuditorium = $auditoriums->contains(fn ($item) => (bool) ($item->is_active ?? true));
-    $createBookingRoute = \Illuminate\Support\Facades\Route::has('pegawai.booking.create')
-        ? 'pegawai.booking.create'
-        : 'borrower.booking.create';
-    $bookingsRouteName = \Illuminate\Support\Facades\Route::has('pegawai.bookings')
-        ? 'pegawai.bookings'
-        : 'borrower.bookings';
-    $bookingsListUrl = route($bookingsRouteName);
-    $guidesUrl = \Illuminate\Support\Facades\Route::has('pegawai.guides')
-        ? route('pegawai.guides')
-        : route('borrower.guides');
+    $chartLabelsSafe = $bulanLabels ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    $defaultYearSafe = (int) ($defaultChartYear ?? now('Asia/Jakarta')->year);
+    $availableYearsSafe = !empty($availableYears) ? array_values($availableYears) : [$defaultYearSafe];
+    $chartByYearSafe = !empty($chartByYear)
+        ? $chartByYear
+        : [
+            (string) $defaultYearSafe => [
+                'approved' => $chartData ?? array_fill(0, 12, 0),
+                'rejected' => array_fill(0, 12, 0),
+            ],
+        ];
+
+    $nowJakarta = \Carbon\Carbon::now('Asia/Jakarta');
+    $todayStartJakarta = $nowJakarta->copy()->startOfDay();
+
+    // Hanya jadwal berstatus disetujui yang tanggalnya tidak lewat dan waktu berakhirnya masih > waktu sekarang
+    $upcomingList = ($upcomingBookings ?? collect())
+        ->filter(function ($item) use ($nowJakarta, $todayStartJakarta) {
+            $status = strtolower(trim((string) ($item->status ?? 'disetujui')));
+            if (!in_array($status, ['disetujui', 'approved', ''], true)) {
+                return false;
+            }
+
+            $tgl = $item->display_date
+                ? \Carbon\Carbon::parse($item->display_date, 'Asia/Jakarta')
+                : (!empty($item->booking_date) ? \Carbon\Carbon::parse($item->booking_date, 'Asia/Jakarta') : null);
+
+            if (!$tgl || $tgl->copy()->startOfDay()->lt($todayStartJakarta)) {
+                return false;
+            }
+
+            $endRaw = !empty($item->end_time)
+                ? trim((string) $item->end_time)
+                : (!empty($item->display_end_time) ? str_replace('.', ':', trim((string) $item->display_end_time)) . ':00' : '23:59:59');
+
+            $endAt = \Carbon\Carbon::parse($tgl->toDateString() . ' ' . $endRaw, 'Asia/Jakarta');
+
+            return $endAt->gt($nowJakarta);
+        })
+        ->values();
 @endphp
 
 <style>
@@ -240,6 +270,460 @@
         font-size: 11px;
     }
 
+    /* PANEL GRAFIK & PEMINJAMAN MENDATANG */
+    .dashboard-analytics-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+        align-items: stretch;
+    }
+
+    /* KONTROL TAHUN DI POJOK KANAN GRAFIK */
+    .chart-year-nav {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        padding: 3px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(35, 124, 77, 0.25);
+        box-shadow: 0 2px 6px rgba(22, 54, 38, 0.04);
+        flex-shrink: 0;
+    }
+
+    .chart-year-btn {
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: 50%;
+        background: transparent;
+        color: #1f7a49;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        transition: background .18s ease, color .18s ease, opacity .18s ease;
+    }
+
+    .chart-year-btn:hover:not(:disabled) {
+        background: #e5f3e9;
+        color: #163626;
+    }
+
+    .chart-year-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .chart-year-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .chart-year-dropdown {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .chart-year-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #163626;
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        padding: 4px 10px;
+        margin: 0;
+        border-radius: 999px;
+        cursor: pointer;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.2;
+        transition: background .18s ease, color .18s ease;
+    }
+
+    .chart-year-trigger:hover,
+    .chart-year-dropdown.is-open .chart-year-trigger {
+        background: rgba(35, 124, 77, 0.1) !important;
+        color: #163626;
+    }
+
+    .chart-year-trigger svg {
+        width: 13px;
+        height: 13px;
+        color: #1f7a49;
+        flex-shrink: 0;
+        transition: transform .2s ease;
+    }
+
+    .chart-year-dropdown.is-open .chart-year-trigger svg {
+        transform: rotate(180deg);
+    }
+
+    .chart-year-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 86px;
+        padding: 4px;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid rgba(35, 124, 77, 0.22);
+        box-shadow: 0 10px 24px rgba(22, 54, 38, 0.14);
+        z-index: 40;
+        display: none;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .chart-year-dropdown.is-open .chart-year-menu {
+        display: flex;
+    }
+
+    .chart-year-option {
+        width: 100%;
+        border: none;
+        background: transparent;
+        color: #163626;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        font-variant-numeric: tabular-nums;
+        transition: background .15s ease, color .15s ease;
+    }
+
+    .chart-year-option:hover {
+        background: #eaf5ed;
+        color: #1f7a49;
+    }
+
+    .chart-year-option.is-active {
+        background: #237c4d;
+        color: #ffffff;
+    }
+
+    .chart-canvas-wrap {
+        position: relative;
+        width: 100%;
+        height: 255px;
+        margin-top: 4px;
+        padding: 10px 12px 8px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(22, 54, 38, 0.08);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-toolbar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+        min-height: 24px;
+        flex-wrap: wrap;
+    }
+
+    .chart-legend-inline {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #4c6456;
+    }
+
+    .chart-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .chart-legend-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 3px;
+        display: inline-block;
+    }
+
+    .chart-legend-dot.is-approved {
+        background: #237c4d;
+    }
+
+    .chart-legend-dot.is-rejected {
+        background: #dc4545;
+    }
+
+    .chart-click-detail {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: #eaf5ed;
+        border: 1px solid rgba(35, 124, 77, 0.28);
+        font-size: 11px;
+        font-weight: 700;
+        color: #163626;
+    }
+
+    .chart-click-detail.is-hidden {
+        display: none;
+    }
+
+    .chart-click-detail .detail-approved {
+        color: #1b653c;
+    }
+
+    .chart-click-detail .detail-rejected {
+        color: #b91c1c;
+    }
+
+    .chart-click-clear {
+        border: none;
+        background: transparent;
+        color: #5c7265;
+        font-size: 13px;
+        line-height: 1;
+        padding: 0 2px;
+        cursor: pointer;
+    }
+
+    .chart-click-clear:hover {
+        color: #163626;
+    }
+
+    .chart-canvas-inner {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+    }
+
+    .chart-canvas-inner canvas {
+        cursor: pointer;
+    }
+
+    /* KARTU PEMINJAMAN MENDATANG */
+    .upcoming-feed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        max-height: 255px;
+        overflow-y: auto;
+        padding: 2px 3px 4px 1px;
+        margin-top: 4px;
+        flex: 1;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(22, 54, 38, 0.18) transparent;
+    }
+
+    .upcoming-feed-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .upcoming-feed-list::-webkit-scrollbar-thumb {
+        background: rgba(22, 54, 38, 0.18);
+        border-radius: 999px;
+    }
+
+    .upcoming-card {
+        display: flex;
+        align-items: stretch;
+        gap: 13px;
+        padding: 13px 15px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(22, 54, 38, 0.09);
+        box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
+        transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .upcoming-card:hover {
+        background: #ffffff;
+        border-color: rgba(35, 124, 77, 0.34);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(22, 54, 38, 0.07);
+    }
+
+    .upcoming-date-box {
+        flex-shrink: 0;
+        width: 62px;
+        min-height: 64px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #eaf5ed 0%, #dff0e5 100%);
+        border: 1px solid rgba(35, 124, 77, 0.22);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6px 4px;
+        box-sizing: border-box;
+    }
+
+    .upcoming-date-day {
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1.05;
+        color: #163626;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .upcoming-date-month {
+        font-size: 9.5px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #1f7a49;
+        margin-top: 3px;
+        text-transform: uppercase;
+    }
+
+    .upcoming-body {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .upcoming-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .upcoming-heading {
+        min-width: 0;
+    }
+
+    .upcoming-title {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        color: #163626;
+        line-height: 1.3;
+        letter-spacing: -0.015em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+
+    .upcoming-card:hover .upcoming-title {
+        color: #1f7a49;
+    }
+
+    .upcoming-org {
+        margin: 3px 0 0;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #1f7a49;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .upcoming-org svg {
+        width: 13px;
+        height: 13px;
+        color: #237c4d;
+        flex-shrink: 0;
+    }
+
+    .upcoming-org span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .upcoming-status-pill {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+    .upcoming-status-pill.is-ongoing {
+        background: #dff3e6;
+        color: #1b653c;
+        border: 1px solid rgba(35, 124, 77, 0.24);
+    }
+
+    .upcoming-status-pill.is-ongoing::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #237c4d;
+        flex-shrink: 0;
+    }
+
+    .upcoming-status-pill.is-upcoming {
+        background: #fef3c7;
+        color: #854d0e;
+        border: 1px solid rgba(217, 119, 6, 0.22);
+    }
+
+    .upcoming-schedule-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 7px;
+        border-top: 1px solid rgba(22, 54, 38, 0.06);
+    }
+
+    .upcoming-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: #3d5446;
+        min-width: 0;
+    }
+
+    .upcoming-meta-item svg {
+        width: 13.5px;
+        height: 13.5px;
+        color: #6b8274;
+        flex-shrink: 0;
+    }
+
+    .upcoming-meta-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
     /* PANEL TENGAH */
     .dashboard-middle {
         display: grid;
@@ -405,16 +889,29 @@
     }
 
     .proto-card-sub {
-        margin: 3px 0 0;
+        margin: 4px 0 0;
         font-size: 12px;
         color: #5c7265;
         display: flex;
         align-items: center;
-        gap: 6px;
+        flex-wrap: wrap;
+        gap: 8px;
         min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    }
+
+    .proto-sub-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .proto-sub-item svg {
+        width: 13px;
+        height: 13px;
+        color: #237c4d;
+        flex-shrink: 0;
     }
 
     .proto-card-sub .event-name {
@@ -438,14 +935,13 @@
         white-space: nowrap;
     }
 
-    /* SOFT STATUS PILL DI KANAN ATAS */
     .proto-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 5px 13px;
+        padding: 4px 12px;
         border-radius: 999px;
-        font-size: 11.5px;
+        font-size: 11px;
         font-weight: 700;
         white-space: nowrap;
         flex-shrink: 0;
@@ -453,34 +949,38 @@
     }
 
     .proto-badge.pending {
-        background: #ffedd5;
-        color: #9a3412;
+        background: #fef3c7;
+        color: #854d0e;
+        border: 1px solid rgba(217, 119, 6, 0.22);
     }
 
     .proto-badge.disetujui,
     .proto-badge.approved {
         background: #dff3e6;
         color: #1b653c;
+        border: 1px solid rgba(35, 124, 77, 0.24);
     }
 
     .proto-badge.ditolak,
     .proto-badge.rejected {
         background: #fee2e2;
         color: #991b1b;
+        border: 1px solid rgba(220, 69, 69, 0.22);
     }
 
     .proto-badge.revisi {
         background: #fef3c7;
         color: #854d0e;
+        border: 1px solid rgba(217, 119, 6, 0.22);
     }
 
     .proto-badge.dibatalkan,
     .proto-badge.cancelled {
         background: #e2e8f0;
         color: #475569;
+        border: 1px solid rgba(71, 85, 105, 0.2);
     }
 
-    /* BARIS WAKTU BAWAH */
     .proto-schedule-bar {
         display: flex;
         align-items: center;
@@ -687,7 +1187,6 @@
         background: #eaf4ee;
     }
 
-    /* SLIDER & SLIDESHOW FOTO AUDITORIUM */
     .aud-slider {
         width: 100%;
         height: 175px;
@@ -1246,6 +1745,7 @@
     }
 
     @media (max-width: 900px) {
+        .dashboard-analytics-row,
         .dashboard-middle {
             grid-template-columns: 1fr;
         }
@@ -1290,6 +1790,31 @@
             font-size: 22px;
         }
 
+        .upcoming-card {
+            padding: 12px;
+            gap: 10px;
+        }
+
+        .upcoming-date-box {
+            width: 54px;
+            min-height: 56px;
+            border-radius: 10px;
+        }
+
+        .upcoming-date-day {
+            font-size: 16px;
+        }
+
+        .upcoming-date-month {
+            font-size: 9px;
+        }
+
+        .upcoming-card-top {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .upcoming-schedule-bar,
         .proto-schedule-bar {
             flex-direction: column;
             align-items: flex-start;
@@ -1326,6 +1851,7 @@
 
     @media (prefers-reduced-motion: reduce) {
         .proto-card,
+        .upcoming-card,
         .guide-item,
         .auditorium-card {
             transition: none;
@@ -1343,7 +1869,7 @@
         </div>
 
         @if($hasActiveAuditorium)
-            <a class="dashboard-action" href="{{ route($createBookingRoute) }}">
+            <a class="dashboard-action" href="{{ route('borrower.booking.create') }}">
                 <i data-lucide="plus"></i>
                 Ajukan Peminjaman
             </a>
@@ -1355,7 +1881,7 @@
         @endif
     </div>
 
-    {{-- STATISTIK --}}
+    {{-- STATISTIK / SCORECARD --}}
     <div class="stats">
         <div class="stat-card">
             <div class="stat-top">
@@ -1402,6 +1928,197 @@
         </div>
     </div>
 
+    {{-- GRAFIK PEMINJAMAN & PEMINJAMAN MENDATANG --}}
+    <div class="dashboard-analytics-row">
+        {{-- KIRI: GRAFIK STATISTIK PEMINJAMAN --}}
+        <div class="dashboard-panel">
+            <div class="section-head">
+                <div>
+                    <div class="section-head-title">
+                        <h2>Statistik Peminjaman</h2>
+                    </div>
+                    <p>Klik atau arahkan kursor pada grafik untuk rincian bulanan</p>
+                </div>
+
+                {{-- NAVIGASI TAHUN --}}
+                <div class="chart-year-nav" aria-label="Pilih tahun statistik peminjaman">
+                    <button
+                        type="button"
+                        class="chart-year-btn"
+                        id="chartPrevYearBtn"
+                        aria-label="Tahun sebelumnya"
+                        title="Tahun sebelumnya"
+                    >
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+
+                    <div class="chart-year-dropdown" id="chartYearDropdown">
+                        <button
+                            type="button"
+                            class="chart-year-trigger"
+                            id="chartYearTrigger"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            aria-label="Pilih tahun"
+                        >
+                            <span id="chartYearLabel">{{ $defaultYearSafe }}</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="chart-year-menu" id="chartYearMenu" role="listbox" aria-label="Daftar tahun">
+                            @foreach($availableYearsSafe as $yr)
+                                <button
+                                    type="button"
+                                    class="chart-year-option {{ (int) $yr === $defaultYearSafe ? 'is-active' : '' }}"
+                                    data-year="{{ $yr }}"
+                                    role="option"
+                                    aria-selected="{{ (int) $yr === $defaultYearSafe ? 'true' : 'false' }}"
+                                >
+                                    {{ $yr }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="chart-year-btn"
+                        id="chartNextYearBtn"
+                        aria-label="Tahun berikutnya"
+                        title="Tahun berikutnya"
+                    >
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chart-canvas-wrap">
+                <div class="chart-toolbar-row">
+                    <div class="chart-legend-inline">
+                        <span class="chart-legend-item">
+                            <span class="chart-legend-dot is-approved"></span>
+                            Disetujui
+                        </span>
+                        <span class="chart-legend-item">
+                            <span class="chart-legend-dot is-rejected"></span>
+                            Ditolak
+                        </span>
+                    </div>
+
+                    <div class="chart-click-detail is-hidden" id="chartClickDetail">
+                        <span id="chartDetailMonth">Jan 2026</span>
+                        <span>•</span>
+                        <span class="detail-approved" id="chartDetailApproved">Disetujui: 0</span>
+                        <span>|</span>
+                        <span class="detail-rejected" id="chartDetailRejected">Ditolak: 0</span>
+                        <button type="button" class="chart-click-clear" id="chartDetailClose" aria-label="Tutup rincian">&times;</button>
+                    </div>
+                </div>
+
+                <div class="chart-canvas-inner">
+                    <canvas
+                        id="sipaduBorrowerChart"
+                        data-labels="{{ json_encode($chartLabelsSafe) }}"
+                        data-yearly="{{ json_encode($chartByYearSafe) }}"
+                        data-years="{{ json_encode($availableYearsSafe) }}"
+                        data-default-year="{{ $defaultYearSafe }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+
+        {{-- KANAN: PEMINJAMAN MENDATANG --}}
+        <div class="dashboard-panel" id="borrowerUpcomingPanel">
+            <div class="section-head">
+                <div>
+                    <div class="section-head-title">
+                        <h2>Peminjaman Mendatang</h2>
+                        <span class="section-head-count" id="borrowerUpcomingCount">({{ $upcomingList->count() }})</span>
+                    </div>
+                    <p>Jadwal penggunaan auditorium terdekat yang telah disetujui</p>
+                </div>
+            </div>
+
+            @if($upcomingList->isNotEmpty())
+                <div class="upcoming-feed-list" id="borrowerUpcomingList">
+                    @foreach($upcomingList as $item)
+                        @php
+                            $tglObj = $item->display_date
+                                ? \Carbon\Carbon::parse($item->display_date, 'Asia/Jakarta')->locale('id')
+                                : \Carbon\Carbon::parse($item->booking_date, 'Asia/Jakarta')->locale('id');
+                            $eventDay = $tglObj->copy()->startOfDay();
+                            $diffDays = (int) $todayStartJakarta->diffInDays($eventDay, false);
+
+                            $endTimeRaw = !empty($item->end_time)
+                                ? trim((string) $item->end_time)
+                                : (!empty($item->display_end_time) ? str_replace('.', ':', trim((string) $item->display_end_time)) . ':00' : '23:59:59');
+                            $endTimestampMs = \Carbon\Carbon::parse($tglObj->toDateString() . ' ' . $endTimeRaw, 'Asia/Jakarta')->valueOf();
+
+                            $boxDay = $tglObj->format('d');
+                            $boxMonthYear = strtoupper($tglObj->translatedFormat('M Y'));
+                            $fullDateText = $tglObj->translatedFormat('d F Y');
+
+                            $startFmt = $item->display_start_time
+                                ?? str_replace(':', '.', substr((string) $item->start_time, 0, 5));
+                            $endFmt = $item->display_end_time
+                                ?? str_replace(':', '.', substr((string) $item->end_time, 0, 5));
+
+                            $venueName = optional($item->auditorium)->name ?? $item->event_name ?? 'Auditorium';
+                            $organizerName = $item->display_organizer
+                                ?? ($item->organization ?: (optional($item->user)->name ?? '-'));
+
+                            $isToday = $diffDays <= 0;
+                            $badgeLabel = $isToday
+                                ? 'Hari ini'
+                                : ('Dalam ' . $diffDays . ' hari');
+                        @endphp
+
+                        <div class="upcoming-card" data-end-ts="{{ $endTimestampMs }}">
+                            <div class="upcoming-date-box">
+                                <span class="upcoming-date-day">{{ $boxDay }}</span>
+                                <span class="upcoming-date-month">{{ $boxMonthYear }}</span>
+                            </div>
+
+                            <div class="upcoming-body">
+                                <div class="upcoming-card-top">
+                                    <div class="upcoming-heading">
+                                        <h3 class="upcoming-title" title="{{ $venueName }}">{{ $venueName }}</h3>
+                                        <p class="upcoming-org" title="{{ $organizerName }}">
+                                            <i data-lucide="user"></i>
+                                            <span>{{ $organizerName }}</span>
+                                        </p>
+                                    </div>
+
+                                    <span class="upcoming-status-pill {{ $isToday ? 'is-ongoing' : 'is-upcoming' }}">
+                                        {{ $badgeLabel }}
+                                    </span>
+                                </div>
+
+                                <div class="upcoming-schedule-bar">
+                                    <div class="upcoming-meta-item">
+                                        <i data-lucide="calendar"></i>
+                                        <span>{{ $fullDateText }}</span>
+                                    </div>
+
+                                    <div class="upcoming-meta-item">
+                                        <i data-lucide="clock"></i>
+                                        <span>{{ $startFmt }} WIB - {{ $endFmt }} WIB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="dash-empty-state">
+                    Belum ada jadwal peminjaman auditorium mendatang.
+                </div>
+            @endif
+        </div>
+    </div>
+
     {{-- PENGAJUAN DAN INFORMASI --}}
     <div class="dashboard-middle">
 
@@ -1416,7 +2133,7 @@
                     <p>Ringkasan pengajuan peminjaman Anda</p>
                 </div>
 
-                <a href="{{ $bookingsListUrl }}">
+                <a href="{{ route('borrower.bookings') }}">
                     Lihat semua
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -1436,7 +2153,7 @@
                             };
 
                             $bDate = $b->booking_date
-                                ? \Carbon\Carbon::parse($b->booking_date)->locale('id')->translatedFormat('d F Y')
+                                ? \Carbon\Carbon::parse($b->booking_date, 'Asia/Jakarta')->locale('id')->translatedFormat('d F Y')
                                 : '-';
                             $bTime = !empty($b->start_time)
                                 ? str_replace(':', '.', substr($b->start_time, 0, 5)) . ' WIB'
@@ -1447,20 +2164,26 @@
                             $hasDistinctEvent = !empty(optional($b->auditorium)->name) && !empty($b->event_name);
                         @endphp
 
-                        <a href="{{ route($bookingsRouteName, ['booking_id' => $b->id]) }}" class="proto-card">
+                        <a href="{{ route('borrower.bookings', ['booking_id' => $b->id]) }}" class="proto-card">
                             <div class="proto-card-top">
                                 <div class="proto-card-heading">
                                     <h3 class="proto-card-title">{{ $bVenue }}</h3>
                                     @if($hasDistinctEvent || $bOrg !== '')
                                         <p class="proto-card-sub">
                                             @if($hasDistinctEvent)
-                                                <span class="event-name">{{ $b->event_name }}</span>
+                                                <span class="proto-sub-item" title="{{ $b->event_name }}">
+                                                    <i data-lucide="bookmark"></i>
+                                                    <span class="event-name">{{ $b->event_name }}</span>
+                                                </span>
                                             @endif
                                             @if($hasDistinctEvent && $bOrg !== '')
                                                 <span class="sub-dot">•</span>
                                             @endif
                                             @if($bOrg !== '')
-                                                <span class="org-name">{{ $bOrg }}</span>
+                                                <span class="proto-sub-item" title="{{ $bOrg }}">
+                                                    <i data-lucide="user"></i>
+                                                    <span class="org-name">{{ $bOrg }}</span>
+                                                </span>
                                             @endif
                                         </p>
                                     @endif
@@ -1496,7 +2219,7 @@
                     <p>Panduan singkat peminjaman</p>
                 </div>
 
-                <a href="{{ $guidesUrl }}">
+                <a href="{{ route('borrower.guides') }}">
                     Informasi lebih lanjut
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -1735,7 +2458,7 @@
                         <div class="auditorium-actions">
                             @if($isActive)
                                 <a
-                                    href="{{ route($createBookingRoute, ['auditorium' => $a->id]) }}"
+                                    href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
                                     class="btn-booking"
                                     onclick="event.stopPropagation()"
                                 >
@@ -1898,7 +2621,7 @@
                             <div class="modal-actions">
                                 @if($isActive)
                                     <a
-                                        href="{{ route($createBookingRoute, ['auditorium' => $a->id]) }}"
+                                        href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
                                     >
                                         <i data-lucide="calendar-plus"></i>
                                         Ajukan Peminjaman
@@ -1930,9 +2653,263 @@
     </div>
 </div>
 
-{{-- JAVASCRIPT DETAIL, TYPEWRITER & SLIDER AUDITORIUM --}}
+{{-- CHART.JS CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+{{-- JAVASCRIPT DETAIL, CHART, TYPEWRITER & SLIDER AUDITORIUM --}}
 <script>
     const AUD_SLIDE_INTERVAL = 4000;
+
+    function pruneExpiredBorrowerUpcoming() {
+        const listEl = document.getElementById('borrowerUpcomingList');
+        if (!listEl) return;
+
+        const nowMs = Date.now();
+        const cards = listEl.querySelectorAll('.upcoming-card[data-end-ts]');
+        let removed = false;
+
+        cards.forEach(function (card) {
+            const endTs = Number(card.dataset.endTs || 0);
+            if (endTs > 0 && nowMs >= endTs) {
+                card.remove();
+                removed = true;
+            }
+        });
+
+        if (removed) {
+            const remaining = listEl.querySelectorAll('.upcoming-card[data-end-ts]').length;
+            const countEl = document.getElementById('borrowerUpcomingCount');
+            if (countEl) {
+                countEl.textContent = '(' + remaining + ')';
+            }
+
+            if (remaining === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'dash-empty-state';
+                emptyDiv.textContent = 'Belum ada jadwal peminjaman auditorium mendatang.';
+                listEl.replaceWith(emptyDiv);
+            }
+        }
+    }
+
+    function initBorrowerChart() {
+        const canvas = document.getElementById('sipaduBorrowerChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const labels = JSON.parse(canvas.dataset.labels || '[]');
+        const yearlyData = JSON.parse(canvas.dataset.yearly || '{}');
+        const availableYears = JSON.parse(canvas.dataset.years || '[]').map(Number);
+        let currentYear = Number(canvas.dataset.defaultYear || availableYears[availableYears.length - 1] || new Date().getFullYear());
+
+        const yearDropdown = document.getElementById('chartYearDropdown');
+        const yearTrigger = document.getElementById('chartYearTrigger');
+        const yearLabel = document.getElementById('chartYearLabel');
+        const yearOptions = document.querySelectorAll('#chartYearMenu .chart-year-option');
+        const prevBtn = document.getElementById('chartPrevYearBtn');
+        const nextBtn = document.getElementById('chartNextYearBtn');
+        const detailBox = document.getElementById('chartClickDetail');
+        const detailMonth = document.getElementById('chartDetailMonth');
+        const detailApproved = document.getElementById('chartDetailApproved');
+        const detailRejected = document.getElementById('chartDetailRejected');
+        const detailClose = document.getElementById('chartDetailClose');
+
+        function getYearSeries(year) {
+            const entry = yearlyData[String(year)] || {};
+            return {
+                approved: Array.isArray(entry.approved) ? entry.approved : new Array(12).fill(0),
+                rejected: Array.isArray(entry.rejected) ? entry.rejected : new Array(12).fill(0)
+            };
+        }
+
+        function closeYearDropdown() {
+            if (!yearDropdown || !yearTrigger) return;
+            yearDropdown.classList.remove('is-open');
+            yearTrigger.setAttribute('aria-expanded', 'false');
+        }
+
+        function syncYearControls() {
+            const idx = availableYears.indexOf(currentYear);
+            if (yearLabel) yearLabel.textContent = String(currentYear);
+            yearOptions.forEach(function (opt) {
+                const isSelected = Number(opt.dataset.year) === currentYear;
+                opt.classList.toggle('is-active', isSelected);
+                opt.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            });
+            if (prevBtn) prevBtn.disabled = idx <= 0;
+            if (nextBtn) nextBtn.disabled = idx === -1 || idx >= availableYears.length - 1;
+        }
+
+        function showMonthDetail(monthIndex) {
+            if (!detailBox || monthIndex < 0 || monthIndex >= labels.length) return;
+            const series = getYearSeries(currentYear);
+            detailMonth.textContent = labels[monthIndex] + ' ' + currentYear;
+            detailApproved.textContent = 'Disetujui: ' + (series.approved[monthIndex] ?? 0);
+            detailRejected.textContent = 'Ditolak: ' + (series.rejected[monthIndex] ?? 0);
+            detailBox.classList.remove('is-hidden');
+        }
+
+        const initialSeries = getYearSeries(currentYear);
+
+        const borrowerChart = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Disetujui',
+                        data: initialSeries.approved,
+                        backgroundColor: 'rgba(35, 124, 77, 0.85)',
+                        hoverBackgroundColor: '#1a633c',
+                        borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 6, bottomRight: 6 },
+                        borderSkipped: false,
+                        barPercentage: 0.62,
+                        categoryPercentage: 0.78
+                    },
+                    {
+                        label: 'Ditolak',
+                        data: initialSeries.rejected,
+                        backgroundColor: 'rgba(220, 69, 69, 0.82)',
+                        hoverBackgroundColor: '#b91c1c',
+                        borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
+                        borderSkipped: false,
+                        barPercentage: 0.62,
+                        categoryPercentage: 0.78
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                onClick: function (event, elements, chart) {
+                    let monthIndex = -1;
+                    if (elements && elements.length > 0) {
+                        monthIndex = elements[0].index;
+                    } else {
+                        const nearest = chart.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
+                        if (nearest && nearest.length > 0) {
+                            monthIndex = nearest[0].index;
+                        }
+                    }
+
+                    if (monthIndex !== -1) {
+                        showMonthDetail(monthIndex);
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#163626',
+                        titleColor: '#ffffff',
+                        bodyColor: '#eef7f1',
+                        padding: 10,
+                        cornerRadius: 9,
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        callbacks: {
+                            title: function (items) {
+                                return (items[0]?.label || '') + ' ' + currentYear;
+                            },
+                            label: function (ctx) {
+                                return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + ' peminjaman';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: {
+                            color: '#4c6456',
+                            font: { size: 11, weight: '600' }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        border: { display: false },
+                        grid: {
+                            color: 'rgba(22, 54, 38, 0.08)',
+                            drawTicks: false
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            precision: 0,
+                            color: '#4c6456',
+                            padding: 8,
+                            font: { size: 11, weight: '600' }
+                        }
+                    }
+                }
+            }
+        });
+
+        function changeChartYear(nextYear) {
+            if (!availableYears.includes(nextYear)) return;
+            currentYear = nextYear;
+            const series = getYearSeries(currentYear);
+            borrowerChart.data.datasets[0].data = series.approved;
+            borrowerChart.data.datasets[1].data = series.rejected;
+            borrowerChart.update();
+            syncYearControls();
+            closeYearDropdown();
+
+            if (detailBox && !detailBox.classList.contains('is-hidden')) {
+                detailBox.classList.add('is-hidden');
+            }
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                const idx = availableYears.indexOf(currentYear);
+                if (idx > 0) changeChartYear(availableYears[idx - 1]);
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                const idx = availableYears.indexOf(currentYear);
+                if (idx !== -1 && idx < availableYears.length - 1) {
+                    changeChartYear(availableYears[idx + 1]);
+                }
+            });
+        }
+
+        if (yearTrigger && yearDropdown) {
+            yearTrigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const isOpen = yearDropdown.classList.toggle('is-open');
+                yearTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!yearDropdown.contains(e.target)) {
+                    closeYearDropdown();
+                }
+            });
+        }
+
+        yearOptions.forEach(function (opt) {
+            opt.addEventListener('click', function (e) {
+                e.stopPropagation();
+                changeChartYear(Number(this.dataset.year));
+            });
+        });
+
+        if (detailClose && detailBox) {
+            detailClose.addEventListener('click', function () {
+                detailBox.classList.add('is-hidden');
+            });
+        }
+
+        syncYearControls();
+    }
 
     function initWelcomeTypewriter() {
         const heading = document.querySelector('.dashboard-welcome h1[data-typewriter]');
@@ -2068,13 +3045,17 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        /* HAPUS OTOMATIS PEMINJAMAN MENDATANG YANG JAMNYA SUDAH BERAKHIR */
+        pruneExpiredBorrowerUpcoming();
+        setInterval(pruneExpiredBorrowerUpcoming, 15000);
+
+        initBorrowerChart();
         initWelcomeTypewriter();
 
         if (window.lucide) {
             window.lucide.createIcons();
         }
 
-        // Pindahkan seluruh modal ke root <body> dan kunci scroll chaining agar backdrop blur menutupi layar tanpa menggeser layout
         document.querySelectorAll('.auditorium-modal').forEach(modal => {
             document.body.appendChild(modal);
 
@@ -2092,7 +3073,6 @@
             }, { passive: false });
         });
 
-        // Inisialisasi slideshow otomatis + kontrol swipe pada kartu dan drawer detail
         document.querySelectorAll('[data-aud-slider]').forEach(slider => {
             let startX = 0;
 
@@ -2124,6 +3104,12 @@
                 .forEach(function(modal) {
                     modal.classList.remove('show');
                 });
+            const yearDropdown = document.getElementById('chartYearDropdown');
+            const yearTrigger = document.getElementById('chartYearTrigger');
+            if (yearDropdown && yearTrigger) {
+                yearDropdown.classList.remove('is-open');
+                yearTrigger.setAttribute('aria-expanded', 'false');
+            }
         }
     });
 </script>
