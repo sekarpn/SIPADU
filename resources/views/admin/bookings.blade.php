@@ -410,7 +410,7 @@
     font-weight: 700;
 }
 
-/* TABLE STYLING (TANPA SPACE KOSONG DI KANAN) */
+/* TABLE STYLING (PROPORSI KOLOM RAPI & SEIMBANG) */
 .booking-page .bp-table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -425,12 +425,12 @@
 .booking-page table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 780px;
+    min-width: 820px;
     font-size: 13px;
 }
 
 .booking-page th {
-    padding: 13px 18px;
+    padding: 13px 20px;
     text-align: left;
     background: rgba(255, 255, 255, .44);
     border-bottom: 1px solid var(--bp-line);
@@ -443,13 +443,64 @@
 }
 
 .booking-page td {
-    padding: 15px 18px;
+    padding: 16px 20px;
     border-bottom: 1px solid rgba(22, 54, 38, .06);
     vertical-align: middle;
     font-size: 12.5px;
     line-height: 1.5;
     color: var(--bp-ink);
     transition: background .18s ease;
+}
+
+/* PROPORSI LEBAR SETIAP KOLOM */
+.booking-page th:nth-child(1),
+.booking-page td:nth-child(1) {
+    width: 24%;
+}
+
+.booking-page th:nth-child(2),
+.booking-page td:nth-child(2) {
+    width: 24%;
+}
+
+.booking-page th:nth-child(3),
+.booking-page td:nth-child(3) {
+    width: 30%;
+}
+
+/* KOLOM STATUS RATA TENGAH */
+.booking-page th:nth-child(4),
+.booking-page td:nth-child(4) {
+    width: 12%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* KOLOM AKSI RATA KANAN & SEJAJAR DENGAN HEADER */
+.booking-page th:last-child,
+.booking-page td:last-child {
+    width: 10%;
+    text-align: right;
+    white-space: nowrap;
+    padding-right: 20px;
+}
+
+.booking-page tbody tr:hover td {
+    background: rgba(255, 255, 255, .52);
+}
+
+.booking-page tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.booking-page .bp-primary {
+    font-weight: 700;
+    color: var(--bp-ink);
+    display: block;
+    max-width: 280px;
+    white-space: normal;
+    line-height: 1.45;
+    margin-top: 2px;
 }
 
 /* KOLOM AKSI MERAPAT KE KANAN TANPA SISA SPACE KOSONG */
