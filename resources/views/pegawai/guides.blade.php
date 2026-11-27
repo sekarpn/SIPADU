@@ -5,6 +5,236 @@
 @php
     $isPegawai = request()->routeIs('pegawai.*');
     $createRoute = $isPegawai ? route('pegawai.booking.create') : route('borrower.booking.create');
+
+    // Ambil data Konten Informasi yang dikelola Admin (/admin/konten)
+    $dbContents = collect();
+    foreach ([\App\Models\GuideContent::class, \App\Models\Content::class, \App\Models\InformationContent::class] as $modelClass) {
+        if (class_exists($modelClass)) {
+            try {
+                $dbContents = $modelClass::all();
+                break;
+            } catch (\Throwable $e) {
+                $dbContents = collect();
+            }
+        }
+    }
+
+    $findContentByType = function (array $keywords) use ($dbContents) {
+        return $dbContents->first(function ($item) use ($keywords) {
+            $type  = strtolower(trim((string) ($item->type ?? $item->category ?? $item->section ?? $item->key ?? '')));
+            $title = strtolower(trim((string) ($item->title ?? '')));
+            foreach ($keywords as $kw) {
+                if ($type === $kw || str_contains($type, $kw) || str_contains($title, $kw)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    };
+
+    $alurRow    = $findContentByType(['alur']);
+    $sopRow     = $findContentByType(['sop']);
+    $faqRow     = $findContentByType(['faq']);
+    $contactRow = $findContentByType(['contact', 'kontak']);
+
+    // 1. PARSING ALUR PENGAJUAN (Memecah "1. ... 2. ... 3. ... 4. ...")
+    $defaultFlows = [
+        [
+            'code'  => 'TAHAP 01',
+            'title' => 'Pengajuan ke Fakultas',
+            'desc'  => 'Himpunan, BEM Fakultas, atau KSM mengajukan proposal dan surat peminjaman kepada pihak fakultas.',
+            'actor' => 'Himpunan / BEM / KSM',
+        ],
+        [
+            'code'  => 'TAHAP 02',
+            'title' => 'Disposisi WaDek II',
+            'desc'  => 'Fakultas membuat permohonan peminjaman tempat dan sarana prasarana yang ditandatangani Dekanat (WaDek II).',
+            'actor' => 'Dekanat (WaDek II)',
+        ],
+        [
+            'code'  => 'TAHAP 03',
+            'title' => 'Verifikasi Ketersediaan',
+            'desc'  => 'Universitas memeriksa apakah ruangan tersedia atau telah digunakan pihak lain yang lebih dahulu mengajukan.',
+            'actor' => 'Pengelola Universitas',
+        ],
+        [
+            'code'  => 'TAHAP 04',
+            'title' => 'Persetujuan Peminjaman',
+            'desc'  => 'Jika ruangan tersedia dan perizinan lengkap, peminjaman dapat disetujui oleh pengelola.',
+            'actor' => 'Status Disetujui',
+        ],
+    ];
+
+    $flowSteps = $defaultFlows;
+    $alurRaw = trim((string) ($alurRow->content ?? $alurRow->body ?? $alurRow->description ?? ''));
+    if ($alurRaw !== '') {
+        $parsedSteps = preg_split('/(?:^|\s+)(?=\d+\.\s)/', $alurRaw, -1, PREG_SPLIT_NO_EMPTY);
+        $parsedSteps = array_values(array_filter(array_map('trim', $parsedSteps)));
+
+        if (count($parsedSteps) >= 2) {
+            $flowSteps = [];
+            foreach ($parsedSteps as $idx => $stepText) {
+                $cleanText = preg_replace('/^\d+\.\s*/', '', $stepText);
+                $preset = $defaultFlows[$idx] ?? [
+                    'code'  => 'TAHAP ' . str_pad($idx + 1, 2, '0', STR_PAD_LEFT),
+                    'title' => 'Tahap ' . ($idx + 1),
+                    'actor' => 'Pemohon / Pengelola',
+                ];
+
+                $stepTitle = $preset['title'];
+                $stepDesc  = $cleanText;
+
+                if (str_contains($cleanText, ':')) {
+                    [$customTitle, $customDesc] = explode(':', $cleanText, 2);
+                    if (mb_strlen(trim($customTitle)) <= 45 && trim($customDesc) !== '') {
+                        $stepTitle = trim($customTitle);
+                        $stepDesc  = trim($customDesc);
+                    }
+                }
+
+                $flowSteps[] = [
+                    'code'  => 'TAHAP ' . str_pad($idx + 1, 2, '0', STR_PAD_LEFT),
+                    'title' => $stepTitle,
+                    'desc'  => $stepDesc,
+                    'actor' => $preset['actor'],
+                ];
+            }
+        }
+    }
+
+    // 2. PARSING SOP & JALUR UKM
+    $defaultSopRules = [
+        [
+            'title'     => 'Agenda Pihak Rektorat',
+            'badge'     => 'Prioritas Utama',
+            'is_solid'  => true,
+            'desc'      => 'Jika ada acara yang jadwalnya bersamaan dengan pihak rektorat, pihak rektorat didahulukan.',
+        ],
+        [
+            'title'     => 'Bentrok Jadwal BEM & Himpunan',
+            'badge'     => 'Penilaian Urgensi',
+            'is_solid'  => false,
+            'desc'      => 'Jika jadwal BEM dan Himpunan bersamaan, akan dilihat tingkat urgensi dan kepentingannya yang ditentukan oleh Kepala Biro Umum & Keuangan atas nama Rektor.',
+        ],
+        [
+            'title'     => 'Acara Eksternal vs Internal UPN',
+            'badge'     => 'Tinjauan Tujuan',
+            'is_solid'  => false,
+            'desc'      => 'Jika terdapat acara eksternal dan internal UPN yang jadwalnya bersamaan, akan dilihat tujuan masing-masing acara dan apakah narasumber berasal dari luar.',
+        ],
+    ];
+
+    $ukmTrackDesc = 'UKM tingkat universitas dapat mengajukan proposal dan surat peminjaman ruangan langsung ke KoorBid Kemahasiswaan.';
+    $sopRules = $defaultSopRules;
+
+    $sopRaw = trim((string) ($sopRow->content ?? $sopRow->body ?? $sopRow->description ?? ''));
+    if ($sopRaw !== '') {
+        // Pisahkan kalimat jika diawali nomor (1., 2.) atau per baris / titik
+        $rawItems = preg_match('/(?:^|\s)\d+\.\s/', $sopRaw)
+            ? preg_split('/(?:^|\s+)(?=\d+\.\s)/', $sopRaw, -1, PREG_SPLIT_NO_EMPTY)
+            : preg_split('/\r\n|\r|\n|(?<=\.)\s+(?=[A-Z])/', $sopRaw, -1, PREG_SPLIT_NO_EMPTY);
+
+        $filteredRules = [];
+        foreach ($rawItems as $line) {
+            $line = trim(preg_replace('/^\d+\.\s*/', '', $line));
+            if ($line === '') continue;
+
+            // Jika baris membahas jalur UKM ke KoorBid Kemahasiswaan, masukkan ke switcher kanan
+            if (stripos($line, 'ukm') !== false && stripos($line, 'koorbid') !== false) {
+                $ukmTrackDesc = $line;
+                continue;
+            }
+
+            $ruleTitle = 'Ketentuan Prioritas ' . str_pad(count($filteredRules) + 1, 2, '0', STR_PAD_LEFT);
+            $ruleBadge = count($filteredRules) === 0 ? 'Prioritas Utama' : 'Ketentuan SOP';
+            $isSolid   = count($filteredRules) === 0;
+            $ruleDesc  = $line;
+
+            if (str_contains($line, ':')) {
+                [$t, $d] = explode(':', $line, 2);
+                if (mb_strlen(trim($t)) <= 50 && trim($d) !== '') {
+                    $ruleTitle = trim($t);
+                    $ruleDesc  = trim($d);
+                }
+            } elseif (stripos($line, 'rektorat') !== false) {
+                $ruleTitle = 'Agenda Pihak Rektorat';
+                $ruleBadge = 'Prioritas Utama';
+                $isSolid   = true;
+            } elseif (stripos($line, 'bem') !== false || stripos($line, 'himpunan') !== false) {
+                $ruleTitle = 'Bentrok Jadwal BEM & Himpunan';
+                $ruleBadge = 'Penilaian Urgensi';
+                $isSolid   = false;
+            } elseif (stripos($line, 'eksternal') !== false) {
+                $ruleTitle = 'Acara Eksternal vs Internal UPN';
+                $ruleBadge = 'Tinjauan Tujuan';
+                $isSolid   = false;
+            }
+
+            $filteredRules[] = [
+                'title'    => $ruleTitle,
+                'badge'    => $ruleBadge,
+                'is_solid' => $isSolid,
+                'desc'     => $ruleDesc,
+            ];
+        }
+
+        if (count($filteredRules) > 0) {
+            $sopRules = $filteredRules;
+        }
+    }
+
+    // 3. PARSING FAQ (Memecah pasangan "Pertanyaan? Jawaban.")
+    $defaultFaqs = [
+        [
+            'question' => 'Apakah pengajuan langsung disetujui setelah dikirim?',
+            'answer'   => 'Tidak. Setiap pengajuan akan diperiksa terlebih dahulu oleh Admin/pengelola auditorium untuk memastikan kelengkapan surat perizinan serta ketersediaan jadwal ruangan.',
+        ],
+        [
+            'question' => 'Bagaimana cara mengetahui jadwal auditorium yang tersedia?',
+            'answer'   => 'Anda dapat melihat jadwal yang sudah disetujui pada panel Peminjaman Mendatang di Beranda, atau langsung memilih auditorium dan tanggal pada formulir Ajukan Peminjaman (sistem otomatis mendeteksi bentrok jam).',
+        ],
+        [
+            'question' => 'Dokumen apa yang wajib diunggah saat mengajukan peminjaman?',
+            'answer'   => 'Surat permohonan peminjaman ruangan dalam format PDF yang telah disahkan oleh WaDek II (untuk Ormawa Fakultas) atau KoorBid Kemahasiswaan (untuk UKM).',
+        ],
+        [
+            'question' => 'Bagaimana jika status pengajuan saya Perlu Revisi atau Ditolak?',
+            'answer'   => 'Buka menu Peminjaman Saya lalu klik pengajuan terkait untuk membaca catatan alasan dari Admin, kemudian lengkapi berkas perbaikan yang diminta atau ajukan ulang.',
+        ],
+        [
+            'question' => 'Siapa yang diprioritaskan jika jadwal kegiatan bentrok di hari yang sama?',
+            'answer'   => 'Agenda pihak rektorat didahulukan. Untuk bentrok antar organisasi mahasiswa, prioritas ditentukan berdasarkan tingkat urgensi acara oleh Kepala Biro Umum & Keuangan atas nama Rektor.',
+        ],
+    ];
+
+    $faqItems = $defaultFaqs;
+    $faqRaw = trim((string) ($faqRow->content ?? $faqRow->body ?? $faqRow->description ?? ''));
+    if ($faqRaw !== '') {
+        // Deteksi pola "Kalimat tanya? Kalimat jawaban."
+        preg_match_all('/([^?]+\?)\s*([^?]+(?=(?:\s+[^?]+\?|$)))/u', $faqRaw, $matches, PREG_SET_ORDER);
+        if (count($matches) > 0) {
+            $parsedFaqs = [];
+            foreach ($matches as $m) {
+                $q = trim(preg_replace('/^\d+\.\s*/', '', $m[1]));
+                $a = trim($m[2]);
+                if ($q !== '' && $a !== '') {
+                    $parsedFaqs[] = [
+                        'question' => $q,
+                        'answer'   => $a,
+                    ];
+                }
+            }
+            if (count($parsedFaqs) > 0) {
+                $faqItems = $parsedFaqs;
+            }
+        }
+    }
+
+    // 4. CONTACT PERSON DARI DATABASE ADMIN
+    $contactText = trim((string) ($contactRow->content ?? $contactRow->body ?? $contactRow->description ?? ''));
+    if ($contactText === '') {
+        $contactText = 'Narahubung gedung diperbarui oleh Admin';
+    }
 @endphp
 
 <style>
@@ -466,7 +696,7 @@
         grid-template-columns: minmax(270px, 0.78fr) minmax(0, 1.45fr);
         gap: 24px;
         align-items: start;
-        min-height: 460px; /* Menjaga tinggi background tetap statis saat FAQ dibuka/tutup */
+        min-height: 460px;
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.56) 0%, rgba(255, 255, 255, 0.28) 100%);
         backdrop-filter: blur(18px) saturate(150%);
         -webkit-backdrop-filter: blur(18px) saturate(150%);
@@ -641,6 +871,7 @@
         font-size: 11.8px;
         font-weight: 700;
         text-align: center;
+        line-height: 1.4;
     }
 
     .cp-status-pill svg {
@@ -650,7 +881,7 @@
         flex-shrink: 0;
     }
 
-    /* KOLOM KANAN FAQ: SINGLE-OPEN ACCORDION DENGAN PANAH BAWAH */
+    /* KOLOM KANAN FAQ: SINGLE-OPEN ACCORDION DENGAN PANAH TANPA BACKGROUND BULET */
     .faq-pill-stack {
         display: flex;
         flex-direction: column;
@@ -702,16 +933,15 @@
     }
 
     .faq-pill-symbol {
-        width: 26px;
-        height: 26px;
+        width: 24px;
+        height: 24px;
         flex-shrink: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
         color: var(--sipadu-primary);
-        background: transparent;
-        transition: transform .24s ease, background .2s ease, color .2s ease;
+        background: transparent !important;
+        transition: transform .24s ease, color .2s ease;
     }
 
     .faq-pill-symbol svg {
@@ -721,7 +951,7 @@
 
     .faq-pill-card.is-pinned .faq-pill-symbol {
         transform: rotate(180deg);
-        background: var(--sipadu-primary-soft);
+        background: transparent !important;
         color: var(--sipadu-primary);
     }
 
@@ -764,14 +994,14 @@
 
     /* RESPONSIVE */
     @media (max-width: 1024px) {
-        .faq-editorial-section {
-            grid-template-columns: 1fr;
-            min-height: auto;
+        .flow-track-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .policy-ledger-grid,
         .faq-editorial-section {
             grid-template-columns: 1fr;
+            min-height: auto;
         }
 
         .ledger-track-pane {
@@ -830,7 +1060,7 @@
         </a>
     </div>
 
-    {{-- 1. ALUR PENGAJUAN (LANGSUNG MUNCUL SEMUA TAHAPAN) --}}
+    {{-- 1. ALUR PENGAJUAN (OTOMATIS DARI KONTEN ADMIN) --}}
     <section class="glass-surface flow-circuit-panel">
         <div class="surface-head">
             <div class="surface-title-group">
@@ -838,56 +1068,25 @@
                     <i data-lucide="route"></i>
                 </div>
                 <div>
-                    <h2>Alur Pengajuan Peminjaman</h2>
+                    <h2>{{ $alurRow->title ?? 'Alur Pengajuan Peminjaman' }}</h2>
                     <p>Tahapan proses perizinan dan verifikasi peminjaman ruang auditorium UPNVJ</p>
                 </div>
             </div>
         </div>
 
         <div class="flow-track-grid">
-            <div class="flow-node">
-                <div>
-                    <div class="flow-node-top">
-                        <span class="flow-step-code">TAHAP 01</span>
+            @foreach($flowSteps as $step)
+                <div class="flow-node">
+                    <div>
+                        <div class="flow-node-top">
+                            <span class="flow-step-code">{{ $step['code'] }}</span>
+                        </div>
+                        <div class="flow-node-title">{{ $step['title'] }}</div>
+                        <p class="flow-node-desc">{{ $step['desc'] }}</p>
                     </div>
-                    <div class="flow-node-title">Pengajuan ke Fakultas</div>
-                    <p class="flow-node-desc">Himpunan, BEM Fakultas, atau KSM mengajukan proposal dan surat peminjaman kepada pihak fakultas.</p>
+                    <span class="flow-node-actor">{{ $step['actor'] }}</span>
                 </div>
-                <span class="flow-node-actor">Himpunan / BEM / KSM</span>
-            </div>
-
-            <div class="flow-node">
-                <div>
-                    <div class="flow-node-top">
-                        <span class="flow-step-code">TAHAP 02</span>
-                    </div>
-                    <div class="flow-node-title">Disposisi WaDek II</div>
-                    <p class="flow-node-desc">Fakultas membuat permohonan peminjaman tempat dan sarana prasarana yang ditandatangani Dekanat (WaDek II).</p>
-                </div>
-                <span class="flow-node-actor">Dekanat (WaDek II)</span>
-            </div>
-
-            <div class="flow-node">
-                <div>
-                    <div class="flow-node-top">
-                        <span class="flow-step-code">TAHAP 03</span>
-                    </div>
-                    <div class="flow-node-title">Verifikasi Ketersediaan</div>
-                    <p class="flow-node-desc">Universitas memeriksa apakah ruangan tersedia atau telah digunakan pihak lain yang lebih dahulu mengajukan.</p>
-                </div>
-                <span class="flow-node-actor">Pengelola Universitas</span>
-            </div>
-
-            <div class="flow-node">
-                <div>
-                    <div class="flow-node-top">
-                        <span class="flow-step-code">TAHAP 04</span>
-                    </div>
-                    <div class="flow-node-title">Persetujuan Peminjaman</div>
-                    <p class="flow-node-desc">Jika ruangan tersedia dan perizinan lengkap, peminjaman dapat disetujui oleh pengelola.</p>
-                </div>
-                <span class="flow-node-actor">Status Disetujui</span>
-            </div>
+            @endforeach
         </div>
     </section>
 
@@ -903,45 +1102,27 @@
                             <i data-lucide="scale"></i>
                         </div>
                         <div>
-                            <h2>SOP &amp; Ketentuan Prioritas Ruangan</h2>
+                            <h2>{{ $sopRow->title ?? 'SOP & Ketentuan Prioritas Ruangan' }}</h2>
                             <p>Pedoman penyelesaian bentrok jadwal auditorium/aula UPN Veteran Jakarta</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="ledger-rule-list">
-                    <div class="ledger-rule-item">
-                        <span class="ledger-index">01</span>
-                        <div>
-                            <div class="ledger-rule-head">
-                                <strong>Agenda Pihak Rektorat</strong>
-                                <span class="ledger-chip is-solid">Prioritas Utama</span>
+                    @foreach($sopRules as $index => $rule)
+                        <div class="ledger-rule-item">
+                            <span class="ledger-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            <div>
+                                <div class="ledger-rule-head">
+                                    <strong>{{ $rule['title'] }}</strong>
+                                    <span class="ledger-chip {{ $rule['is_solid'] ? 'is-solid' : '' }}">
+                                        {{ $rule['badge'] }}
+                                    </span>
+                                </div>
+                                <p>{{ $rule['desc'] }}</p>
                             </div>
-                            <p>Jika ada acara yang jadwalnya bersamaan dengan pihak rektorat, pihak rektorat didahulukan.</p>
                         </div>
-                    </div>
-
-                    <div class="ledger-rule-item">
-                        <span class="ledger-index">02</span>
-                        <div>
-                            <div class="ledger-rule-head">
-                                <strong>Bentrok Jadwal BEM &amp; Himpunan</strong>
-                                <span class="ledger-chip">Penilaian Urgensi</span>
-                            </div>
-                            <p>Jika jadwal BEM dan Himpunan bersamaan, akan dilihat tingkat urgensi dan kepentingannya yang ditentukan oleh Kepala Biro Umum &amp; Keuangan atas nama Rektor.</p>
-                        </div>
-                    </div>
-
-                    <div class="ledger-rule-item">
-                        <span class="ledger-index">03</span>
-                        <div>
-                            <div class="ledger-rule-head">
-                                <strong>Acara Eksternal vs Internal UPN</strong>
-                                <span class="ledger-chip">Tinjauan Tujuan</span>
-                            </div>
-                            <p>Jika terdapat acara eksternal dan internal UPN yang jadwalnya bersamaan, akan dilihat tujuan masing-masing acara dan apakah narasumber berasal dari luar.</p>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -971,7 +1152,7 @@
                             role="tab"
                             aria-selected="false"
                             data-track-title="Unit Kegiatan Mahasiswa (UKM)"
-                            data-track-desc="UKM tingkat universitas dapat mengajukan proposal dan surat peminjaman ruangan langsung ke KoorBid Kemahasiswaan."
+                            data-track-desc="{{ $ukmTrackDesc }}"
                         >
                             UKM Universitas
                         </button>
@@ -1016,14 +1197,14 @@
                 <input type="text" id="faqSearchInput" placeholder="Cari pertanyaan..." aria-label="Cari pertanyaan FAQ">
             </div>
 
-            {{-- KARTU CONTACT PERSON --}}
+            {{-- KARTU CONTACT PERSON (OTOMATIS DARI KONTEN ADMIN) --}}
             <div class="cp-callout-card">
                 <div class="cp-card-header">
                     <div class="cp-avatar-wrap">
                         <i data-lucide="headset"></i>
                     </div>
                     <div>
-                        <h3>Contact Person</h3>
+                        <h3>{{ $contactRow->title ?? 'Contact Person' }}</h3>
                         <span>Layanan Pengelola Ruang</span>
                     </div>
                 </div>
@@ -1043,83 +1224,27 @@
 
                 <div class="cp-status-pill">
                     <i data-lucide="info"></i>
-                    <span>Narahubung gedung diperbarui oleh Admin</span>
+                    <span>{{ $contactText }}</span>
                 </div>
             </div>
         </div>
 
-        {{-- KOLOM KANAN: SINGLE-OPEN ACCORDION DENGAN PANAH KE BAWAH --}}
+        {{-- KOLOM KANAN: SINGLE-OPEN ACCORDION (SEMUA TERTUTUP DEFAULT & PANAH TANPA BULET) --}}
         <div>
             <div class="faq-pill-stack" id="faqPillStack">
-                <button type="button" class="faq-pill-card is-pinned" aria-expanded="true">
-                    <div class="faq-pill-header">
-                        <span class="faq-pill-question">Apakah pengajuan langsung disetujui setelah dikirim?</span>
-                        <span class="faq-pill-symbol" aria-hidden="true"><i data-lucide="chevron-down"></i></span>
-                    </div>
-                    <div class="faq-pill-reveal">
-                        <div class="faq-pill-reveal-inner">
-                            <p class="faq-pill-answer">
-                                Tidak. Setiap pengajuan akan diperiksa terlebih dahulu oleh Admin/pengelola auditorium untuk memastikan kelengkapan surat perizinan serta ketersediaan jadwal ruangan.
-                            </p>
+                @foreach($faqItems as $faq)
+                    <button type="button" class="faq-pill-card" aria-expanded="false">
+                        <div class="faq-pill-header">
+                            <span class="faq-pill-question">{{ $faq['question'] }}</span>
+                            <span class="faq-pill-symbol" aria-hidden="true"><i data-lucide="chevron-down"></i></span>
                         </div>
-                    </div>
-                </button>
-
-                <button type="button" class="faq-pill-card" aria-expanded="false">
-                    <div class="faq-pill-header">
-                        <span class="faq-pill-question">Bagaimana cara mengetahui jadwal auditorium yang tersedia?</span>
-                        <span class="faq-pill-symbol" aria-hidden="true"><i data-lucide="chevron-down"></i></span>
-                    </div>
-                    <div class="faq-pill-reveal">
-                        <div class="faq-pill-reveal-inner">
-                            <p class="faq-pill-answer">
-                                Anda dapat melihat jadwal yang sudah disetujui pada panel Peminjaman Mendatang di Beranda, atau langsung memilih auditorium dan tanggal pada formulir Ajukan Peminjaman (sistem otomatis mendeteksi bentrok jam).
-                            </p>
+                        <div class="faq-pill-reveal">
+                            <div class="faq-pill-reveal-inner">
+                                <p class="faq-pill-answer">{{ $faq['answer'] }}</p>
+                            </div>
                         </div>
-                    </div>
-                </button>
-
-                <button type="button" class="faq-pill-card" aria-expanded="false">
-                    <div class="faq-pill-header">
-                        <span class="faq-pill-question">Dokumen apa yang wajib diunggah saat mengajukan peminjaman?</span>
-                        <span class="faq-pill-symbol" aria-hidden="true"><i data-lucide="chevron-down"></i></span>
-                    </div>
-                    <div class="faq-pill-reveal">
-                        <div class="faq-pill-reveal-inner">
-                            <p class="faq-pill-answer">
-                                Surat permohonan peminjaman ruangan dalam format PDF yang telah disahkan oleh WaDek II (untuk Ormawa Fakultas) atau KoorBid Kemahasiswaan (untuk UKM).
-                            </p>
-                        </div>
-                    </div>
-                </button>
-
-                <button type="button" class="faq-pill-card" aria-expanded="false">
-                    <div class="faq-pill-header">
-                        <span class="faq-pill-question">Bagaimana jika status pengajuan saya Perlu Revisi atau Ditolak?</span>
-                        <span class="faq-pill-symbol" aria-hidden="true"><i data-lucide="chevron-down"></i></span>
-                    </div>
-                    <div class="faq-pill-reveal">
-                        <div class="faq-pill-reveal-inner">
-                            <p class="faq-pill-answer">
-                                Buka menu Peminjaman Saya lalu klik pengajuan terkait untuk membaca catatan alasan dari Admin, kemudian lengkapi berkas perbaikan yang diminta atau ajukan ulang.
-                            </p>
-                        </div>
-                    </div>
-                </button>
-
-                <button type="button" class="faq-pill-card" aria-expanded="false">
-                    <div class="faq-pill-header">
-                        <span class="faq-pill-question">Siapa yang diprioritaskan jika jadwal kegiatan bentrok di hari yang sama?</span>
-                        <span class="faq-pill-symbol" aria-hidden="true"><i data-lucide="chevron-down"></i></span>
-                    </div>
-                    <div class="faq-pill-reveal">
-                        <div class="faq-pill-reveal-inner">
-                            <p class="faq-pill-answer">
-                                Agenda pihak rektorat didahulukan. Untuk bentrok antar organisasi mahasiswa, prioritas ditentukan berdasarkan tingkat urgensi acara oleh Kepala Biro Umum &amp; Keuangan atas nama Rektor.
-                            </p>
-                        </div>
-                    </div>
-                </button>
+                    </button>
+                @endforeach
             </div>
 
             <div class="faq-empty-msg" id="faqEmptyMsg">
