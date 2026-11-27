@@ -182,7 +182,7 @@
     border: 1px solid rgba(248, 113, 113, .35);
 }
 
-/* MAIN TABLE CARD */
+/* MAIN GLASS CONTAINER */
 .user-page .up-card {
     background: var(--up-glass-bg);
     backdrop-filter: blur(18px) saturate(150%);
@@ -359,100 +359,112 @@
     font-weight: 700;
 }
 
-/* GLASS TABLE STYLING */
-.user-page .up-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+/* DAFTAR KARTU PENGGUNA (GAYA PROTOTYPE CARD) */
+.user-page .user-feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px;
 }
 
-.user-page table.user-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 860px;
-    font-size: 13px;
+.user-page .user-proto-card {
+    display: block;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(22, 54, 38, 0.09);
+    box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
+    color: #163626;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 
-.user-page table.user-table th {
-    padding: 13px 18px;
-    text-align: left;
-    background: rgba(255, 255, 255, .36);
-    border-bottom: 1px solid var(--up-line);
-    font-size: 10.5px;
+.user-page .user-proto-card:hover {
+    background: #ffffff;
+    border-color: rgba(35, 124, 77, 0.34);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(22, 54, 38, 0.07);
+}
+
+.user-page .user-proto-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.user-page .user-proto-heading {
+    min-width: 0;
+}
+
+.user-page .user-proto-title {
+    margin: 0;
+    font-size: 15px;
     font-weight: 800;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: var(--up-muted);
-    white-space: nowrap;
+    color: #163626;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    transition: color .15s ease;
 }
 
-.user-page table.user-table td {
-    padding: 15px 18px;
-    border-bottom: 1px solid rgba(22, 54, 38, .06);
-    vertical-align: middle;
-    font-size: 12.5px;
-    line-height: 1.5;
-    color: var(--up-ink);
-    background: transparent;
-    transition: background .18s ease;
+.user-page .user-proto-card:hover .user-proto-title {
+    color: #1f7a49;
 }
 
-.user-page table.user-table tbody tr:hover td {
-    background: rgba(255, 255, 255, .42);
-}
-
-.user-page table.user-table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.user-page .up-primary {
-    font-weight: 700;
-    color: var(--up-ink);
-    display: block;
-}
-
-.user-page .up-sub {
-    display: block;
-    color: var(--up-subtle);
-    font-size: 11.5px;
-    font-weight: 500;
-    margin-top: 2px;
-}
-
-.user-actions {
+.user-page .user-proto-sub {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: #5c7265;
     display: flex;
     align-items: center;
-    gap: 7px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.user-actions form {
-    margin: 0;
+.user-page .user-sub-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+    color: #465d50;
 }
 
-.user-actions .up-btn {
-    padding: 7px 12px;
-    font-size: 11.5px;
-    border-radius: 9px;
+.user-page .user-sub-item.is-green {
+    color: #1f7a49;
 }
 
-/* ROLE PILLS */
+.user-page .user-sub-item svg {
+    width: 13.5px;
+    height: 13.5px;
+    color: #237c4d;
+    flex-shrink: 0;
+}
+
+.user-page .user-sub-dot {
+    color: #9cb0a4;
+}
+
+/* ROLE PILLS DI KANAN ATAS */
 .role-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
     border-radius: 999px;
-    padding: 5px 11px;
-    font-size: 11px;
-    font-weight: 800;
-    background: #bbf7d0;
-    color: #065f46;
-    border: 1px solid #34d399;
+    padding: 5px 14px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid rgba(22, 163, 74, 0.25);
     white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1.2;
 }
 
 .role-pill.mahasiswa {
-    background: #bbf7d0;
-    color: #065f46;
-    border: 1px solid #34d399;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid rgba(22, 163, 74, 0.25);
 }
 
 .role-pill.admin {
@@ -467,11 +479,64 @@
     border: 1px solid #93c5fd;
 }
 
+/* BARIS BAWAH KARTU: META & TOMBOL AKSI */
+.user-page .user-proto-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 11px;
+    border-top: 1px solid rgba(22, 54, 38, 0.06);
+}
+
+.user-page .user-meta-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.user-page .user-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #3d5446;
+}
+
+.user-page .user-meta-item svg {
+    width: 14px;
+    height: 14px;
+    color: #6b8274;
+    flex-shrink: 0;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.user-actions form {
+    margin: 0;
+}
+
+.user-actions .up-btn {
+    padding: 7px 13px;
+    font-size: 11.5px;
+    border-radius: 9px;
+}
+
 .user-page .up-empty {
     padding: 46px 20px;
     text-align: center;
     color: var(--up-muted);
     font-size: 13px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px dashed rgba(22, 54, 38, 0.16);
+    border-radius: 14px;
 }
 
 .user-page .up-empty-icon {
@@ -483,12 +548,6 @@
     place-items: center;
     background: rgba(33, 128, 77, .12);
     color: var(--up-green);
-}
-
-.user-page .up-pagination {
-    padding: 14px 18px;
-    border-top: 1px solid var(--up-line);
-    background: rgba(255, 255, 255, .25);
 }
 
 /* DRAWER TAMBAH PENGGUNA (ISOLATED FIXED LAYER) */
@@ -714,6 +773,8 @@ body.user-drawer-open {
     .user-page .up-toolbar { padding: 12px; }
     .user-page .up-tabs { padding: 0 12px; }
     .user-page .up-tab { padding: 12px 14px; font-size: 12.5px; }
+    .user-page .user-feed-list { padding: 12px; }
+    .user-page .user-proto-bottom { flex-direction: column; align-items: flex-start; }
     .sipadu-user-panel { width: 100vw; }
     .sipadu-user-panel-header { padding: 16px 18px; }
     .sipadu-user-panel-body { padding: 18px; }
@@ -788,96 +849,111 @@ body.user-drawer-open {
             </button>
         </div>
 
-        {{-- TABEL DATA PENGGUNA --}}
-        <div class="up-table-wrap">
-            <table class="user-table" id="usersDataTable">
-                <thead>
-                    <tr>
-                        <th>Pengguna</th>
-                        <th>No. Telepon</th>
-                        <th>NIM / NIP</th>
-                        <th>Role</th>
-                        <th>Bergabung</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody">
-                    @if($users->count() > 0)
-                        @foreach($users as $u)
-                            @php
-                                $searchIndex = strtolower(trim(
-                                    ($u->name ?? '') . ' ' .
-                                    ($u->email ?? '') . ' ' .
-                                    ($u->phone ?? '') . ' ' .
-                                    ($u->nim_nip ?? '') . ' ' .
-                                    ($u->role ?? '')
-                                ));
-                            @endphp
-                            <tr class="user-data-row" data-role="{{ strtolower($u->role) }}" data-search="{{ $searchIndex }}">
-                                <td>
-                                    <span class="up-primary">{{ $u->name }}</span>
-                                    <span class="up-sub">{{ $u->email }}</span>
-                                </td>
-                                <td>{{ $u->phone ?: '—' }}</td>
-                                <td>{{ $u->nim_nip ?: '—' }}</td>
-                                <td>
-                                    <span class="role-pill {{ strtolower($u->role) }}">
-                                        {{ ucfirst($u->role) }}
-                                    </span>
-                                </td>
-                                <td>{{ optional($u->created_at)->format('d M Y') }}</td>
-                                <td>
-                                    <div class="user-actions">
-                                        <a class="up-btn detail" href="{{ route('admin.users.show', $u) }}">Detail</a>
-                                        <a class="up-btn edit" href="{{ route('admin.users.edit', $u) }}">Edit</a>
-                                        <form method="POST" action="{{ route('admin.users.delete', $u) }}" onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="up-btn danger" type="submit" {{ (string)$u->getAuthIdentifier() === (string)auth()->id() ? 'disabled' : '' }}>
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
+        {{-- DAFTAR KARTU DATA PENGGUNA --}}
+        <div class="user-feed-list" id="usersListContainer">
+            @if($users->count() > 0)
+                @foreach($users as $u)
+                    @php
+                        $roleLower = strtolower($u->role);
+                        $roleLabel = match($roleLower) {
+                            'mahasiswa' => 'Mahasiswa',
+                            'pegawai'   => 'Dosen & Tendik',
+                            'admin'     => 'Admin',
+                            default     => ucfirst($u->role),
+                        };
+                        $joinedDate = $u->created_at
+                            ? \Carbon\Carbon::parse($u->created_at)->locale('id')->translatedFormat('d F Y')
+                            : '-';
+                        $searchIndex = strtolower(trim(
+                            ($u->name ?? '') . ' ' .
+                            ($u->email ?? '') . ' ' .
+                            ($u->phone ?? '') . ' ' .
+                            ($u->nim_nip ?? '') . ' ' .
+                            ($u->role ?? '')
+                        ));
+                        $isSelf = (string) $u->getAuthIdentifier() === (string) auth()->id();
+                    @endphp
 
-                        <tr id="userFilterEmptyRow" style="display: none;">
-                            <td colspan="6">
-                                <div class="up-empty">
-                                    <div class="up-empty-icon">
-                                        <i data-lucide="users"></i>
-                                    </div>
-                                    <strong>Tidak ada pengguna ditemukan</strong>
-                                    <div style="margin-top:5px">
-                                        Coba ubah kata kunci pencarian atau pilih tab role lainnya.
-                                    </div>
+                    <div class="user-proto-card user-data-row"
+                         data-role="{{ $roleLower }}"
+                         data-search="{{ $searchIndex }}">
+
+                        {{-- BARIS ATAS: NAMA, EMAIL/NIM, & PILL ROLE --}}
+                        <div class="user-proto-top">
+                            <div class="user-proto-heading">
+                                <h3 class="user-proto-title">{{ $u->name }}</h3>
+                                <div class="user-proto-sub">
+                                    <span class="user-sub-item">
+                                        <i data-lucide="mail"></i>
+                                        {{ $u->email }}
+                                    </span>
+                                    <span class="user-sub-dot">•</span>
+                                    <span class="user-sub-item is-green">
+                                        <i data-lucide="id-card"></i>
+                                        {{ $u->nim_nip ?: 'Tanpa NIM/NIP' }}
+                                    </span>
                                 </div>
-                            </td>
-                        </tr>
-                    @else
-                        <tr>
-                            <td colspan="6">
-                                <div class="up-empty">
-                                    <div class="up-empty-icon">
-                                        <i data-lucide="users"></i>
-                                    </div>
-                                    <strong>Belum ada data pengguna</strong>
-                                    <div style="margin-top:5px">
-                                        Klik tombol Tambah Pengguna untuk membuat akun baru.
-                                    </div>
+                            </div>
+
+                            <span class="role-pill {{ $roleLower }}">
+                                {{ $roleLabel }}
+                            </span>
+                        </div>
+
+                        {{-- BARIS BAWAH: TANGGAL BERGABUNG, NO. TELEPON, & TOMBOL AKSI --}}
+                        <div class="user-proto-bottom">
+                            <div class="user-meta-group">
+                                <div class="user-meta-item">
+                                    <i data-lucide="calendar"></i>
+                                    <span>Bergabung {{ $joinedDate }}</span>
                                 </div>
-                            </td>
-                        </tr>
-                    @endif
-                </tbody>
-            </table>
+                                <div class="user-meta-item">
+                                    <i data-lucide="phone"></i>
+                                    <span>{{ $u->phone ?: '—' }}</span>
+                                </div>
+                            </div>
+
+                            <div class="user-actions">
+                                <a class="up-btn detail" href="{{ route('admin.users.show', $u) }}">Detail</a>
+                                <a class="up-btn edit" href="{{ route('admin.users.edit', $u) }}">Edit</a>
+                                <form method="POST" action="{{ route('admin.users.delete', $u) }}" onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="up-btn danger" type="submit" {{ $isSelf ? 'disabled' : '' }}>
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+
+                <div class="up-empty" id="userFilterEmptyRow" style="display: none;">
+                    <div class="up-empty-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <strong>Tidak ada pengguna ditemukan</strong>
+                    <div style="margin-top:5px">
+                        Coba ubah kata kunci pencarian atau pilih tab role lainnya.
+                    </div>
+                </div>
+            @else
+                <div class="up-empty">
+                    <div class="up-empty-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <strong>Belum ada data pengguna</strong>
+                    <div style="margin-top:5px">
+                        Klik tombol Tambah Pengguna untuk membuat akun baru.
+                    </div>
+                </div>
+            @endif
         </div>
 
     </section>
 </div>
 
-{{-- OVERLAY & DRAWER TAMBAH PENGGUNA (FIELD NIM/NIP DIHAPUS) --}}
+{{-- OVERLAY & DRAWER TAMBAH PENGGUNA --}}
 <div class="sipadu-user-overlay" id="addUserOverlay"></div>
 <aside class="sipadu-user-panel" id="addUserPanel" role="dialog" aria-modal="true" aria-labelledby="addUserDrawerTitle" data-has-errors="{{ $errors->any() ? '1' : '0' }}">
     <header class="sipadu-user-panel-header">
@@ -1006,6 +1082,27 @@ document.addEventListener('DOMContentLoaded', function () {
         openUserPanel();
     }
 
+    /* TOGGLE SHOW / HIDE PASSWORD */
+    document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const targetId = btn.getAttribute('data-toggle-password');
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+            btn.setAttribute('aria-label', isPassword ? 'Sembunyikan password' : 'Tampilkan password');
+            btn.innerHTML = isPassword
+                ? '<i data-lucide="eye-off"></i>'
+                : '<i data-lucide="eye"></i>';
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    });
+
     /* SEARCH & TAB FILTER TIAP ROLE */
     const filterForm = document.getElementById('userFilterForm');
     const searchInput = document.getElementById('userSearchInput');
@@ -1015,7 +1112,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const roleTabs = document.querySelectorAll('[data-role-tab]');
     const userRows = Array.from(document.querySelectorAll('.user-data-row'));
     const emptyFilterRow = document.getElementById('userFilterEmptyRow');
-    const usersTable = document.getElementById('usersDataTable');
 
     const countAllEl = document.getElementById('roleCountAll');
     const countMahasiswaEl = document.getElementById('roleCountMahasiswa');
@@ -1080,8 +1176,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const matchesRole = activeRole === '' || rowRole === activeRole;
             const isVisible = matchesSearch && matchesRole;
 
-            row.dataset.filterHidden = isVisible ? '0' : '1';
-            row.style.display = isVisible ? '' : 'none';
+            row.style.display = isVisible ? 'block' : 'none';
             if (isVisible) visibleCount++;
         });
 
@@ -1091,35 +1186,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (countAdminEl) countAdminEl.textContent = matchedAdmin;
 
         if (emptyFilterRow) {
-            emptyFilterRow.style.display = (userRows.length > 0 && visibleCount === 0) ? '' : 'none';
-        }
-
-        if (usersTable && typeof usersTable.sipaduRefreshPagination === 'function') {
-            usersTable.sipaduRefreshPagination(true);
+            emptyFilterRow.style.display = (userRows.length > 0 && visibleCount === 0) ? 'block' : 'none';
         }
 
         syncUrlParams(query, activeRole);
     }
 
-    roleTabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-            activeRole = (tab.dataset.roleTab || '').toLowerCase();
-            applyUserFilter();
-        });
-    });
-
     searchInput?.addEventListener('input', applyUserFilter);
-
-    clearSearchBtn?.addEventListener('click', function () {
-        if (!searchInput) return;
-        searchInput.value = '';
-        searchInput.focus();
-        applyUserFilter();
-    });
 
     filterForm?.addEventListener('submit', function (e) {
         e.preventDefault();
         applyUserFilter();
+    });
+
+    clearSearchBtn?.addEventListener('click', function () {
+        if (!searchInput) return;
+        searchInput.value = '';
+        applyUserFilter();
+        searchInput.focus();
     });
 
     resetFilterBtn?.addEventListener('click', function (e) {
@@ -1129,41 +1213,18 @@ document.addEventListener('DOMContentLoaded', function () {
         applyUserFilter();
     });
 
+    roleTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            activeRole = (tab.dataset.roleTab || '').toLowerCase();
+            applyUserFilter();
+        });
+    });
+
     applyUserFilter();
 
     if (window.lucide) {
-        window.lucide.createIcons();
+        lucide.createIcons();
     }
-
-    document.querySelectorAll('[data-toggle-password]').forEach(function (button) {
-        button.addEventListener('click', function () {
-            const input = document.getElementById(button.dataset.togglePassword);
-
-            if (!input) return;
-
-            const showing = input.type === 'password';
-
-            input.type = showing ? 'text' : 'password';
-
-            button.setAttribute(
-                'aria-label',
-                showing ? 'Sembunyikan password' : 'Tampilkan password'
-            );
-
-            button.setAttribute(
-                'aria-pressed',
-                showing ? 'true' : 'false'
-            );
-
-            button.innerHTML = showing
-                ? '<i data-lucide="eye-off"></i>'
-                : '<i data-lucide="eye"></i>';
-
-            if (window.lucide) {
-                window.lucide.createIcons();
-            }
-        });
-    });
 });
 </script>
 @endsection
