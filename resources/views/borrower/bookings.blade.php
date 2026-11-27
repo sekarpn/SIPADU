@@ -505,7 +505,7 @@
     font-weight: 700;
 }
 
-/* TABLE STYLING (HEADER & ISI SEJAJAR RAPI + OVERRIDE DATATABLES) */
+/* TABLE STYLING (HEADER & ISI SEJAJAR RAPI + OVERRIDE DATATABLES V2) */
 .booking-page .bp-table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -548,54 +548,98 @@
     transition: background .18s ease;
 }
 
+/* PAKSA OVERRIDE FLEXBOX DATATABLES V2 (.dt-column-header) */
+.booking-page table.dataTable thead th .dt-column-header,
+.booking-page thead th .dt-column-header {
+    display: flex !important;
+    width: 100% !important;
+    align-items: center !important;
+}
+
 /* 1. PENGAJUAN (RATA KIRI) */
 .booking-page thead th:nth-child(1),
-.booking-page thead th:nth-child(1) .dt-column-title,
-.booking-page thead th:nth-child(1) > div,
-.booking-page tbody td:nth-child(1) {
+.booking-page table.dataTable thead th:nth-child(1),
+.booking-page tbody td:nth-child(1),
+.booking-page table.dataTable tbody td:nth-child(1) {
     width: 22% !important;
     text-align: left !important;
+}
+.booking-page table.dataTable thead th:nth-child(1) .dt-column-header,
+.booking-page thead th:nth-child(1) .dt-column-header {
+    justify-content: flex-start !important;
 }
 
 /* 2. AUDITORIUM & JADWAL (RATA KIRI) */
 .booking-page thead th:nth-child(2),
-.booking-page thead th:nth-child(2) .dt-column-title,
-.booking-page thead th:nth-child(2) > div,
-.booking-page tbody td:nth-child(2) {
+.booking-page table.dataTable thead th:nth-child(2),
+.booking-page tbody td:nth-child(2),
+.booking-page table.dataTable tbody td:nth-child(2) {
     width: 26% !important;
     text-align: left !important;
+}
+.booking-page table.dataTable thead th:nth-child(2) .dt-column-header,
+.booking-page thead th:nth-child(2) .dt-column-header {
+    justify-content: flex-start !important;
 }
 
 /* 3. STATUS (HEADER & PILL RATA TENGAH) */
 .booking-page thead th:nth-child(3),
-.booking-page thead th:nth-child(3) .dt-column-title,
-.booking-page thead th:nth-child(3) > div,
-.booking-page tbody td:nth-child(3) {
+.booking-page table.dataTable thead th:nth-child(3),
+.booking-page tbody td:nth-child(3),
+.booking-page table.dataTable tbody td:nth-child(3) {
     width: 13% !important;
     text-align: center !important;
-    justify-content: center !important;
     white-space: nowrap;
+}
+.booking-page table.dataTable thead th:nth-child(3) .dt-column-header,
+.booking-page thead th:nth-child(3) .dt-column-header {
+    justify-content: center !important;
+}
+.booking-page table.dataTable thead th:nth-child(3) .dt-column-title,
+.booking-page thead th:nth-child(3) .dt-column-title {
+    flex: 0 1 auto !important;
+    text-align: center !important;
+}
+.booking-page table.dataTable thead th:nth-child(3) .dt-column-order,
+.booking-page thead th:nth-child(3) .dt-column-order {
+    display: none !important;
 }
 
 /* 4. CATATAN ADMIN (RATA KIRI) */
 .booking-page thead th:nth-child(4),
-.booking-page thead th:nth-child(4) .dt-column-title,
-.booking-page thead th:nth-child(4) > div,
-.booking-page tbody td:nth-child(4) {
+.booking-page table.dataTable thead th:nth-child(4),
+.booking-page tbody td:nth-child(4),
+.booking-page table.dataTable tbody td:nth-child(4) {
     width: 21% !important;
     text-align: left !important;
+}
+.booking-page table.dataTable thead th:nth-child(4) .dt-column-header,
+.booking-page thead th:nth-child(4) .dt-column-header {
+    justify-content: flex-start !important;
 }
 
 /* 5. AKSI (HEADER & TOMBOL SEJAJAR RATA KANAN) */
 .booking-page thead th:nth-child(5),
-.booking-page thead th:nth-child(5) .dt-column-title,
-.booking-page thead th:nth-child(5) > div,
-.booking-page tbody td:nth-child(5) {
+.booking-page table.dataTable thead th:nth-child(5),
+.booking-page tbody td:nth-child(5),
+.booking-page table.dataTable tbody td:nth-child(5) {
     width: 18% !important;
     text-align: right !important;
-    justify-content: flex-end !important;
     white-space: nowrap;
     padding-right: 20px !important;
+}
+.booking-page table.dataTable thead th:nth-child(5) .dt-column-header,
+.booking-page thead th:nth-child(5) .dt-column-header {
+    justify-content: flex-end !important;
+}
+.booking-page table.dataTable thead th:nth-child(5) .dt-column-title,
+.booking-page thead th:nth-child(5) .dt-column-title {
+    flex: 0 1 auto !important;
+    text-align: right !important;
+}
+.booking-page table.dataTable thead th:nth-child(5) .dt-column-order,
+.booking-page thead th:nth-child(5) .dt-column-order {
+    display: none !important;
 }
 
 .booking-page tbody tr:hover td {
@@ -1419,13 +1463,9 @@ body.bp-drawer-open {
                     <tr>
                         <th style="width: 22%;">Pengajuan</th>
                         <th style="width: 26%;">Auditorium & Jadwal</th>
-                        <th style="width: 13%;" class="dt-center">
-                            <div style="width: 100%; text-align: center;">Status</div>
-                        </th>
+                        <th style="width: 13%;">Status</th>
                         <th style="width: 21%;">Catatan Admin</th>
-                        <th style="width: 18%;" class="dt-right">
-                            <div style="width: 100%; text-align: right;">Aksi</div>
-                        </th>
+                        <th style="width: 18%;">Aksi</th>
                     </tr>
                 </thead>
 
