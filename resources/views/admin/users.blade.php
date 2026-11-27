@@ -370,8 +370,9 @@
     font-weight: 700;
 }
 
-/* GLASS TABLE STYLING */
+/* GLASS TABLE STYLING (TANPA SPACE KOSONG DI KANAN) */
 .user-page .up-table-wrap {
+    width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -379,7 +380,7 @@
 .user-page table.user-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 860px;
+    min-width: 820px;
     font-size: 13px;
 }
 
@@ -407,6 +408,15 @@
     transition: background .18s ease;
 }
 
+/* KOLOM AKSI MERAPAT KE KANAN TANPA SISA RUANG KOSONG */
+.user-page table.user-table th:last-child,
+.user-page table.user-table td:last-child {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+    padding-right: 18px;
+}
+
 .user-page table.user-table tbody tr:hover td {
     background: rgba(255, 255, 255, .52);
 }
@@ -430,8 +440,9 @@
 }
 
 .user-actions {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 7px;
 }
 
@@ -948,7 +959,7 @@ body.user-drawer-open {
                         @endforeach
 
                         <tr id="userFilterEmptyRow" style="display: none;">
-                            <td colspan="6">
+                            <td colspan="6" style="text-align: center; width: auto; white-space: normal;">
                                 <div class="up-empty">
                                     <div class="up-empty-icon">
                                         <i data-lucide="users"></i>
@@ -962,7 +973,7 @@ body.user-drawer-open {
                         </tr>
                     @else
                         <tr>
-                            <td colspan="6">
+                            <td colspan="6" style="text-align: center; width: auto; white-space: normal;">
                                 <div class="up-empty">
                                     <div class="up-empty-icon">
                                         <i data-lucide="users"></i>
