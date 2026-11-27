@@ -1333,24 +1333,6 @@ body.bp-drawer-open {
         </a>
     </div>
 
-    {{-- HEADER --}}
-    <div class="bp-heading">
-        <div>
-            <h1>Kelola Peminjaman Auditorium</h1>
-            <p>Kelola pengajuan peminjaman, periksa jadwal, dan tentukan keputusan untuk setiap permohonan.</p>
-        </div>
-
-        <a
-            href="{{ route('admin.bookings.export', request()->query()) }}"
-            class="bp-download-btn"
-            id="exportBookingBtn"
-            title="Unduh rekap data peminjaman (CSV/Excel)"
-        >
-            <i data-lucide="download"></i>
-            <span>Download Data</span>
-        </a>
-    </div>
-
     {{-- STATISTIK --}}
     <div class="bp-stats">
         <a href="{{ route('admin.bookings', request()->except('status', 'page')) }}" class="bp-stat">
