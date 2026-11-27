@@ -63,8 +63,9 @@
     line-height: 1.55;
 }
 
-/* TOMBOL CRUD (SELARAS DENGAN DATA AUDITORIUM) */
-.user-page .up-btn {
+/* TOMBOL CRUD (SELARAS WARNA PASTEL DATA AUDITORIUM) */
+.user-page .up-btn,
+.sipadu-user-panel .up-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -83,26 +84,30 @@
     transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
 }
 
-.user-page .up-btn svg {
+.user-page .up-btn svg,
+.sipadu-user-panel .up-btn svg {
     width: 15px;
     height: 15px;
 }
 
-.user-page .up-btn:hover {
+.user-page .up-btn:hover,
+.sipadu-user-panel .up-btn:hover {
     transform: translateY(-1px);
     box-shadow: none !important;
 }
 
-.user-page .up-btn.primary {
+.user-page .up-btn.primary,
+.sipadu-user-panel .up-btn.primary {
     background: #237c4d !important;
     color: #fff !important;
     border-color: #237c4d !important;
-    padding: 10px 16px;
+    padding: 10px 18px;
     font-size: 12.5px;
     box-shadow: 0 4px 12px rgba(35, 124, 77, .22) !important;
 }
 
-.user-page .up-btn.primary:hover {
+.user-page .up-btn.primary:hover,
+.sipadu-user-panel .up-btn.primary:hover {
     background: #1b663f !important;
     color: #fff !important;
 }
@@ -120,13 +125,15 @@
 }
 
 /* TOMBOL EDIT (KUNING KREM SOFT SEPERTI DATA AUDITORIUM) */
-.user-page .up-btn.edit {
+.user-page .up-btn.edit,
+.sipadu-user-panel .up-btn.edit {
     background: #fef3c7 !important;
     color: #92400e !important;
     border-color: rgba(217, 119, 6, .24) !important;
 }
 
-.user-page .up-btn.edit:hover {
+.user-page .up-btn.edit:hover,
+.sipadu-user-panel .up-btn.edit:hover {
     background: #fde68a !important;
     color: #78350f !important;
 }
@@ -152,14 +159,16 @@
     transform: none;
 }
 
-.user-page .up-btn.secondary {
-    background: rgba(255, 255, 255, .82) !important;
+.user-page .up-btn.secondary,
+.sipadu-user-panel .up-btn.secondary {
+    background: #ffffff !important;
     color: #294735 !important;
-    border-color: rgba(22, 54, 38, .14) !important;
+    border-color: rgba(22, 54, 38, .15) !important;
 }
 
-.user-page .up-btn.secondary:hover {
-    background: #fff !important;
+.user-page .up-btn.secondary:hover,
+.sipadu-user-panel .up-btn.secondary:hover {
+    background: #f4f8f5 !important;
     color: #163626 !important;
 }
 
@@ -184,7 +193,7 @@
     border: 1px solid rgba(248, 113, 113, .35);
 }
 
-/* MAIN GLASS CONTAINER */
+/* MAIN TABLE CARD */
 .user-page .up-card {
     background: var(--up-glass-bg);
     backdrop-filter: blur(18px) saturate(150%);
@@ -361,108 +370,94 @@
     font-weight: 700;
 }
 
-/* DAFTAR KARTU PENGGUNA (SELARAS GLASS CARD DATA AUDITORIUM) */
-.user-page .user-feed-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 18px;
+/* GLASS TABLE STYLING */
+.user-page .up-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-.user-page .user-proto-card {
-    display: block;
-    padding: 16px 20px;
-    border-radius: 16px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, .78) 0%, rgba(255, 255, 255, .56) 100%);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, .65);
-    box-shadow: 0 6px 22px rgba(22, 54, 38, .05);
-    color: #163626;
-    transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+.user-page table.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+    font-size: 13px;
 }
 
-.user-page .user-proto-card:hover {
-    background: linear-gradient(145deg, rgba(255, 255, 255, .92) 0%, rgba(255, 255, 255, .75) 100%);
-    border-color: rgba(35, 124, 77, .32);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 26px rgba(22, 54, 38, .08);
-}
-
-.user-page .user-proto-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 14px;
-    margin-bottom: 12px;
-}
-
-.user-page .user-proto-heading {
-    min-width: 0;
-}
-
-.user-page .user-proto-title {
-    margin: 0;
-    font-size: 15px;
+.user-page table.user-table th {
+    padding: 13px 18px;
+    text-align: left;
+    background: rgba(255, 255, 255, .44);
+    border-bottom: 1px solid var(--up-line);
+    font-size: 10.5px;
     font-weight: 800;
-    color: #163626;
-    line-height: 1.35;
-    letter-spacing: -0.015em;
-    transition: color .15s ease;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--up-muted);
+    white-space: nowrap;
 }
 
-.user-page .user-proto-card:hover .user-proto-title {
-    color: #1f7a49;
+.user-page table.user-table td {
+    padding: 15px 18px;
+    border-bottom: 1px solid rgba(22, 54, 38, .06);
+    vertical-align: middle;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--up-ink);
+    background: transparent;
+    transition: background .18s ease;
 }
 
-.user-page .user-proto-sub {
-    margin: 5px 0 0;
-    font-size: 12px;
-    color: #5c7265;
+.user-page table.user-table tbody tr:hover td {
+    background: rgba(255, 255, 255, .52);
+}
+
+.user-page table.user-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.user-page .up-primary {
+    font-weight: 700;
+    color: var(--up-ink);
+    display: block;
+}
+
+.user-page .up-sub {
+    display: block;
+    color: var(--up-subtle);
+    font-size: 11.5px;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.user-actions {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+    gap: 7px;
 }
 
-.user-page .user-sub-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: 600;
-    color: #465d50;
+.user-actions form {
+    margin: 0;
 }
 
-.user-page .user-sub-item.is-green {
-    color: #1f7a49;
+.user-actions .up-btn {
+    padding: 7px 13px;
+    font-size: 11.5px;
+    border-radius: 10px;
 }
 
-.user-page .user-sub-item svg {
-    width: 13.5px;
-    height: 13.5px;
-    color: #237c4d;
-    flex-shrink: 0;
-}
-
-.user-page .user-sub-dot {
-    color: #9cb0a4;
-}
-
-/* ROLE PILLS DI KANAN ATAS (SELARAS BADGE "AKTIF" DATA AUDITORIUM) */
+/* ROLE PILLS (SELARAS BADGE PASTEL DATA AUDITORIUM) */
 .role-pill {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 6px;
     border-radius: 999px;
-    padding: 5px 14px;
-    font-size: 11.5px;
+    padding: 5px 12px;
+    font-size: 11px;
     font-weight: 700;
     background: #dcfce7;
     color: #166534;
     border: 1px solid rgba(22, 163, 74, .22);
     white-space: nowrap;
-    flex-shrink: 0;
-    line-height: 1.2;
 }
 
 .role-pill.mahasiswa {
@@ -483,64 +478,11 @@
     border: 1px solid rgba(217, 119, 6, .22);
 }
 
-/* BARIS BAWAH KARTU: META & TOMBOL AKSI */
-.user-page .user-proto-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding-top: 11px;
-    border-top: 1px solid rgba(22, 54, 38, .07);
-}
-
-.user-page .user-meta-group {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 18px;
-}
-
-.user-page .user-meta-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    color: #3d5446;
-}
-
-.user-page .user-meta-item svg {
-    width: 14px;
-    height: 14px;
-    color: #6b8274;
-    flex-shrink: 0;
-}
-
-.user-actions {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-.user-actions form {
-    margin: 0;
-}
-
-.user-actions .up-btn {
-    padding: 7px 14px;
-    font-size: 11.5px;
-    border-radius: 10px;
-}
-
 .user-page .up-empty {
     padding: 46px 20px;
     text-align: center;
     color: var(--up-muted);
     font-size: 13px;
-    background: rgba(255, 255, 255, .55);
-    border: 1px dashed rgba(22, 54, 38, .16);
-    border-radius: 14px;
 }
 
 .user-page .up-empty-icon {
@@ -554,13 +496,12 @@
     color: var(--up-green);
 }
 
-/* DRAWER TAMBAH PENGGUNA (ISOLATED FIXED LAYER) */
+/* ==========================================================================
+   POPUP / DRAWER SAMPING (SELARAS DENGAN POPUP DATA AUDITORIUM)
+   ========================================================================== */
 .sipadu-user-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 99990;
     background: rgba(15, 32, 23, .45);
     display: none;
@@ -572,21 +513,23 @@
 
 .sipadu-user-panel {
     position: fixed;
-    top: 0;
+    top: 14px;
     right: -540px;
-    bottom: 0;
+    bottom: 14px;
     z-index: 99995;
-    width: min(510px, 100vw);
-    background: #f8fbf9;
-    box-shadow: -18px 0 55px rgba(12, 32, 21, .22);
+    width: min(490px, calc(100vw - 28px));
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: -12px 0 48px rgba(12, 32, 21, .22);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     transition: right .26s ease;
     font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
 .sipadu-user-panel.is-open {
-    right: 0;
+    right: 14px;
 }
 
 .sipadu-user-panel-header {
@@ -594,7 +537,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 18px 24px 16px;
+    padding: 20px 24px 16px;
     background: #fff;
     border-bottom: 1px solid rgba(22, 54, 38, .08);
     flex-shrink: 0;
@@ -609,7 +552,7 @@
 }
 
 .sipadu-user-panel-header p {
-    margin: 4px 0 0;
+    margin: 3px 0 0;
     color: #718078;
     font-size: 12px;
 }
@@ -618,15 +561,16 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     padding: 0;
     flex-shrink: 0;
     border: 1px solid rgba(22, 54, 38, .12);
-    border-radius: 50%;
+    border-radius: 10px;
     background: #fff;
     color: #52665a;
     cursor: pointer;
+    transition: background .18s ease, color .18s ease;
 }
 
 .sipadu-user-panel-close:hover {
@@ -635,22 +579,25 @@
 }
 
 .sipadu-user-panel-close svg {
-    width: 17px;
-    height: 17px;
+    width: 16px;
+    height: 16px;
     display: block;
 }
 
 .sipadu-user-panel-body {
     flex: 1;
     overflow-y: auto;
-    padding: 22px 24px 26px;
+    padding: 20px 24px 22px;
 }
 
-.user-form-intro {
-    font-size: 12px;
-    color: #64776b;
-    margin: 0 0 18px;
-    line-height: 1.6;
+.sipadu-user-panel-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 24px;
+    border-top: 1px solid rgba(22, 54, 38, .08);
+    background: #fff;
+    flex-shrink: 0;
 }
 
 .user-form-grid {
@@ -661,10 +608,15 @@
 
 .user-field label {
     display: block;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
-    color: #294735;
+    color: #163626;
     margin-bottom: 7px;
+}
+
+.user-field label .req {
+    color: #dc2626;
+    margin-left: 2px;
 }
 
 .user-field input,
@@ -672,11 +624,11 @@
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #d8e1db;
-    border-radius: 10px;
-    padding: 11px 12px;
+    border-radius: 11px;
+    padding: 11px 13px;
     font-family: inherit;
     font-size: 13px;
-    color: #243b2e;
+    color: #163626;
     background: #fff;
     outline: none;
     transition: border-color .2s, box-shadow .2s;
@@ -729,36 +681,79 @@
     grid-column: 1 / -1;
 }
 
-.user-form-actions {
+/* DETAIL PENGGUNA STYLING DI DALAM POPUP */
+.user-detail-hero {
     display: flex;
-    justify-content: flex-end;
-    gap: 9px;
-    margin-top: 23px;
-    padding-top: 18px;
-    border-top: 1px solid #e5ece7;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #f5f9f6;
+    border: 1px solid rgba(22, 54, 38, .08);
+    margin-bottom: 18px;
 }
 
-.user-form-actions .up-btn {
-    display: inline-flex;
+.user-detail-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: #dcfce7;
+    color: #166534;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 16px;
-    border-radius: 11px;
-    font-size: 12.5px;
+    font-size: 17px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.user-detail-hero-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.user-detail-hero-info h3 {
+    margin: 0;
+    font-size: 15.5px;
+    font-weight: 800;
+    color: #163626;
+    line-height: 1.3;
+}
+
+.user-detail-hero-info p {
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: #5c7265;
+    word-break: break-all;
+}
+
+.user-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.user-detail-row {
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(22, 54, 38, .08);
+    background: #ffffff;
+}
+
+.user-detail-row small {
+    display: block;
+    font-size: 11px;
     font-weight: 700;
-    cursor: pointer;
-    border: 1px solid transparent;
+    color: #64786c;
+    margin-bottom: 3px;
 }
 
-.user-form-actions .up-btn.secondary {
-    background: #fff;
-    color: #294735;
-    border-color: rgba(22, 54, 38, .15);
-}
-
-.user-form-actions .up-btn.primary {
-    background: #237c4d;
-    color: #fff;
+.user-detail-row strong {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #163626;
 }
 
 body.user-drawer-open {
@@ -777,9 +772,13 @@ body.user-drawer-open {
     .user-page .up-toolbar { padding: 12px; }
     .user-page .up-tabs { padding: 0 12px; }
     .user-page .up-tab { padding: 12px 14px; font-size: 12.5px; }
-    .user-page .user-feed-list { padding: 12px; }
-    .user-page .user-proto-bottom { flex-direction: column; align-items: flex-start; }
-    .sipadu-user-panel { width: 100vw; }
+    .sipadu-user-panel {
+        top: 0;
+        bottom: 0;
+        width: 100vw;
+        border-radius: 0;
+    }
+    .sipadu-user-panel.is-open { right: 0; }
     .sipadu-user-panel-header { padding: 16px 18px; }
     .sipadu-user-panel-body { padding: 18px; }
     .user-form-grid { grid-template-columns: 1fr; }
@@ -853,132 +852,169 @@ body.user-drawer-open {
             </button>
         </div>
 
-        {{-- DAFTAR KARTU DATA PENGGUNA --}}
-        <div class="user-feed-list" id="usersListContainer">
-            @if($users->count() > 0)
-                @foreach($users as $u)
-                    @php
-                        $roleLower = strtolower($u->role);
-                        $roleLabel = match($roleLower) {
-                            'mahasiswa' => 'Mahasiswa',
-                            'pegawai'   => 'Dosen & Tendik',
-                            'admin'     => 'Admin',
-                            default     => ucfirst($u->role),
-                        };
-                        $joinedDate = $u->created_at
-                            ? \Carbon\Carbon::parse($u->created_at)->locale('id')->translatedFormat('d F Y')
-                            : '-';
-                        $searchIndex = strtolower(trim(
-                            ($u->name ?? '') . ' ' .
-                            ($u->email ?? '') . ' ' .
-                            ($u->phone ?? '') . ' ' .
-                            ($u->nim_nip ?? '') . ' ' .
-                            ($u->role ?? '')
-                        ));
-                        $isSelf = (string) $u->getAuthIdentifier() === (string) auth()->id();
-                    @endphp
-
-                    <div class="user-proto-card user-data-row"
-                         data-role="{{ $roleLower }}"
-                         data-search="{{ $searchIndex }}">
-
-                        {{-- BARIS ATAS: NAMA, EMAIL/NIM, & PILL ROLE --}}
-                        <div class="user-proto-top">
-                            <div class="user-proto-heading">
-                                <h3 class="user-proto-title">{{ $u->name }}</h3>
-                                <div class="user-proto-sub">
-                                    <span class="user-sub-item">
-                                        <i data-lucide="mail"></i>
-                                        {{ $u->email }}
+        {{-- TABEL DATA PENGGUNA --}}
+        <div class="up-table-wrap">
+            <table class="user-table" id="usersDataTable">
+                <thead>
+                    <tr>
+                        <th>Pengguna</th>
+                        <th>No. Telepon</th>
+                        <th>NIM / NIP</th>
+                        <th>Role</th>
+                        <th>Bergabung</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    @if($users->count() > 0)
+                        @foreach($users as $u)
+                            @php
+                                $roleLower = strtolower($u->role);
+                                $roleLabel = match($roleLower) {
+                                    'mahasiswa' => 'Mahasiswa',
+                                    'pegawai'   => 'Dosen & Tendik',
+                                    'admin'     => 'Admin',
+                                    default     => ucfirst($u->role),
+                                };
+                                $joinedDate = optional($u->created_at)->format('d M Y') ?: '-';
+                                $searchIndex = strtolower(trim(
+                                    ($u->name ?? '') . ' ' .
+                                    ($u->email ?? '') . ' ' .
+                                    ($u->phone ?? '') . ' ' .
+                                    ($u->nim_nip ?? '') . ' ' .
+                                    ($u->role ?? '')
+                                ));
+                                $isSelf = (string) $u->getAuthIdentifier() === (string) auth()->id();
+                                $initials = collect(explode(' ', trim($u->name)))
+                                    ->filter()
+                                    ->take(2)
+                                    ->map(fn($part) => strtoupper(mb_substr($part, 0, 1)))
+                                    ->implode('') ?: 'U';
+                            @endphp
+                            <tr class="user-data-row" data-role="{{ $roleLower }}" data-search="{{ $searchIndex }}">
+                                <td>
+                                    <span class="up-primary">{{ $u->name }}</span>
+                                    <span class="up-sub">{{ $u->email }}</span>
+                                </td>
+                                <td>{{ $u->phone ?: '—' }}</td>
+                                <td>{{ $u->nim_nip ?: '—' }}</td>
+                                <td>
+                                    <span class="role-pill {{ $roleLower }}">
+                                        {{ $roleLabel }}
                                     </span>
-                                    <span class="user-sub-dot">•</span>
-                                    <span class="user-sub-item is-green">
-                                        <i data-lucide="id-card"></i>
-                                        {{ $u->nim_nip ?: 'Tanpa NIM/NIP' }}
-                                    </span>
+                                </td>
+                                <td>{{ $joinedDate }}</td>
+                                <td>
+                                    <div class="user-actions">
+                                        <button
+                                            type="button"
+                                            class="up-btn detail js-open-detail-user"
+                                            data-name="{{ $u->name }}"
+                                            data-initials="{{ $initials }}"
+                                            data-email="{{ $u->email }}"
+                                            data-phone="{{ $u->phone ?: '—' }}"
+                                            data-nim="{{ $u->nim_nip ?: '—' }}"
+                                            data-role="{{ $roleLower }}"
+                                            data-role-label="{{ $roleLabel }}"
+                                            data-joined="{{ $joinedDate }}"
+                                            data-update-url="{{ route('admin.users.update', $u) }}"
+                                        >
+                                            Detail
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="up-btn edit js-open-edit-user"
+                                            data-name="{{ $u->name }}"
+                                            data-email="{{ $u->email }}"
+                                            data-phone="{{ $u->phone ?? '' }}"
+                                            data-nim="{{ $u->nim_nip ?? '' }}"
+                                            data-role="{{ $roleLower }}"
+                                            data-update-url="{{ route('admin.users.update', $u) }}"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <form method="POST" action="{{ route('admin.users.delete', $u) }}" onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="up-btn danger" type="submit" {{ $isSelf ? 'disabled' : '' }}>
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+
+                        <tr id="userFilterEmptyRow" style="display: none;">
+                            <td colspan="6">
+                                <div class="up-empty">
+                                    <div class="up-empty-icon">
+                                        <i data-lucide="users"></i>
+                                    </div>
+                                    <strong>Tidak ada pengguna ditemukan</strong>
+                                    <div style="margin-top:5px">
+                                        Coba ubah kata kunci pencarian atau pilih tab role lainnya.
+                                    </div>
                                 </div>
-                            </div>
-
-                            <span class="role-pill {{ $roleLower }}">
-                                {{ $roleLabel }}
-                            </span>
-                        </div>
-
-                        {{-- BARIS BAWAH: TANGGAL BERGABUNG, NO. TELEPON, & TOMBOL AKSI --}}
-                        <div class="user-proto-bottom">
-                            <div class="user-meta-group">
-                                <div class="user-meta-item">
-                                    <i data-lucide="calendar"></i>
-                                    <span>Bergabung {{ $joinedDate }}</span>
+                            </td>
+                        </tr>
+                    @else
+                        <tr>
+                            <td colspan="6">
+                                <div class="up-empty">
+                                    <div class="up-empty-icon">
+                                        <i data-lucide="users"></i>
+                                    </div>
+                                    <strong>Belum ada data pengguna</strong>
+                                    <div style="margin-top:5px">
+                                        Klik tombol Tambah Pengguna untuk membuat akun baru.
+                                    </div>
                                 </div>
-                                <div class="user-meta-item">
-                                    <i data-lucide="phone"></i>
-                                    <span>{{ $u->phone ?: '—' }}</span>
-                                </div>
-                            </div>
-
-                            <div class="user-actions">
-                                <a class="up-btn detail" href="{{ route('admin.users.show', $u) }}">Detail</a>
-                                <a class="up-btn edit" href="{{ route('admin.users.edit', $u) }}">Edit</a>
-                                <form method="POST" action="{{ route('admin.users.delete', $u) }}" onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="up-btn danger" type="submit" {{ $isSelf ? 'disabled' : '' }}>
-                                        Hapus
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-
-                <div class="up-empty" id="userFilterEmptyRow" style="display: none;">
-                    <div class="up-empty-icon">
-                        <i data-lucide="users"></i>
-                    </div>
-                    <strong>Tidak ada pengguna ditemukan</strong>
-                    <div style="margin-top:5px">
-                        Coba ubah kata kunci pencarian atau pilih tab role lainnya.
-                    </div>
-                </div>
-            @else
-                <div class="up-empty">
-                    <div class="up-empty-icon">
-                        <i data-lucide="users"></i>
-                    </div>
-                    <strong>Belum ada data pengguna</strong>
-                    <div style="margin-top:5px">
-                        Klik tombol Tambah Pengguna untuk membuat akun baru.
-                    </div>
-                </div>
-            @endif
+                            </td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
         </div>
 
     </section>
 </div>
 
-{{-- OVERLAY & DRAWER TAMBAH PENGGUNA --}}
-<div class="sipadu-user-overlay" id="addUserOverlay"></div>
-<aside class="sipadu-user-panel" id="addUserPanel" role="dialog" aria-modal="true" aria-labelledby="addUserDrawerTitle" data-has-errors="{{ $errors->any() ? '1' : '0' }}">
+{{-- OVERLAY BERSAMA UNTUK SEMUA POPUP / DRAWER --}}
+<div class="sipadu-user-overlay" id="userDrawerOverlay"></div>
+
+{{-- 1. POPUP TAMBAH PENGGUNA --}}
+<aside class="sipadu-user-panel" id="addUserPanel" role="dialog" aria-modal="true" aria-labelledby="addUserDrawerTitle" data-has-errors="{{ ($errors->any() && old('_form_mode') !== 'edit') ? '1' : '0' }}">
     <header class="sipadu-user-panel-header">
         <div>
-            <h2 id="addUserDrawerTitle">Tambah Pengguna</h2>
+            <h2 id="addUserDrawerTitle">Tambah Pengguna Baru</h2>
             <p>Masukkan informasi akun pengguna baru.</p>
         </div>
-        <button type="button" class="sipadu-user-panel-close" id="closeAddUserDrawer" aria-label="Tutup">
+        <button type="button" class="sipadu-user-panel-close js-close-user-drawer" aria-label="Tutup">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
     </header>
-    <div class="sipadu-user-panel-body">
-        <p class="user-form-intro">Lengkapi data berikut untuk membuat akun baru di SIPADU. Pastikan role yang dipilih sudah sesuai.</p>
-        <form method="POST" action="{{ route('admin.users.store') }}">
-            @csrf
+    <form method="POST" action="{{ route('admin.users.store') }}" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+        @csrf
+        <input type="hidden" name="_form_mode" value="create">
+        <div class="sipadu-user-panel-body">
             <div class="user-form-grid">
-                <div class="user-field full"><label for="newUserName">Nama Lengkap</label><input id="newUserName" name="name" value="{{ old('name') }}" required></div>
-                <div class="user-field full"><label for="newUserEmail">Email</label><input id="newUserEmail" type="email" name="email" value="{{ old('email') }}" required></div>
-                <div class="user-field full"><label for="newUserPhone">Nomor Telepon</label><input id="newUserPhone" name="phone" value="{{ old('phone') }}"></div>
                 <div class="user-field full">
-                    <label for="newUserRole">Role</label>
+                    <label for="newUserName">Nama Lengkap <span class="req">*</span></label>
+                    <input id="newUserName" name="name" placeholder="Masukkan nama lengkap" value="{{ old('_form_mode') !== 'edit' ? old('name') : '' }}" required>
+                </div>
+                <div class="user-field full">
+                    <label for="newUserEmail">Email <span class="req">*</span></label>
+                    <input id="newUserEmail" type="email" name="email" placeholder="Contoh: nama@upnvj.ac.id" value="{{ old('_form_mode') !== 'edit' ? old('email') : '' }}" required>
+                </div>
+                <div class="user-field full">
+                    <label for="newUserPhone">Nomor Telepon</label>
+                    <input id="newUserPhone" name="phone" placeholder="Contoh: 081234567890" value="{{ old('_form_mode') !== 'edit' ? old('phone') : '' }}">
+                </div>
+                <div class="user-field full">
+                    <label for="newUserRole">Role <span class="req">*</span></label>
                     <select id="newUserRole" name="role" required>
                         <option value="mahasiswa" @selected(old('role', 'mahasiswa') === 'mahasiswa')>Mahasiswa</option>
                         <option value="pegawai" @selected(old('role') === 'pegawai')>Dosen & Tendik</option>
@@ -986,104 +1022,287 @@ body.user-drawer-open {
                     </select>
                 </div>
                 <div class="user-field">
-                    <label for="newUserPassword">Password</label>
-
+                    <label for="newUserPassword">Password <span class="req">*</span></label>
                     <div class="user-password-wrap">
-                        <input
-                            id="newUserPassword"
-                            type="password"
-                            name="password"
-                            required
-                            minlength="8"
-                            autocomplete="new-password"
-                        >
-
-                        <button
-                            type="button"
-                            class="user-password-toggle"
-                            data-toggle-password="newUserPassword"
-                            aria-label="Tampilkan password"
-                            aria-pressed="false"
-                        >
+                        <input id="newUserPassword" type="password" name="password" placeholder="Min. 8 karakter" required minlength="8" autocomplete="new-password">
+                        <button type="button" class="user-password-toggle" data-toggle-password="newUserPassword" aria-label="Tampilkan password" aria-pressed="false">
                             <i data-lucide="eye"></i>
                         </button>
                     </div>
                 </div>
-
                 <div class="user-field">
-                    <label for="newUserPasswordConfirm">
-                        Konfirmasi Password
-                    </label>
-
+                    <label for="newUserPasswordConfirm">Konfirmasi Password <span class="req">*</span></label>
                     <div class="user-password-wrap">
-                        <input
-                            id="newUserPasswordConfirm"
-                            type="password"
-                            name="password_confirmation"
-                            required
-                            minlength="8"
-                            autocomplete="new-password"
-                        >
-
-                        <button
-                            type="button"
-                            class="user-password-toggle"
-                            data-toggle-password="newUserPasswordConfirm"
-                            aria-label="Tampilkan password"
-                            aria-pressed="false"
-                        >
+                        <input id="newUserPasswordConfirm" type="password" name="password_confirmation" placeholder="Ulangi password" required minlength="8" autocomplete="new-password">
+                        <button type="button" class="user-password-toggle" data-toggle-password="newUserPasswordConfirm" aria-label="Tampilkan password" aria-pressed="false">
                             <i data-lucide="eye"></i>
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="user-form-actions">
-                <button class="up-btn secondary" type="button" id="cancelAddUserDrawer">Batal</button>
-                <button class="up-btn primary" type="submit">Simpan Pengguna</button>
+        </div>
+        <div class="sipadu-user-panel-footer">
+            <button class="up-btn secondary js-close-user-drawer" type="button">Batal</button>
+            <button class="up-btn primary" type="submit">Simpan Pengguna</button>
+        </div>
+    </form>
+</aside>
+
+{{-- 2. POPUP DETAIL PENGGUNA --}}
+<aside class="sipadu-user-panel" id="detailUserPanel" role="dialog" aria-modal="true" aria-labelledby="detailUserDrawerTitle">
+    <header class="sipadu-user-panel-header">
+        <div>
+            <h2 id="detailUserDrawerTitle">Detail Pengguna</h2>
+            <p>Informasi lengkap akun pengguna terdaftar.</p>
+        </div>
+        <button type="button" class="sipadu-user-panel-close js-close-user-drawer" aria-label="Tutup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+    </header>
+    <div class="sipadu-user-panel-body">
+        <div class="user-detail-hero">
+            <div class="user-detail-avatar" id="detailUserAvatar">U</div>
+            <div class="user-detail-hero-info">
+                <h3 id="detailUserName">-</h3>
+                <p id="detailUserEmail">-</p>
             </div>
-        </form>
+            <span class="role-pill" id="detailUserRoleBadge">-</span>
+        </div>
+
+        <div class="user-detail-list">
+            <div class="user-detail-row">
+                <small>Nama Lengkap</small>
+                <strong id="detailUserFullName">-</strong>
+            </div>
+            <div class="user-detail-row">
+                <small>Alamat Email</small>
+                <strong id="detailUserEmailRow">-</strong>
+            </div>
+            <div class="user-detail-row">
+                <small>NIM / NIP</small>
+                <strong id="detailUserNim">—</strong>
+            </div>
+            <div class="user-detail-row">
+                <small>Nomor Telepon</small>
+                <strong id="detailUserPhone">—</strong>
+            </div>
+            <div class="user-detail-row">
+                <small>Tanggal Bergabung</small>
+                <strong id="detailUserJoined">-</strong>
+            </div>
+        </div>
     </div>
+    <div class="sipadu-user-panel-footer">
+        <button class="up-btn secondary js-close-user-drawer" type="button">Tutup</button>
+        <button class="up-btn edit" type="button" id="detailSwitchToEditBtn">
+            <i data-lucide="pencil"></i>
+            Edit Pengguna
+        </button>
+    </div>
+</aside>
+
+{{-- 3. POPUP EDIT PENGGUNA --}}
+<aside class="sipadu-user-panel" id="editUserPanel" role="dialog" aria-modal="true" aria-labelledby="editUserDrawerTitle" data-has-errors="{{ ($errors->any() && old('_form_mode') === 'edit') ? '1' : '0' }}">
+    <header class="sipadu-user-panel-header">
+        <div>
+            <h2 id="editUserDrawerTitle">Edit Pengguna</h2>
+            <p>Perbarui data profil, role, atau kata sandi pengguna.</p>
+        </div>
+        <button type="button" class="sipadu-user-panel-close js-close-user-drawer" aria-label="Tutup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+    </header>
+    <form method="POST" id="editUserForm" action="{{ old('_edit_action', '') }}" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="_form_mode" value="edit">
+        <input type="hidden" name="_edit_action" id="editUserActionInput" value="{{ old('_edit_action', '') }}">
+
+        <div class="sipadu-user-panel-body">
+            <div class="user-form-grid">
+                <div class="user-field full">
+                    <label for="editUserName">Nama Lengkap <span class="req">*</span></label>
+                    <input id="editUserName" name="name" placeholder="Masukkan nama lengkap" value="{{ old('_form_mode') === 'edit' ? old('name') : '' }}" required>
+                </div>
+                <div class="user-field full">
+                    <label for="editUserEmail">Email <span class="req">*</span></label>
+                    <input id="editUserEmail" type="email" name="email" placeholder="Contoh: nama@upnvj.ac.id" value="{{ old('_form_mode') === 'edit' ? old('email') : '' }}" required>
+                </div>
+                <div class="user-field">
+                    <label for="editUserNim">NIM / NIP</label>
+                    <input id="editUserNim" name="nim_nip" placeholder="Opsional" value="{{ old('_form_mode') === 'edit' ? old('nim_nip') : '' }}">
+                </div>
+                <div class="user-field">
+                    <label for="editUserPhone">Nomor Telepon</label>
+                    <input id="editUserPhone" name="phone" placeholder="Contoh: 081234567890" value="{{ old('_form_mode') === 'edit' ? old('phone') : '' }}">
+                </div>
+                <div class="user-field full">
+                    <label for="editUserRole">Role <span class="req">*</span></label>
+                    <select id="editUserRole" name="role" required>
+                        <option value="mahasiswa" @selected(old('role') === 'mahasiswa')>Mahasiswa</option>
+                        <option value="pegawai" @selected(old('role') === 'pegawai')>Dosen & Tendik</option>
+                        <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+                    </select>
+                </div>
+                <div class="user-field">
+                    <label for="editUserPassword">Password Baru</label>
+                    <div class="user-password-wrap">
+                        <input id="editUserPassword" type="password" name="password" placeholder="Kosongkan jika tetap" minlength="8" autocomplete="new-password">
+                        <button type="button" class="user-password-toggle" data-toggle-password="editUserPassword" aria-label="Tampilkan password" aria-pressed="false">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="user-field">
+                    <label for="editUserPasswordConfirm">Konfirmasi Password</label>
+                    <div class="user-password-wrap">
+                        <input id="editUserPasswordConfirm" type="password" name="password_confirmation" placeholder="Ulangi password baru" minlength="8" autocomplete="new-password">
+                        <button type="button" class="user-password-toggle" data-toggle-password="editUserPasswordConfirm" aria-label="Tampilkan password" aria-pressed="false">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sipadu-user-panel-footer">
+            <button class="up-btn secondary js-close-user-drawer" type="button">Batal</button>
+            <button class="up-btn primary" type="submit">Simpan Perubahan</button>
+        </div>
+    </form>
 </aside>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    /* DRAWER TAMBAH PENGGUNA */
-    const overlay = document.getElementById('addUserOverlay');
-    const panel = document.getElementById('addUserPanel');
-    const openButton = document.getElementById('openAddUserDrawer');
-    const closeButton = document.getElementById('closeAddUserDrawer');
-    const cancelButton = document.getElementById('cancelAddUserDrawer');
+    /* MANAJEMEN POPUP / DRAWER SAMPING (TAMBAH, DETAIL, EDIT) */
+    const overlay = document.getElementById('userDrawerOverlay');
+    const addPanel = document.getElementById('addUserPanel');
+    const detailPanel = document.getElementById('detailUserPanel');
+    const editPanel = document.getElementById('editUserPanel');
+    const allPanels = [addPanel, detailPanel, editPanel].filter(Boolean);
 
-    function openUserPanel() {
-        if (!overlay || !panel) return;
-        overlay.classList.add('is-open');
-        panel.classList.add('is-open');
-        document.body.classList.add('user-drawer-open');
-        setTimeout(function () {
-            document.getElementById('newUserName')?.focus();
-        }, 180);
-    }
-
-    function closeUserPanel() {
-        if (!overlay || !panel) return;
-        overlay.classList.remove('is-open');
-        panel.classList.remove('is-open');
+    function closeAllUserDrawers() {
+        overlay?.classList.remove('is-open');
+        allPanels.forEach(function (p) {
+            p.classList.remove('is-open');
+        });
         document.body.classList.remove('user-drawer-open');
     }
 
-    openButton?.addEventListener('click', openUserPanel);
-    closeButton?.addEventListener('click', closeUserPanel);
-    cancelButton?.addEventListener('click', closeUserPanel);
-    overlay?.addEventListener('click', closeUserPanel);
+    function openSpecificDrawer(targetPanel, focusSelector) {
+        if (!overlay || !targetPanel) return;
+        allPanels.forEach(function (p) {
+            p.classList.toggle('is-open', p === targetPanel);
+        });
+        overlay.classList.add('is-open');
+        document.body.classList.add('user-drawer-open');
 
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && panel?.classList.contains('is-open')) {
-            closeUserPanel();
+        if (focusSelector) {
+            setTimeout(function () {
+                targetPanel.querySelector(focusSelector)?.focus();
+            }, 180);
+        }
+    }
+
+    // 1. Buka Popup Tambah Pengguna
+    document.getElementById('openAddUserDrawer')?.addEventListener('click', function () {
+        openSpecificDrawer(addPanel, '#newUserName');
+    });
+
+    // 2. Buka Popup Detail Pengguna
+    let currentDetailPayload = null;
+    document.querySelectorAll('.js-open-detail-user').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            currentDetailPayload = {
+                name: btn.dataset.name || '-',
+                initials: btn.dataset.initials || 'U',
+                email: btn.dataset.email || '-',
+                phone: btn.dataset.phone || '—',
+                nim: btn.dataset.nim || '—',
+                role: btn.dataset.role || 'mahasiswa',
+                roleLabel: btn.dataset.roleLabel || 'Mahasiswa',
+                joined: btn.dataset.joined || '-',
+                updateUrl: btn.dataset.updateUrl || ''
+            };
+
+            document.getElementById('detailUserAvatar').textContent = currentDetailPayload.initials;
+            document.getElementById('detailUserName').textContent = currentDetailPayload.name;
+            document.getElementById('detailUserEmail').textContent = currentDetailPayload.email;
+            document.getElementById('detailUserFullName').textContent = currentDetailPayload.name;
+            document.getElementById('detailUserEmailRow').textContent = currentDetailPayload.email;
+            document.getElementById('detailUserNim').textContent = currentDetailPayload.nim;
+            document.getElementById('detailUserPhone').textContent = currentDetailPayload.phone;
+            document.getElementById('detailUserJoined').textContent = currentDetailPayload.joined;
+
+            const badgeEl = document.getElementById('detailUserRoleBadge');
+            badgeEl.textContent = currentDetailPayload.roleLabel;
+            badgeEl.className = 'role-pill ' + currentDetailPayload.role;
+
+            openSpecificDrawer(detailPanel);
+        });
+    });
+
+    // 3. Buka Popup Edit Pengguna
+    const editForm = document.getElementById('editUserForm');
+    const editActionInput = document.getElementById('editUserActionInput');
+    const editNameInput = document.getElementById('editUserName');
+    const editEmailInput = document.getElementById('editUserEmail');
+    const editNimInput = document.getElementById('editUserNim');
+    const editPhoneInput = document.getElementById('editUserPhone');
+    const editRoleSelect = document.getElementById('editUserRole');
+    const editPasswordInput = document.getElementById('editUserPassword');
+    const editPasswordConfirmInput = document.getElementById('editUserPasswordConfirm');
+
+    function populateAndOpenEdit(data) {
+        if (!editForm) return;
+        editForm.action = data.updateUrl || '';
+        if (editActionInput) editActionInput.value = data.updateUrl || '';
+        if (editNameInput) editNameInput.value = data.name || '';
+        if (editEmailInput) editEmailInput.value = data.email || '';
+        if (editNimInput) editNimInput.value = (data.nim && data.nim !== '—') ? data.nim : '';
+        if (editPhoneInput) editPhoneInput.value = (data.phone && data.phone !== '—') ? data.phone : '';
+        if (editRoleSelect) editRoleSelect.value = data.role || 'mahasiswa';
+        if (editPasswordInput) editPasswordInput.value = '';
+        if (editPasswordConfirmInput) editPasswordConfirmInput.value = '';
+
+        openSpecificDrawer(editPanel, '#editUserName');
+    }
+
+    document.querySelectorAll('.js-open-edit-user').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            populateAndOpenEdit({
+                name: btn.dataset.name,
+                email: btn.dataset.email,
+                nim: btn.dataset.nim,
+                phone: btn.dataset.phone,
+                role: btn.dataset.role,
+                updateUrl: btn.dataset.updateUrl
+            });
+        });
+    });
+
+    document.getElementById('detailSwitchToEditBtn')?.addEventListener('click', function () {
+        if (currentDetailPayload) {
+            populateAndOpenEdit(currentDetailPayload);
         }
     });
 
-    if (panel?.dataset.hasErrors === '1') {
-        openUserPanel();
+    // Tutup popup
+    document.querySelectorAll('.js-close-user-drawer').forEach(function (btn) {
+        btn.addEventListener('click', closeAllUserDrawers);
+    });
+    overlay?.addEventListener('click', closeAllUserDrawers);
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay?.classList.contains('is-open')) {
+            closeAllUserDrawers();
+        }
+    });
+
+    if (addPanel?.dataset.hasErrors === '1') {
+        openSpecificDrawer(addPanel, '#newUserName');
+    } else if (editPanel?.dataset.hasErrors === '1') {
+        openSpecificDrawer(editPanel, '#editUserName');
     }
 
     /* TOGGLE SHOW / HIDE PASSWORD */
@@ -1180,7 +1399,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const matchesRole = activeRole === '' || rowRole === activeRole;
             const isVisible = matchesSearch && matchesRole;
 
-            row.style.display = isVisible ? 'block' : 'none';
+            row.style.display = isVisible ? '' : 'none';
             if (isVisible) visibleCount++;
         });
 
@@ -1190,7 +1409,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (countAdminEl) countAdminEl.textContent = matchedAdmin;
 
         if (emptyFilterRow) {
-            emptyFilterRow.style.display = (userRows.length > 0 && visibleCount === 0) ? 'block' : 'none';
+            emptyFilterRow.style.display = (userRows.length > 0 && visibleCount === 0) ? '' : 'none';
         }
 
         syncUrlParams(query, activeRole);
