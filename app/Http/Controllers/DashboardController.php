@@ -23,7 +23,9 @@ class DashboardController extends Controller
 
         $bookings = (clone $q)->with('auditorium')->latest()->take(6)->get();
 
-        $auditoriums = Auditorium::where('is_active', true)->get();
+        $auditoriums = Auditorium::orderByDesc('is_active')
+            ->orderBy('name')
+            ->get();
 
         $view = $r->user()->role === 'pegawai' ? 'pegawai.dashboard' : 'borrower.dashboard';
 
@@ -66,7 +68,7 @@ class DashboardController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'nim_nip' => $user->role === 'admin' ? 'nullable|string|max:40|unique:users,nim_nip,' . $user->id : 'required|string|max:40|unique:users,nim_nip,' . $user->id,
-            'phone' => 'required|string|max:20',
+            'phone' => $user->role === 'admin' ? 'nullable|string|max:20' : 'required|string|max:20',
             'faculty' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
             'study_program' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
             'employee_unit' => $user->role === 'pegawai' ? 'required|string|max:150' : 'nullable|string|max:150',
@@ -80,6 +82,7 @@ class DashboardController extends Controller
             'email.unique' => 'Email sudah digunakan akun lain.',
             'nim_nip.required' => 'NIM atau NIP wajib diisi.',
             'nim_nip.unique' => 'NIM atau NIP sudah digunakan akun lain.',
+            'phone.required' => 'Nomor telepon wajib diisi.',
             'phone.max' => 'Nomor telepon maksimal 20 karakter.',
             'profile_photo.image' => 'File foto profil harus berupa gambar.',
             'profile_photo.mimes' => 'Format foto profil harus JPG, JPEG, PNG, atau WEBP.',

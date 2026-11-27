@@ -40,11 +40,25 @@ class BookingController extends Controller
 
     public function create(Request $r)
     {
-        $profileComplete = $this->profileIsComplete($r->user());
-        $auditoriums = Auditorium::where('is_active', true)->get();
-        $selected = $r->query('auditorium');
+        $user = $r->user();
+        $profileComplete = $this->profileIsComplete($user);
+        $auditoriums = Auditorium::where('is_active', true)->orderBy('name')->get();
+        $selected = $r->query('auditorium') ?? $r->query('auditorium_id');
 
-        $view = $r->user()->role === 'pegawai' ? 'pegawai.booking-form' : 'borrower.booking-form';
+        if ($selected) {
+            $requestedAuditorium = Auditorium::find($selected);
+            if ($requestedAuditorium && !$requestedAuditorium->is_active) {
+                $reason = trim((string) ($requestedAuditorium->deactivation_reason ?? ''));
+                $reasonText = $reason !== '' ? " Keterangan: {$reason}" : '';
+                $dashboardRoute = $user->role === 'pegawai' ? 'pegawai.dashboard' : 'borrower.dashboard';
+
+                return redirect()
+                    ->route($dashboardRoute)
+                    ->with('error', "Auditorium {$requestedAuditorium->name} sedang dinonaktifkan dan tidak dapat diajukan.{$reasonText}");
+            }
+        }
+
+        $view = $user->role === 'pegawai' ? 'pegawai.booking-form' : 'borrower.booking-form';
         return view($view, compact('auditoriums', 'selected', 'profileComplete'));
     }
 
@@ -66,6 +80,17 @@ class BookingController extends Controller
             'end_time' => 'required|date_format:H:i|after:start_time',
             'surat' => 'required|file|mimes:pdf|max:5120',
         ]);
+
+        // Pastikan auditorium masih aktif saat pengajuan dikirim
+        $auditorium = Auditorium::findOrFail($data['auditorium_id']);
+        if (!$auditorium->is_active) {
+            $reason = trim((string) ($auditorium->deactivation_reason ?? ''));
+            $reasonText = $reason !== '' ? " ({$reason})" : '';
+
+            return back()->withInput()->withErrors([
+                'auditorium_id' => "Auditorium {$auditorium->name} sedang dinonaktifkan dan tidak dapat dipinjam{$reasonText}.",
+            ]);
+        }
 
         // Cek jadwal bentrok
         $conflict = Booking::where('auditorium_id', $data['auditorium_id'])
