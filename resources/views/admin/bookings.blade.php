@@ -1311,16 +1311,6 @@ body.bp-drawer-open {
             <h1>Kelola Peminjaman Auditorium</h1>
             <p>Kelola pengajuan peminjaman, periksa jadwal, dan tentukan keputusan untuk setiap permohonan.</p>
         </div>
-        <a href="{{ route('admin.bookings', request()->except('status', 'page')) }}"
-           class="bp-stat {{ !request('status') ? 'is-active' : '' }}">
-            <div class="bp-stat-icon">
-                <i data-lucide="clipboard-list"></i>
-            </div>
-            <div>
-                <small>Total Pengajuan</small>
-                <strong>{{ $stats['total'] }}</strong>
-            </div>
-        </a>
 
         <a
             href="{{ route('admin.bookings.export', request()->query()) }}"
