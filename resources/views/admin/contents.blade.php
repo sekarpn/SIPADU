@@ -4,11 +4,28 @@
 
 <style>
     .content-page {
+        --cp-ink: #163626;
+        --cp-muted: #4c6456;
+        --cp-subtle: #64786c;
+        --cp-green: #1f7a49;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
         padding: 10px 10px 35px;
-        color: #163626;
+        color: var(--cp-ink);
+        font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .content-page,
+    .content-page button,
+    .content-page input,
+    .content-page select,
+    .content-page textarea,
+    .sipadu-content-panel,
+    .sipadu-content-panel button,
+    .sipadu-content-panel input,
+    .sipadu-content-panel select,
+    .sipadu-content-panel textarea {
         font-family: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
     }
 
@@ -22,35 +39,37 @@
     }
 
     .content-heading h1 {
-        font-size: 26px;
+        font-size: 25px;
         font-weight: 800;
         letter-spacing: -.03em;
-        color: #163626;
+        color: var(--cp-ink);
         margin: 0 0 5px;
     }
 
     .content-heading p {
         font-size: 13px;
-        color: #4c6456;
+        color: var(--cp-muted);
         margin: 0;
     }
 
-    /* TOMBOL CLEAN & SELARAS DENGAN DATA AUDITORIUM */
+    /* TOMBOL CLEAN & SELARAS DENGAN KELOLA PEMINJAMAN */
     .content-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        padding: 7px 14px;
+        gap: 7px;
+        padding: 8px 15px;
         border: 1px solid transparent;
-        border-radius: 9px;
+        border-radius: 11px;
         font-family: inherit;
         font-size: 12px;
         font-weight: 700;
         text-decoration: none;
+        white-space: nowrap;
+        flex-shrink: 0;
         cursor: pointer;
         box-shadow: none !important;
-        transition: background .2s ease, transform .15s ease, border-color .2s ease;
+        transition: background .2s ease, transform .15s ease, border-color .2s ease, box-shadow .2s ease;
     }
 
     .content-btn:hover {
@@ -58,81 +77,54 @@
     }
 
     .content-btn-primary {
-        background: #237c4d !important;
-        color: #fff !important;
-        border-color: #237c4d !important;
+        background: #1f7a49 !important;
+        color: #ffffff !important;
+        border-color: #1f7a49 !important;
         padding: 10px 18px;
         font-size: 12.5px;
-        border-radius: 11px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(31, 122, 73, .22) !important;
     }
 
     .content-btn-primary:hover {
-        background: #1b663f !important;
+        background: #176139 !important;
+        border-color: #176139 !important;
     }
 
     .content-btn-secondary {
-        background: rgba(255, 255, 255, .85) !important;
-        color: #163626 !important;
-        border-color: rgba(22, 54, 38, .16) !important;
+        background: #ffffff !important;
+        color: #294735 !important;
+        border-color: rgba(22, 54, 38, .15) !important;
         padding: 10px 16px;
         font-size: 12.5px;
-        border-radius: 11px;
+        border-radius: 12px;
     }
 
     .content-btn-secondary:hover {
-        background: #fff !important;
+        background: #f4f8f5 !important;
     }
 
     .content-btn-edit {
         background: #fef3c7 !important;
         color: #92400e !important;
-        border-color: #fde68a !important;
+        border-color: rgba(217, 119, 6, .24) !important;
     }
 
     .content-btn-edit:hover {
         background: #fde68a !important;
     }
 
-    .content-btn-edit.is-submit {
-        padding: 10px 18px;
-        font-size: 12.5px;
-        border-radius: 11px;
-    }
-
     .content-btn-delete {
         background: #fee2e2 !important;
         color: #b91c1c !important;
-        border-color: #fecaca !important;
+        border-color: rgba(220, 38, 38, .22) !important;
     }
 
     .content-btn-delete:hover {
         background: #fecaca !important;
     }
 
-    /* LAYOUT SPLIT: KIRI DAFTAR KONTEN, KANAN FORM PANEL */
-    .content-split-layout {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: flex-start !important;
-        gap: 0px;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        transition: gap 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .content-split-layout.is-open {
-        gap: 24px !important;
-    }
-
-    /* KOLOM KIRI: MAKSIMAL 2 KARTU PER BARIS */
-    .content-list-col {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
-        width: 100% !important;
-        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
+    /* GRID DAFTAR KONTEN (2 KOLOM PENUH & SEIMBANG) */
     .content-cards {
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -142,10 +134,10 @@
     }
 
     .content-info-card {
-        background: linear-gradient(145deg, rgba(255, 255, 255, .74), rgba(255, 255, 255, .46));
+        background: linear-gradient(145deg, rgba(255, 255, 255, .72), rgba(255, 255, 255, .44));
         backdrop-filter: blur(18px) saturate(150%);
         -webkit-backdrop-filter: blur(18px) saturate(150%);
-        border: 1px solid rgba(255, 255, 255, .62);
+        border: 1px solid rgba(255, 255, 255, .60);
         border-radius: 18px;
         padding: 20px 22px;
         min-height: 225px;
@@ -159,11 +151,12 @@
 
     .content-info-card:hover {
         transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(22, 54, 38, .09);
     }
 
     .content-info-card.is-active {
-        border: 2px solid #237c4d !important;
-        box-shadow: 0 0 0 3px rgba(35, 124, 77, .14) !important;
+        border: 1.5px solid #2b8a57 !important;
+        box-shadow: 0 6px 20px rgba(31, 122, 73, .12) !important;
     }
 
     .content-card-head {
@@ -175,16 +168,26 @@
     }
 
     .content-key-badge {
-        display: inline-block;
-        padding: 4px 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 11px;
         border-radius: 999px;
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: .04em;
-        background: #bbf7d0;
-        border: 1px solid #34d399;
-        color: #065f46;
+        background: #dcfce7;
+        border: 1px solid rgba(22, 163, 74, .22);
+        color: #166534;
+    }
+
+    .content-key-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
     }
 
     .content-info-card h3 {
@@ -192,14 +195,14 @@
         font-size: 16.5px;
         line-height: 1.35;
         font-weight: 800;
-        color: #163626;
+        color: var(--cp-ink);
     }
 
     .content-info-card p {
         margin: 0 0 16px;
         font-size: 12.8px;
         line-height: 1.65;
-        color: #4c6456;
+        color: var(--cp-muted);
         display: -webkit-box;
         -webkit-line-clamp: 4;
         -webkit-box-orient: vertical;
@@ -221,50 +224,126 @@
         margin: 0;
     }
 
-    /* KOLOM KANAN: PANEL FORM TAMBAH / PERBARUI KONTEN */
-    .content-form-col {
-        flex: 0 0 0px !important;
-        width: 0px !important;
-        max-width: 0px !important;
-        opacity: 0;
-        overflow: hidden;
-        pointer-events: none;
-        transform: translateX(16px);
-        position: sticky;
-        top: 20px;
-        box-sizing: border-box !important;
-        transition:
-            flex-basis 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-            width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-            max-width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.3s ease 0.06s,
-            transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    .content-empty {
+        background: linear-gradient(145deg, rgba(255, 255, 255, .64), rgba(255, 255, 255, .36));
+        border: 1px dashed rgba(22, 54, 38, .22);
+        border-radius: 16px;
+        padding: 36px;
+        text-align: center;
+        color: var(--cp-muted);
+        grid-column: 1 / -1;
     }
 
-    .content-form-col.is-open {
-        flex: 0 0 clamp(440px, 46%, 540px) !important;
-        width: clamp(440px, 46%, 540px) !important;
-        max-width: 50% !important;
-        opacity: 1 !important;
-        overflow: visible !important;
-        pointer-events: auto !important;
-        transform: translateX(0) !important;
+    /* ==========================================================================
+       POPUP / DRAWER SAMPING KONTEN INFORMASI (IDENTIK KELOLA PEMINJAMAN)
+       ========================================================================== */
+    .sipadu-content-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99990;
+        background: rgba(15, 32, 23, .36);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        display: none;
     }
 
-    .content-form-card {
-        width: 100% !important;
-        min-width: 360px;
-        background: linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(255, 255, 255, .60));
-        backdrop-filter: blur(18px) saturate(150%);
-        -webkit-backdrop-filter: blur(18px) saturate(150%);
-        border: 1px solid rgba(255, 255, 255, .72);
+    .sipadu-content-overlay.is-open {
+        display: block;
+    }
+
+    .sipadu-content-panel {
+        position: fixed;
+        top: 12px;
+        right: -540px;
+        bottom: 12px;
+        z-index: 99995;
+        width: min(490px, calc(100vw - 24px));
+        background: #ffffff;
         border-radius: 18px;
-        padding: 22px 24px;
-        box-shadow: 0 8px 28px rgba(22, 54, 38, .08);
-        box-sizing: border-box !important;
+        box-shadow: -14px 0 44px rgba(12, 32, 21, .2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: right .26s cubic-bezier(.22, .61, .36, 1);
+        color: #163626;
     }
 
-    .content-form-header {
+    .sipadu-content-panel.is-open {
+        right: 12px;
+    }
+
+    .sipadu-content-panel-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 20px 22px 15px;
+        background: #ffffff;
+        border-bottom: 1px solid rgba(22, 54, 38, .08);
+        flex-shrink: 0;
+    }
+
+    .sipadu-content-panel-header h2 {
+        margin: 0;
+        color: #163626;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -.02em;
+        line-height: 1.25;
+    }
+
+    .sipadu-content-panel-header p {
+        margin: 4px 0 0;
+        color: #6b7f73;
+        font-size: 11.5px;
+        font-weight: 500;
+    }
+
+    .sipadu-content-panel-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        flex-shrink: 0;
+        border: 1px solid rgba(22, 54, 38, .12);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #52665a;
+        line-height: 0;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease;
+    }
+
+    .sipadu-content-panel-close svg {
+        width: 15px;
+        height: 15px;
+        display: block;
+    }
+
+    .sipadu-content-panel-close:hover {
+        background: #f1f6f2;
+        color: #163626;
+    }
+
+    .sipadu-content-panel-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 22px 22px;
+        background: #ffffff;
+    }
+
+    /* KARTU FORM DI DALAM POPUP (BERBORDER HIJAU TIPIS SEPERTI KELOLA PEMINJAMAN) */
+    .content-drawer-card {
+        padding: 18px;
+        border: 1.5px solid #2b8a57;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(31, 122, 73, .05);
+    }
+
+    .content-drawer-card-top {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -274,57 +353,44 @@
         border-bottom: 1px solid rgba(22, 54, 38, .08);
     }
 
-    .content-form-header h3 {
-        margin: 0;
-        font-size: 16.5px;
+    .content-drawer-code {
+        font-size: 11px;
         font-weight: 800;
-        color: #163626;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: #1f7a49;
     }
 
-    .content-close-btn {
-        width: 30px;
-        height: 30px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        border: 1px solid rgba(22, 54, 38, .12);
-        background: rgba(255, 255, 255, .75);
-        color: #163626;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-    .content-close-btn:hover {
-        background: #fff;
-    }
-
-    .content-form-card label {
+    .content-drawer-card label {
         display: block;
-        margin: 12px 0 6px;
-        font-size: 12.5px;
+        margin: 13px 0 6px;
+        font-size: 12px;
         font-weight: 700;
-        color: #294735;
+        color: #163626;
     }
 
-    .content-form-card select,
-    .content-form-card input,
-    .content-form-card textarea {
+    .content-drawer-card label .req {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    .content-drawer-card select,
+    .content-drawer-card input,
+    .content-drawer-card textarea {
         width: 100% !important;
         padding: 10px 13px;
-        border: 1px solid rgba(22, 54, 38, .14);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, .88);
+        border: 1px solid #d5e0d9;
+        border-radius: 11px;
+        background: #ffffff;
         font-family: inherit;
-        font-size: 13px;
+        font-size: 12.5px;
         color: #163626;
         box-sizing: border-box !important;
         outline: none;
-        transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+        transition: border-color .2s ease, box-shadow .2s ease;
     }
 
-    .content-form-card select {
+    .content-drawer-card select {
         appearance: none !important;
         -webkit-appearance: none !important;
         padding-right: 40px !important;
@@ -335,70 +401,87 @@
         cursor: pointer;
     }
 
-    .content-form-card select:focus,
-    .content-form-card input:focus,
-    .content-form-card textarea:focus {
-        background-color: #fff;
-        border-color: #237c4d;
-        box-shadow: 0 0 0 3px rgba(35, 124, 77, .12);
+    .content-drawer-card select:focus,
+    .content-drawer-card input:focus,
+    .content-drawer-card textarea:focus {
+        border-color: #1f7a49;
+        box-shadow: 0 0 0 3px rgba(31, 122, 73, .12);
     }
 
-    .content-form-card textarea {
-        min-height: 170px !important;
+    .content-drawer-card textarea {
+        min-height: 185px !important;
         resize: vertical;
         line-height: 1.65;
     }
 
-    .content-form-footer {
+    .content-drawer-hint {
+        margin-top: 14px;
+        padding: 12px 13px;
+        border-radius: 12px;
+        background: #f2f9f5;
+        border: 1px solid rgba(31, 122, 73, .14);
+        font-size: 11.5px;
+        line-height: 1.5;
+        color: #294735;
+    }
+
+    .content-drawer-hint strong {
+        color: #163626;
+    }
+
+    /* FOOTER POPUP (TOMBOL BERTINGKAT SEPERTI KELOLA PEMINJAMAN) */
+    .sipadu-content-panel-footer {
+        padding: 14px 22px 18px;
+        border-top: 1px solid rgba(22, 54, 38, .08);
+        background: #ffffff;
+        flex-shrink: 0;
+    }
+
+    .content-footer-stack {
         display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 18px;
+        flex-direction: column;
+        gap: 9px;
     }
 
-    .content-empty {
-        background: linear-gradient(145deg, rgba(255, 255, 255, .64), rgba(255, 255, 255, .36));
-        border: 1px dashed rgba(22, 54, 38, .22);
-        border-radius: 16px;
-        padding: 36px;
-        text-align: center;
-        color: #4c6456;
-        grid-column: 1 / -1;
+    .content-footer-stack .content-btn {
+        width: 100%;
+        min-height: 42px;
+        border-radius: 12px;
+        font-size: 12.5px;
     }
 
-    /* RESPONSIF LAPTOP LAYAR KECIL SAAT FORM TERBUKA */
-    @media (max-width: 1220px) {
-        .content-split-layout.is-open .content-cards {
-            grid-template-columns: 1fr !important;
-        }
+    body.content-drawer-open {
+        overflow: hidden;
     }
 
     @media (max-width: 900px) {
-        .content-split-layout {
-            flex-direction: column-reverse !important;
-            gap: 20px !important;
-        }
-
         .content-cards {
             grid-template-columns: 1fr !important;
         }
+    }
 
-        .content-form-col {
-            display: none !important;
+    @media (max-width: 600px) {
+        .sipadu-content-panel {
+            top: 0;
+            bottom: 0;
+            width: 100vw;
+            border-radius: 0;
         }
 
-        .content-form-col.is-open {
-            display: block !important;
-            flex: 1 1 100% !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            position: static !important;
-            transform: none !important;
+        .sipadu-content-panel.is-open {
+            right: 0;
         }
 
-        .content-form-card {
-            min-width: 0 !important;
-            width: 100% !important;
+        .sipadu-content-panel-header {
+            padding: 16px 18px;
+        }
+
+        .sipadu-content-panel-body {
+            padding: 16px 18px;
+        }
+
+        .sipadu-content-panel-footer {
+            padding: 14px 18px;
         }
     }
 </style>
@@ -415,86 +498,114 @@
         </button>
     </div>
 
-    <div class="content-split-layout {{ $errors->any() ? 'is-open' : '' }}" id="contentSplitLayout">
-
-        {{-- KIRI: DAFTAR KONTEN (MAKSIMAL 2 KOTAK PER BARIS) --}}
-        <div class="content-list-col">
-            <div class="content-cards">
-                @if($contents->count() > 0)
-                    @foreach($contents as $c)
-                        <article class="content-info-card" id="contentCard-{{ $c->id }}">
-                            <div>
-                                <div class="content-card-head">
-                                    <span class="content-key-badge">{{ strtoupper($c->key) }}</span>
-                                </div>
-                                <h3>{{ $c->title }}</h3>
-                                <p>{{ \Illuminate\Support\Str::limit($c->body, 220) }}</p>
-                            </div>
-
-                            <div class="content-actions">
-                                <button
-                                    type="button"
-                                    class="content-btn content-btn-edit"
-                                    data-card-id="contentCard-{{ $c->id }}"
-                                    data-key="{{ $c->key }}"
-                                    data-title="{{ $c->title }}"
-                                    data-body="{{ $c->body }}"
-                                    onclick="fillContentForm(this)"
-                                >
-                                    Edit
-                                </button>
-
-                                <form method="POST" action="{{ route('admin.contents.delete', $c) }}" onsubmit="return confirm('Hapus konten ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="content-btn content-btn-delete" data-confirm="Hapus konten ini?">
-                                        Hapus
-                                    </button>
-                                </form>
-                            </div>
-                        </article>
-                    @endforeach
-                @else
-                    <div class="content-empty">
-                        <h3 style="margin:0 0 6px;color:#163626;">Belum Ada Konten Informasi</h3>
-                        <p style="margin:0;font-size:13px;">Silakan klik tombol Tambah Konten untuk menambahkan data.</p>
+    {{-- DAFTAR KONTEN (2 KOLOM) --}}
+    <div class="content-cards">
+        @if($contents->count() > 0)
+            @foreach($contents as $c)
+                <article class="content-info-card" id="contentCard-{{ $c->id }}">
+                    <div>
+                        <div class="content-card-head">
+                            <span class="content-key-badge">{{ strtoupper($c->key) }}</span>
+                        </div>
+                        <h3>{{ $c->title }}</h3>
+                        <p>{{ \Illuminate\Support\Str::limit($c->body, 220) }}</p>
                     </div>
-                @endif
-            </div>
-        </div>
 
-        {{-- KANAN: FORM TAMBAH / PERBARUI KONTEN (TERSEMBUNYI DEFAULT) --}}
-        <aside class="content-form-col {{ $errors->any() ? 'is-open' : '' }}" id="contentFormPanel">
-            <form class="content-form-card" id="contentForm" method="POST" action="{{ route('admin.contents.save') }}">
-                @csrf
-                <div class="content-form-header">
-                    <h3 id="contentFormHeading">Tambah Konten Baru</h3>
-                    <button type="button" class="content-close-btn" onclick="closeContentForm()" title="Tutup">✕</button>
+                    <div class="content-actions">
+                        <button
+                            type="button"
+                            class="content-btn content-btn-edit"
+                            data-card-id="contentCard-{{ $c->id }}"
+                            data-key="{{ $c->key }}"
+                            data-title="{{ $c->title }}"
+                            data-body="{{ $c->body }}"
+                            onclick="fillContentForm(this)"
+                        >
+                            Edit
+                        </button>
+
+                        <form method="POST" action="{{ route('admin.contents.delete', $c) }}" onsubmit="return confirm('Hapus konten ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="content-btn content-btn-delete" data-confirm="Hapus konten ini?">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            @endforeach
+        @else
+            <div class="content-empty">
+                <h3 style="margin:0 0 6px;color:#163626;">Belum Ada Konten Informasi</h3>
+                <p style="margin:0;font-size:13px;">Silakan klik tombol Tambah Konten untuk menambahkan data.</p>
+            </div>
+        @endif
+    </div>
+</div>
+
+{{-- OVERLAY BLUR & POPUP DRAWER SAMPING KANAN --}}
+<div class="sipadu-content-overlay {{ $errors->any() ? 'is-open' : '' }}" id="contentOverlay" onclick="closeContentForm()"></div>
+
+<aside
+    class="sipadu-content-panel {{ $errors->any() ? 'is-open' : '' }}"
+    id="contentFormPanel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="contentFormHeading"
+>
+    <header class="sipadu-content-panel-header">
+        <div>
+            <h2 id="contentFormHeading">Tambah Konten Baru</h2>
+            <p id="contentFormSubtitle">Atur informasi yang ditampilkan pada halaman utama dan peminjam.</p>
+        </div>
+        <button type="button" class="sipadu-content-panel-close" onclick="closeContentForm()" aria-label="Tutup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+            </svg>
+        </button>
+    </header>
+
+    <form id="contentForm" method="POST" action="{{ route('admin.contents.save') }}" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+        @csrf
+        <div class="sipadu-content-panel-body">
+            <div class="content-drawer-card">
+                <div class="content-drawer-card-top">
+                    <span class="content-drawer-code" id="contentDrawerModeLabel">FORMULIR KONTEN • BARU</span>
+                    <span class="content-key-badge" id="contentDrawerKeyBadge">ALUR</span>
                 </div>
 
-                <label for="contentKey">Jenis Konten *</label>
-                <select id="contentKey" name="key" required>
+                <label for="contentKey">Jenis Konten <span class="req">*</span></label>
+                <select id="contentKey" name="key" required onchange="syncContentKeyBadge()">
                     <option value="alur" @selected(old('key') === 'alur')>Alur Pengajuan</option>
                     <option value="sop" @selected(old('key') === 'sop')>SOP</option>
                     <option value="faq" @selected(old('key') === 'faq')>FAQ</option>
                     <option value="contact" @selected(old('key') === 'contact')>Contact Person</option>
                 </select>
 
-                <label for="contentTitle">Judul *</label>
+                <label for="contentTitle">Judul <span class="req">*</span></label>
                 <input id="contentTitle" name="title" value="{{ old('title') }}" required placeholder="Masukkan judul konten informasi">
 
-                <label for="contentBody">Isi Konten *</label>
+                <label for="contentBody">Isi Konten <span class="req">*</span></label>
                 <textarea id="contentBody" name="body" rows="8" required placeholder="Tuliskan detail informasi konten...">{{ old('body') }}</textarea>
 
-                <div class="content-form-footer">
-                    <button class="content-btn content-btn-primary" type="submit" id="contentSubmitBtn">Simpan Konten</button>
-                    <button class="content-btn content-btn-secondary" type="button" onclick="closeContentForm()">Batal</button>
+                <div class="content-drawer-hint">
+                    <strong>Informasi Publikasi:</strong> Perubahan konten akan langsung diperbarui dan tampil pada landing page serta portal peminjam SIPADU.
                 </div>
-            </form>
-        </aside>
+            </div>
+        </div>
 
-    </div>
-</div>
+        <div class="sipadu-content-panel-footer">
+            <div class="content-footer-stack">
+                <button class="content-btn content-btn-primary" type="submit" id="contentSubmitBtn">
+                    ✓ Simpan Konten
+                </button>
+                <button class="content-btn content-btn-secondary" type="button" onclick="closeContentForm()">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </form>
+</aside>
 
 <script>
 function clearSelectedContentCards() {
@@ -503,30 +614,58 @@ function clearSelectedContentCards() {
     });
 }
 
+function syncContentKeyBadge() {
+    const keySelect = document.getElementById('contentKey');
+    const badge = document.getElementById('contentDrawerKeyBadge');
+    if (keySelect && badge) {
+        badge.textContent = (keySelect.value || 'ALUR').toUpperCase();
+    }
+}
+
 function showContentPanel() {
-    document.getElementById('contentSplitLayout').classList.add('is-open');
-    document.getElementById('contentFormPanel').classList.add('is-open');
+    document.getElementById('contentOverlay')?.classList.add('is-open');
+    document.getElementById('contentFormPanel')?.classList.add('is-open');
+
+    const pageBody = document.body;
+    if (!pageBody.classList.contains('content-drawer-open')) {
+        pageBody.dataset.cpOriginalPaddingRight = pageBody.style.paddingRight;
+        const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+        const currentPaddingRight = parseFloat(window.getComputedStyle(pageBody).paddingRight) || 0;
+        pageBody.style.paddingRight = (currentPaddingRight + scrollbarWidth) + 'px';
+        pageBody.classList.add('content-drawer-open');
+    }
 }
 
 function closeContentForm() {
-    document.getElementById('contentSplitLayout').classList.remove('is-open');
-    document.getElementById('contentFormPanel').classList.remove('is-open');
+    document.getElementById('contentOverlay')?.classList.remove('is-open');
+    document.getElementById('contentFormPanel')?.classList.remove('is-open');
     clearSelectedContentCards();
+
+    const pageBody = document.body;
+    if (pageBody.classList.contains('content-drawer-open')) {
+        pageBody.classList.remove('content-drawer-open');
+        pageBody.style.paddingRight = pageBody.dataset.cpOriginalPaddingRight || '';
+        delete pageBody.dataset.cpOriginalPaddingRight;
+    }
 }
 
 function openAddContentForm() {
     clearSelectedContentCards();
     document.getElementById('contentFormHeading').textContent = 'Tambah Konten Baru';
+    document.getElementById('contentFormSubtitle').textContent = 'Tambahkan panduan alur, SOP, FAQ, atau kontak baru.';
+    document.getElementById('contentDrawerModeLabel').textContent = 'FORMULIR KONTEN • BARU';
+
     const submitBtn = document.getElementById('contentSubmitBtn');
-    submitBtn.textContent = 'Simpan Konten';
+    submitBtn.textContent = '✓ Simpan Konten';
     submitBtn.className = 'content-btn content-btn-primary';
 
     document.getElementById('contentKey').value = 'alur';
     document.getElementById('contentTitle').value = '';
     document.getElementById('contentBody').value = '';
+    syncContentKeyBadge();
 
     showContentPanel();
-    setTimeout(() => document.getElementById('contentTitle').focus(), 200);
+    setTimeout(() => document.getElementById('contentTitle')?.focus(), 200);
 }
 
 function fillContentForm(btn) {
@@ -534,21 +673,36 @@ function fillContentForm(btn) {
     const card = document.getElementById(btn.dataset.cardId);
     if (card) card.classList.add('is-active');
 
-    document.getElementById('contentFormHeading').textContent = 'Edit ' + (btn.dataset.title || 'Konten');
-    const submitBtn = document.getElementById('contentSubmitBtn');
-    submitBtn.textContent = 'Simpan Perubahan';
-    submitBtn.className = 'content-btn content-btn-edit is-submit';
+    const keyVal = btn.dataset.key || 'alur';
+    document.getElementById('contentFormHeading').textContent = 'Edit Konten Informasi';
+    document.getElementById('contentFormSubtitle').textContent = '#' + keyVal.toUpperCase() + ' • ' + (btn.dataset.title || 'Konten');
+    document.getElementById('contentDrawerModeLabel').textContent = 'TINJAU & EDIT • #' + keyVal.toUpperCase();
 
-    document.getElementById('contentKey').value = btn.dataset.key || 'alur';
+    const submitBtn = document.getElementById('contentSubmitBtn');
+    submitBtn.textContent = '✓ Simpan Perubahan';
+    submitBtn.className = 'content-btn content-btn-primary';
+
+    document.getElementById('contentKey').value = keyVal;
     document.getElementById('contentTitle').value = btn.dataset.title || '';
     document.getElementById('contentBody').value = btn.dataset.body || '';
+    syncContentKeyBadge();
 
     showContentPanel();
-    if (window.innerWidth <= 900) {
-        document.getElementById('contentFormPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    setTimeout(() => document.getElementById('contentTitle').focus(), 200);
+    setTimeout(() => document.getElementById('contentTitle')?.focus(), 200);
 }
+
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && document.getElementById('contentFormPanel')?.classList.contains('is-open')) {
+        closeContentForm();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    syncContentKeyBadge();
+    @if($errors->any())
+        showContentPanel();
+    @endif
+});
 </script>
 
 @endsection
