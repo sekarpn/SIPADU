@@ -52,4 +52,31 @@ class User extends Authenticatable
     {
         return $this->hasMany(Booking::class);
     }
+
+    public function hasCompleteProfile(): bool
+    {
+        $role = strtolower((string) ($this->role ?? 'mahasiswa'));
+
+        if (trim((string) $this->name) === '' || trim((string) $this->email) === '') {
+            return false;
+        }
+
+        if ($role === 'admin') {
+            return true;
+        }
+
+        // Mahasiswa & Pegawai wajib mengisi nomor telepon dan NIM/NIP
+        if (trim((string) $this->phone) === '' || trim((string) $this->nim_nip) === '') {
+            return false;
+        }
+
+        if ($role === 'pegawai') {
+            return trim((string) $this->employee_unit) !== ''
+                && trim((string) $this->position) !== '';
+        }
+
+        // Mahasiswa
+        return trim((string) $this->faculty) !== ''
+            && trim((string) $this->study_program) !== '';
+    }
 }
