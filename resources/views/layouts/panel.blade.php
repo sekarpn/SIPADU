@@ -1347,6 +1347,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const tbody = table.querySelector('tbody');
         if (!tbody) return;
 
+        let card = table.closest('.sipadu-glass-card, [class*="-card"], .table-wrap, .dashboard-table-wrap, .panel');
+        const hasNativePagination = Boolean(
+            (card && card.querySelector('.bp-pagination, .up-pagination, #bookingPagination, [class*="-pagination"], nav[aria-label*="Navigasi"]')) ||
+            table.closest('.booking-page')
+        );
+
         const allRows = Array.from(tbody.querySelectorAll('tr'));
         const dataRows = allRows.filter(function (tr) {
             return !(tr.children.length === 1 && tr.children[0].hasAttribute('colspan'));
@@ -1354,7 +1360,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         table.dataset.sipaduPaginated = '1';
 
-        let card = table.closest('.sipadu-glass-card, [class*="-card"], .table-wrap, .dashboard-table-wrap, .panel');
         let scrollWrap = table.parentElement;
 
         if (!scrollWrap || (!scrollWrap.classList.contains('sipadu-table-scroll') && !scrollWrap.classList.contains('table-wrap') && !scrollWrap.classList.contains('dashboard-table-wrap'))) {
@@ -1376,7 +1381,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.classList.add('sipadu-glass-card');
         }
 
-        if (dataRows.length === 0) return;
+        if (dataRows.length === 0 || hasNativePagination) return;
 
         let pageSize = 10;
         let currentPage = 1;

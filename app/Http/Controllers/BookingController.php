@@ -164,6 +164,95 @@ class BookingController extends Controller
 
     public function adminIndex(Request $request)
     {
+        $query = Booking::with(['user', 'auditorium', 'histories'])->where('status', 'Pending')->latest();
+
+        if ($request->filled('booking_id')) {
+            $query->where('id', $request->booking_id);
+        }
+
+        if ($request->filled('q')) {
+            $term = trim($request->q);
+
+            $query->where(function ($q) use ($term) {
+                $q->where('event_name', 'like', "%{$term}%")
+                    ->orWhere('organization', 'like', "%{$term}%")
+                    ->orWhereHas('user', fn ($user) => $user->where('name', 'like', "%{$term}%"));
+            });
+        }
+
+        if ($request->filled('auditorium')) {
+            $query->where('auditorium_id', $request->auditorium);
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('booking_date', $request->date);
+        }
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100], true)
+            ? (int) $request->input('per_page')
+            : 10;
+
+        $bookings = $query->paginate($perPage)->withQueryString();
+
+        $pageItems = $bookings->getCollection();
+        $extraDrawerBookings = collect();
+
+        foreach ($pageItems as $item) {
+            if ($item->status === 'Pending') {
+                $conflicts = Booking::with(['user', 'auditorium', 'histories'])
+                    ->where('id', '!=', $item->id)
+                    ->where('auditorium_id', $item->auditorium_id)
+                    ->whereDate('booking_date', $item->booking_date)
+                    ->whereIn('status', ['Pending', 'Disetujui'])
+                    ->where('start_time', '<', $item->end_time)
+                    ->where('end_time', '>', $item->start_time)
+                    ->orderByRaw("CASE WHEN status = 'Disetujui' THEN 0 ELSE 1 END")
+                    ->orderBy('created_at')
+                    ->get();
+
+                $item->setRelation('conflicts', $conflicts);
+
+                foreach ($conflicts as $conflict) {
+                    if (
+                        !$pageItems->contains('id', $conflict->id) &&
+                        !$extraDrawerBookings->contains('id', $conflict->id)
+                    ) {
+                        $subConflicts = Booking::with(['user', 'auditorium', 'histories'])
+                            ->where('id', '!=', $conflict->id)
+                            ->where('auditorium_id', $conflict->auditorium_id)
+                            ->whereDate('booking_date', $conflict->booking_date)
+                            ->whereIn('status', ['Pending', 'Disetujui'])
+                            ->where('start_time', '<', $conflict->end_time)
+                            ->where('end_time', '>', $conflict->start_time)
+                            ->orderByRaw("CASE WHEN status = 'Disetujui' THEN 0 ELSE 1 END")
+                            ->orderBy('created_at')
+                            ->get();
+
+                        $conflict->setRelation('conflicts', $subConflicts);
+                        $extraDrawerBookings->push($conflict);
+                    }
+                }
+            } else {
+                $item->setRelation('conflicts', collect());
+            }
+        }
+
+        $stats = [
+            'pending' => Booking::where('status', 'Pending')->count(),
+            'approved' => Booking::where('status', 'Disetujui')->count(),
+            'rejected' => Booking::where('status', 'Ditolak')->count(),
+            'revision' => Booking::where('status', 'Perlu Revisi')->count(),
+            'cancelled' => Booking::where('status', 'Dibatalkan')->count(),
+            'total' => Booking::count(),
+        ];
+
+        $auditoriums = Auditorium::orderBy('name')->get();
+
+        return view('admin.bookings', compact('bookings', 'stats', 'auditoriums', 'extraDrawerBookings'));
+    }
+
+    public function adminReports(Request $request)
+    {
         $query = Booking::with(['user', 'auditorium', 'histories'])->latest();
 
         if ($request->filled('booking_id')) {
@@ -252,7 +341,14 @@ class BookingController extends Controller
 
         $auditoriums = Auditorium::orderBy('name')->get();
 
-        return view('admin.bookings', compact('bookings', 'stats', 'auditoriums', 'extraDrawerBookings'));
+        return view('admin.reports', compact('bookings', 'stats', 'auditoriums', 'extraDrawerBookings'));
+    }
+
+    // Export khusus halaman Kelola Pengajuan (hanya Pending).
+    public function adminPendingExport(Request $request)
+    {
+        $request->merge(['status' => 'Pending']);
+        return $this->adminExport($request);
     }
 
     // Export data peminjaman ke CSV/Excel oleh admin
