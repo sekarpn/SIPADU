@@ -1,9 +1,10 @@
-
 @extends('layouts.app')
 
 @section('content')
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
     html,
     body {
         width: 100%;
@@ -12,6 +13,7 @@
         overflow: hidden !important;
         scrollbar-width: none !important;
         -ms-overflow-style: none !important;
+        font-family: "Plus Jakarta Sans", sans-serif;
     }
 
     /* Sembunyikan scrollbar seluruh halaman */
@@ -30,6 +32,11 @@
         min-height: 100vh;
     }
 
+    .auth-page,
+    .auth-page * {
+        font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
     .auth-page {
         position: fixed;
         inset: 0;
@@ -44,7 +51,6 @@
         padding: clamp(12px, 2.2vw, 30px);
         overflow: hidden !important;
         background: #e9efec;
-        font-family: "Plus Jakarta Sans", sans-serif;
     }
 
     .auth-shell {
@@ -127,6 +133,7 @@
         margin: 0 0 16px;
         color: #fff;
         font-size: clamp(27px, 3.1vw, 43px);
+        font-weight: 800;
         line-height: 1.14;
         letter-spacing: -1.2px;
     }
@@ -164,26 +171,43 @@
         color: #172b20;
     }
 
+    /* TAUTAN KEMBALI + UKURAN PANAH PROPORSIONAL */
     .auth-form .back {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        margin: 0 0 26px;
-        color: #64736a;
-        font-size: 12px;
+        gap: 6px;
+        margin: 0 0 24px;
+        color: #2f7d58;
+        font-size: 12.5px;
+        font-weight: 600;
+        line-height: 1.2;
         text-decoration: none;
+        transition: color .18s ease;
+    }
+
+    .auth-form .back svg {
+        width: 15px;
+        height: 15px;
+        stroke-width: 2.2;
+        flex-shrink: 0;
+        transition: transform .18s ease;
     }
 
     .auth-form .back:hover {
-        color: #2f7d58;
+        color: #225e41;
+    }
+
+    .auth-form .back:hover svg {
+        transform: translateX(-2px);
     }
 
     .auth-form h2 {
-        margin: 0 0 9px;
+        margin: 0 0 8px;
         color: #172b20;
-        font-size: clamp(25px, 2.4vw, 32px);
+        font-size: clamp(25px, 2.4vw, 31px);
+        font-weight: 800;
         line-height: 1.2;
-        letter-spacing: -.8px;
+        letter-spacing: -0.025em;
     }
 
     .auth-intro {
@@ -216,7 +240,8 @@
         outline: none;
         background: #fff;
         color: #172b20;
-        font: 400 13px "Plus Jakarta Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
     }
 
     /* Sembunyikan ikon password bawaan browser */

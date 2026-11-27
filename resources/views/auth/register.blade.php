@@ -3,16 +3,26 @@
 @section('content')
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
     html,
     body {
         width: 100%;
         height: 100%;
         margin: 0;
         overflow: hidden !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+        font-family: "Plus Jakarta Sans", sans-serif;
     }
 
     body {
         min-height: 100vh;
+    }
+
+    .auth-page,
+    .auth-page * {
+        font-family: "Plus Jakarta Sans", sans-serif;
     }
 
     .auth-page {
@@ -26,23 +36,22 @@
         width: 100%;
         height: 100vh;
         height: 100dvh;
-        padding: clamp(14px, 2.4vw, 32px);
+        padding: clamp(12px, 2.2vw, 30px);
         overflow: hidden;
         background: #e9efec;
-        font-family: "Plus Jakarta Sans", sans-serif;
     }
 
     .auth-shell {
         width: min(1320px, 100%);
         height: 100%;
-        max-height: 920px;
+        max-height: 900px;
         min-height: 0;
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         overflow: hidden;
         background: #fff;
         border: 1px solid #dce5e0;
-        border-radius: 20px;
+        border-radius: 18px;
         box-shadow: 0 18px 55px rgba(24, 55, 37, .09);
     }
 
@@ -56,7 +65,7 @@
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: clamp(32px, 4.5vw, 68px);
+        padding: clamp(28px, 4.5vw, 68px);
         color: #fff;
         background: #24563d;
     }
@@ -91,21 +100,21 @@
         background: linear-gradient(
             180deg,
             rgba(12, 48, 29, .20) 0%,
-            rgba(12, 48, 29, .38) 42%,
-            rgba(12, 48, 29, .90) 100%
+            rgba(12, 48, 29, .35) 40%,
+            rgba(12, 48, 29, .88) 100%
         );
     }
 
     .auth-art-copy {
         display: flex;
         flex-direction: column;
-        gap: clamp(12px, 1.5vw, 18px);
+        gap: 0;
         max-width: 520px;
     }
 
     .auth-art .eyebrow {
-        margin: 0;
-        color: rgba(255, 255, 255, .84);
+        margin: 0 0 14px;
+        color: rgba(255, 255, 255, .82);
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 1.8px;
@@ -113,17 +122,18 @@
 
     .auth-art h1 {
         max-width: 520px;
-        margin: 0;
+        margin: 0 0 16px;
         color: #fff;
-        font-size: clamp(26px, 3vw, 42px);
-        line-height: 1.16;
-        letter-spacing: -1.1px;
+        font-size: clamp(27px, 3.1vw, 43px);
+        font-weight: 800;
+        line-height: 1.14;
+        letter-spacing: -1.2px;
     }
 
     .auth-art-copy > p:last-child {
-        max-width: 440px;
+        max-width: 430px;
         margin: 0;
-        color: rgba(255, 255, 255, .92);
+        color: rgba(255, 255, 255, .9);
         font-size: 14px;
         line-height: 1.75;
     }
@@ -143,7 +153,7 @@
         min-height: 0;
         overflow-y: auto;
         overflow-x: hidden;
-        padding: clamp(24px, 3.8vh, 44px) clamp(26px, 5vw, 72px);
+        padding: clamp(24px, 3.8vh, 44px) clamp(24px, 4vw, 62px);
         box-sizing: border-box;
         background: #fff;
         scrollbar-width: thin;
@@ -159,21 +169,23 @@
         border-radius: 999px;
     }
 
-    /* WRAPPER FORM REGISTRASI */
+    /* WRAPPER FORM REGISTRASI (SERAGAM DENGAN LOGIN) */
     .auth-form {
         width: min(440px, 100%);
         margin: auto;
         color: #172b20;
     }
 
+    /* TAUTAN KEMBALI + UKURAN PANAH SAMA PERSIS DENGAN LOGIN */
     .auth-form .back {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        margin: 0 0 18px;
-        color: #64736a;
+        gap: 6px;
+        margin: 0 0 22px;
+        color: #2f7d58;
         font-size: 12.5px;
-        font-weight: 500;
+        font-weight: 600;
+        line-height: 1.2;
         text-decoration: none;
         transition: color .18s ease;
     }
@@ -181,33 +193,40 @@
     .auth-form .back svg {
         width: 15px;
         height: 15px;
+        stroke-width: 2.2;
         flex-shrink: 0;
+        transition: transform .18s ease;
     }
 
     .auth-form .back:hover {
-        color: #2f7d58;
+        color: #225e41;
+    }
+
+    .auth-form .back:hover svg {
+        transform: translateX(-2px);
     }
 
     .auth-form h2 {
         margin: 0 0 8px;
         color: #172b20;
-        font-size: clamp(24px, 2.3vw, 31px);
+        font-size: clamp(25px, 2.4vw, 31px);
+        font-weight: 800;
         line-height: 1.2;
-        letter-spacing: -.8px;
+        letter-spacing: -0.025em;
     }
 
     .auth-intro {
-        margin: 0 0 24px;
+        margin: 0 0 22px;
         color: #68736c;
-        font-size: 12.5px;
+        font-size: 13px;
         line-height: 1.6;
     }
 
-    /* SUSUNAN FIELD DENGAN GAP TERATUR */
+    /* SUSUNAN FIELD */
     .auth-form form {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 14px;
     }
 
     .auth-field {
@@ -219,9 +238,8 @@
     .auth-field label {
         margin: 0;
         color: #20372a;
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 700;
-        letter-spacing: .01em;
     }
 
     .auth-form input:not([type=checkbox]) {
@@ -229,13 +247,14 @@
         width: 100%;
         height: 44px;
         margin: 0;
-        padding: 0 14px;
+        padding: 0 13px;
         border: 1px solid #dce5e0;
-        border-radius: 9px;
+        border-radius: 8px;
         outline: none;
         background: #fff;
         color: #172b20;
-        font: 400 12.5px "Plus Jakarta Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
         transition: border-color .18s ease, box-shadow .18s ease;
     }
 
@@ -272,7 +291,7 @@
     .password-toggle {
         position: absolute;
         top: 50%;
-        right: 6px;
+        right: 5px;
         transform: translateY(-50%);
         display: grid;
         place-items: center;
@@ -280,7 +299,7 @@
         height: 34px;
         padding: 0;
         border: 0;
-        border-radius: 7px;
+        border-radius: 6px;
         background: transparent;
         color: #68736c;
         cursor: pointer;
@@ -293,8 +312,8 @@
     }
 
     .password-toggle svg {
-        width: 16px;
-        height: 16px;
+        width: 17px;
+        height: 17px;
     }
 
     .btn.wide {
@@ -302,13 +321,13 @@
         min-height: 44px;
         margin-top: 6px;
         border: 1px solid #276b4c;
-        border-radius: 9px;
+        border-radius: 8px;
         background: #2f7d58 !important;
         color: #fff;
-        font-size: 13.5px;
+        font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: background-color .18s ease, transform .12s ease;
+        transition: background-color .18s ease;
     }
 
     .btn.wide:hover {
@@ -318,12 +337,12 @@
     .auth-switch {
         margin: 20px 0 0;
         color: #68736c;
-        font-size: 12.5px;
+        font-size: 12px;
         text-align: center;
     }
 
     .auth-switch a {
-        margin-left: 4px;
+        margin-left: 3px;
         color: #2f7d58 !important;
         font-weight: 700;
         text-decoration: none;
@@ -336,7 +355,7 @@
     .auth-error {
         margin: 0;
         color: #b32e2e;
-        font-size: 11.5px;
+        font-size: 11px;
         line-height: 1.45;
     }
 
@@ -344,7 +363,7 @@
     body > .flash {
         position: fixed;
         z-index: 50;
-        top: 14px;
+        top: 12px;
         left: 50%;
         transform: translateX(-50%);
         max-width: min(520px, 90vw);
@@ -362,7 +381,7 @@
         }
 
         .auth-form .back {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .auth-form h2 {
@@ -375,7 +394,7 @@
         }
 
         .auth-form form {
-            gap: 12px;
+            gap: 11px;
         }
 
         .auth-field {
@@ -414,40 +433,36 @@
             width: 100%;
             height: auto;
             min-height: 100dvh;
-            padding: 14px;
+            padding: 10px;
             overflow: visible;
         }
 
         .auth-shell {
             width: 100%;
             height: auto;
-            min-height: calc(100dvh - 28px);
+            min-height: calc(100dvh - 20px);
             max-height: none;
-            grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
-            border-radius: 16px;
+            grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+            border-radius: 12px;
             overflow: hidden;
         }
 
         .auth-art {
-            padding: 26px 24px;
-        }
-
-        .auth-art-copy {
-            gap: 10px;
+            padding: 22px;
         }
 
         .auth-art h1 {
-            font-size: clamp(22px, 3.8vw, 30px);
+            font-size: clamp(21px, 4vw, 30px);
         }
 
         .auth-art-copy > p:last-child {
-            font-size: 12.5px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
         .auth-form-panel {
             align-items: center;
-            padding: 32px 24px;
+            padding: 24px 20px;
             overflow: visible;
         }
 
@@ -460,7 +475,7 @@
     @media (max-width: 560px) {
         .auth-page {
             min-height: 100dvh;
-            padding: 12px 12px 32px;
+            padding: 10px 10px 28px;
         }
 
         .auth-shell {
@@ -469,39 +484,35 @@
             grid-template-rows: auto auto;
             min-height: 0;
             height: auto;
-            border-radius: 16px;
+            border-radius: 14px;
             overflow: hidden;
         }
 
         .auth-art {
-            min-height: 168px;
-            padding: 22px 22px;
-        }
-
-        .auth-art-copy {
-            gap: 8px;
+            min-height: 145px;
+            padding: 16px 20px;
         }
 
         .auth-art .eyebrow {
-            font-size: 10px;
+            margin-bottom: 6px;
         }
 
         .auth-art h1 {
             font-size: 21px;
-            line-height: 1.24;
-            letter-spacing: -.6px;
+            margin-bottom: 6px;
+            line-height: 1.2;
         }
 
         .auth-art-copy > p:last-child {
-            font-size: 11.5px;
-            line-height: 1.5;
+            font-size: 11px;
+            line-height: 1.45;
         }
 
         .auth-form-panel {
             align-items: flex-start;
             justify-content: center;
             min-height: 0;
-            padding: 28px 22px 44px;
+            padding: 26px 20px 44px;
             overflow: visible;
         }
 
@@ -512,56 +523,7 @@
         }
 
         .auth-form .back {
-            margin-bottom: 14px;
-        }
-
-        .auth-form h2 {
-            font-size: 25px;
-            margin-bottom: 8px;
-        }
-
-        .auth-intro {
-            margin-bottom: 22px;
-            font-size: 12.5px;
-        }
-
-        .auth-form form {
-            gap: 15px;
-        }
-
-        .auth-field {
-            gap: 7px;
-        }
-
-        .auth-form input:not([type=checkbox]) {
-            height: 44px;
-            font-size: 13px;
-        }
-
-        .btn.wide {
-            min-height: 44px;
-            margin-top: 6px;
-        }
-
-        .auth-switch {
-            margin-top: 20px;
-            padding-bottom: 4px;
-        }
-    }
-
-    /* MOBILE DENGAN TINGGI LAYAR PENDEK (<= 700px) */
-    @media (max-width: 560px) and (max-height: 700px) {
-        .auth-page {
-            padding-bottom: 24px;
-        }
-
-        .auth-art {
-            min-height: 145px;
-            padding: 18px 20px;
-        }
-
-        .auth-form-panel {
-            padding: 24px 20px 36px;
+            margin-bottom: 12px;
         }
 
         .auth-intro {
@@ -573,11 +535,18 @@
         }
 
         .auth-form input:not([type=checkbox]) {
-            height: 41px;
+            height: 42px;
+            font-size: 13px;
+        }
+
+        .btn.wide {
+            min-height: 44px;
+            margin-top: 6px;
         }
 
         .auth-switch {
-            margin-top: 16px;
+            margin-top: 18px;
+            padding-bottom: 4px;
         }
     }
 </style>

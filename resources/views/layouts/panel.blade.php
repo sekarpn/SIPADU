@@ -33,6 +33,40 @@ body,
     font-size: 13px;
 }
 
+/* GLOBAL GLASS / TRANSPARENT SCROLLBAR UNTUK SELURUH HALAMAN */
+html,
+body,
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(22, 54, 38, 0.22) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(22, 54, 38, 0.20);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 122, 73, 0.38);
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
 /* Konsistensi tipografi seluruh halaman setelah login: Admin, Dosen & Tendik, dan Mahasiswa */
 .app-layout,
 .app-layout *,
