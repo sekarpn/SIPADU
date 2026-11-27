@@ -1284,6 +1284,50 @@ body.bp-drawer-open {
         width: 100%;
     }
 }
+    /* =====================================================
+    FIX ALIGNMENT KOLOM AKSI
+    ===================================================== */
+
+    /* Samakan posisi header AKSI dengan tombol */
+    .booking-page table#borrowerDataTable thead th:nth-child(5),
+    .booking-page table#borrowerDataTable thead th:nth-child(5) .dt-column-title,
+    .booking-page table#borrowerDataTable thead th:nth-child(5) > div {
+        text-align: left !important;
+        justify-content: flex-start !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    /* Samakan posisi isi kolom AKSI */
+    .booking-page table#borrowerDataTable tbody td:nth-child(5) {
+        text-align: left !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+        vertical-align: middle !important;
+    }
+
+    /* Posisi tombol konsisten pada setiap baris */
+    .booking-page table#borrowerDataTable tbody td:nth-child(5) .bp-action-row {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: 100% !important;
+        gap: 7px !important;
+        margin: 0 !important;
+    }
+
+    /* Form tombol Batalkan tidak menambah jarak */
+    .booking-page table#borrowerDataTable tbody td:nth-child(5) form {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+    }
+
+    /* Ukuran tombol tetap konsisten */
+    .booking-page table#borrowerDataTable tbody td:nth-child(5) .bp-btn {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+    }
 </style>
 
 <div class="booking-page">
