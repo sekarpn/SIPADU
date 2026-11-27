@@ -112,7 +112,7 @@
         <tr>
             <td>Sesi & Waktu</td>
             <td>:</td>
-            <td>[Sesi Pagi (07.00–11.00) / Sesi Siang (13.00–17.00) / Full Day (07.00–17.00)] WIB</td>
+            <td>{{ config('booking_sessions.sessions.pagi.label') }} ({{ config('booking_sessions.sessions.pagi.start') }}–{{ config('booking_sessions.sessions.pagi.end') }}) / {{ config('booking_sessions.sessions.siang.label') }} ({{ config('booking_sessions.sessions.siang.start') }}–{{ config('booking_sessions.sessions.siang.end') }}) / {{ config('booking_sessions.sessions.full_day.label') }} ({{ config('booking_sessions.sessions.full_day.start') }}–{{ config('booking_sessions.sessions.full_day.end') }}) WIB</td>
         </tr>
         <tr>
             <td>Perkiraan Peserta</td>

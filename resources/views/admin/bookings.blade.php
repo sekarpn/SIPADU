@@ -3,7 +3,7 @@
 @section('panel')
 @php
     $statusOptions = [
-        'Pending' => 'Menunggu',
+        'Pending' => 'Pending',
         'Disetujui' => 'Disetujui',
         'Ditolak' => 'Ditolak',
         'Perlu Revisi' => 'Perlu Revisi',
@@ -29,14 +29,13 @@
         $startDot = str_replace(':', '.', $startRaw);
         $endDot = str_replace(':', '.', $endRaw);
 
-        if ($startRaw <= '08:00' && $endRaw >= '16:00') {
-            $sessionLabel = 'Full Day';
-        } elseif ($endRaw <= '12:30') {
-            $sessionLabel = 'Sesi Pagi';
-        } elseif ($startRaw >= '12:00') {
-            $sessionLabel = 'Sesi Siang';
-        } else {
-            $sessionLabel = 'Sesi Acara';
+        $sessions = config('booking_sessions.sessions');
+        $sessionLabel = 'Sesi Acara';
+        foreach ($sessions as $session) {
+            if ($startRaw === $session['start'] && $endRaw === $session['end']) {
+                $sessionLabel = $session['label'];
+                break;
+            }
         }
 
         return "{$sessionLabel} ({$startDot}–{$endDot})";
@@ -478,12 +477,21 @@
 .bp-status {
     display: inline-flex;
     align-items: center;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    width: max-content;
+    white-space: nowrap;
     gap: 6px;
     padding: 5px 11px;
     border-radius: 999px;
     font-size: 11px;
     font-weight: 800;
     white-space: nowrap;
+}
+
+.bp-status > span:not(.bp-status-dot) {
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .bp-status-dot {
@@ -1325,7 +1333,7 @@ body.bp-drawer-open {
                 <i data-lucide="clock"></i>
             </div>
             <div>
-                <small>Menunggu Verifikasi</small>
+                <small>Pending</small>
                 <strong>{{ $stats['pending'] }}</strong>
             </div>
         </div>
@@ -1465,7 +1473,7 @@ body.bp-drawer-open {
                 class="bp-tab {{ request('status') === 'Pending' ? 'active' : '' }}"
                 href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Pending'])) }}"
             >
-                Menunggu <span>{{ $stats['pending'] }}</span>
+                Pending <span>{{ $stats['pending'] }}</span>
             </a>
 
             <a
@@ -1550,7 +1558,7 @@ body.bp-drawer-open {
                         <td>
                             <span class="bp-status {{ $statusClass }}">
                                 <span class="bp-status-dot"></span>
-                                {{ $b->status === 'Pending' ? 'Sedang Diproses' : $b->status }}
+                                {{ $b->status === 'Pending' ? 'Pending' : $b->status }}
                             </span>
                         </td>
 
@@ -1614,7 +1622,7 @@ body.bp-drawer-open {
                             </span>
                             <span class="bp-status {{ $itemStatusClass }}">
                                 <span class="bp-status-dot"></span>
-                                {{ $item->status === 'Pending' ? 'Sedang Diproses' : $item->status }}
+                                {{ $item->status === 'Pending' ? 'Pending' : $item->status }}
                             </span>
                         </div>
 

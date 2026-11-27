@@ -14,7 +14,8 @@ class DashboardController extends Controller
 {
     public function borrower(Request $r)
     {
-        $q = Booking::where('user_id', $r->user()->id);
+        $userId = $r->user()->id;
+        $q = Booking::where('user_id', $userId);
 
         $stats = [
             'total'    => (clone $q)->count(),
@@ -36,6 +37,7 @@ class DashboardController extends Controller
                 'status',
                 DB::raw('COUNT(*) as total')
             )
+            ->where('user_id', $userId)
             ->whereNotNull('booking_date')
             ->whereIn('status', ['Disetujui', 'Ditolak'])
             ->groupBy('tahun', 'bulan', 'status')
@@ -79,6 +81,7 @@ class DashboardController extends Controller
         $currentTimeStr = $now->format('H:i:s');
 
         $upcomingBookings = Booking::with(['auditorium', 'user'])
+            ->where('user_id', $userId)
             ->where('status', 'Disetujui')
             ->where(function ($query) use ($todayStr, $currentTimeStr) {
                 $query->whereDate('booking_date', '>', $todayStr)

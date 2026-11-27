@@ -68,6 +68,8 @@ class BookingController extends Controller
             return $this->redirectToIncompleteProfile($r->user());
         }
 
+        $minimumBookingDate = date('Y-m-d', strtotime('+7 days'));
+
         $data = $r->validate([
             'auditorium_id' => 'required|exists:auditoriums,id',
             'event_name' => 'required|string|max:255',
@@ -75,7 +77,7 @@ class BookingController extends Controller
             'organization' => 'required|string|max:255',
             'pic_name' => 'required|string|max:255',
             'pic_phone' => 'required|string|max:30',
-            'booking_date' => 'required|date|after_or_equal:today',
+            'booking_date' => 'required|date|after_or_equal:' . $minimumBookingDate,
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'surat' => 'required|file|mimes:pdf|max:5120',

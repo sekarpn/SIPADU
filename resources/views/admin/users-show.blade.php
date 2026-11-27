@@ -282,7 +282,7 @@
                     <label>Role</label>
                     <div>
                         <span class="role-pill {{ $user->role }}">
-                            {{ ucfirst($user->role) }}
+                            {{ $user->role === 'pegawai' ? 'Dosen & Tendik' : ucfirst($user->role) }}
                         </span>
                     </div>
                 </div>

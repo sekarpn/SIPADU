@@ -43,7 +43,7 @@ class AdminController extends Controller
 
     public function auditoriums()
     {
-        $auditoriums = Auditorium::latest()->paginate(15);
+        $auditoriums = Auditorium::orderBy('name')->paginate(15);
 
         return view('admin.auditoriums', compact('auditoriums'));
     }

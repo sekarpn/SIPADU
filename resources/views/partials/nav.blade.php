@@ -423,7 +423,7 @@
 
     {{-- MENU TITLE --}}
     <div class="nav-caption">
-        {{ $isAdmin ? 'MENU ADMIN' : ($isEmployee ? 'MENU PEGAWAI' : 'MENU MAHASISWA') }}
+        {{ $isAdmin ? 'MENU ADMIN' : ($isEmployee ? 'MENU DOSEN & TENDIK' : 'MENU MAHASISWA') }}
     </div>
 
     {{-- MENU ADMIN --}}

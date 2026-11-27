@@ -33,7 +33,7 @@ body,
     font-size: 13px;
 }
 
-/* Konsistensi tipografi seluruh halaman setelah login: Admin, Pegawai, dan Mahasiswa */
+/* Konsistensi tipografi seluruh halaman setelah login: Admin, Dosen & Tendik, dan Mahasiswa */
 .app-layout,
 .app-layout *,
 .app-layout *::before,
