@@ -508,13 +508,15 @@
 }
 
 /* ==========================================================================
-   POPUP / DRAWER SAMPING (SELARAS DENGAN POPUP DATA AUDITORIUM)
+   POPUP / DRAWER SAMPING + BACKDROP BLUR (SELARAS DATA AUDITORIUM)
    ========================================================================== */
 .sipadu-user-overlay {
     position: fixed;
     inset: 0;
     z-index: 99990;
-    background: rgba(15, 32, 23, .45);
+    background: rgba(15, 32, 23, .38);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     display: none;
 }
 
@@ -993,7 +995,7 @@ body.user-drawer-open {
     </section>
 </div>
 
-{{-- OVERLAY BERSAMA UNTUK SEMUA POPUP / DRAWER --}}
+{{-- OVERLAY BERSAMA DENGAN EFEK BLUR BACKGROUND --}}
 <div class="sipadu-user-overlay" id="userDrawerOverlay"></div>
 
 {{-- 1. POPUP TAMBAH PENGGUNA --}}
