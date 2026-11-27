@@ -26,7 +26,7 @@
         width: 100%;
         height: 100vh;
         height: 100dvh;
-        padding: clamp(12px, 2.2vw, 30px);
+        padding: clamp(14px, 2.4vw, 32px);
         overflow: hidden;
         background: #e9efec;
         font-family: "Plus Jakarta Sans", sans-serif;
@@ -35,17 +35,18 @@
     .auth-shell {
         width: min(1320px, 100%);
         height: 100%;
-        max-height: 900px;
+        max-height: 920px;
         min-height: 0;
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         overflow: hidden;
         background: #fff;
         border: 1px solid #dce5e0;
-        border-radius: 18px;
+        border-radius: 20px;
         box-shadow: 0 18px 55px rgba(24, 55, 37, .09);
     }
 
+    /* PANEL KIRI (VISUAL & COPY) */
     .auth-art {
         position: relative;
         isolation: isolate;
@@ -55,7 +56,7 @@
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: clamp(28px, 4.5vw, 68px);
+        padding: clamp(32px, 4.5vw, 68px);
         color: #fff;
         background: #24563d;
     }
@@ -90,18 +91,21 @@
         background: linear-gradient(
             180deg,
             rgba(12, 48, 29, .20) 0%,
-            rgba(12, 48, 29, .35) 40%,
-            rgba(12, 48, 29, .88) 100%
+            rgba(12, 48, 29, .38) 42%,
+            rgba(12, 48, 29, .90) 100%
         );
     }
 
     .auth-art-copy {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(12px, 1.5vw, 18px);
         max-width: 520px;
     }
 
     .auth-art .eyebrow {
-        margin: 0 0 14px;
-        color: rgba(255, 255, 255, .82);
+        margin: 0;
+        color: rgba(255, 255, 255, .84);
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 1.8px;
@@ -109,17 +113,17 @@
 
     .auth-art h1 {
         max-width: 520px;
-        margin: 0 0 16px;
+        margin: 0;
         color: #fff;
-        font-size: clamp(27px, 3.1vw, 43px);
-        line-height: 1.14;
-        letter-spacing: -1.2px;
+        font-size: clamp(26px, 3vw, 42px);
+        line-height: 1.16;
+        letter-spacing: -1.1px;
     }
 
     .auth-art-copy > p:last-child {
-        max-width: 430px;
+        max-width: 440px;
         margin: 0;
-        color: rgba(255, 255, 255, .9);
+        color: rgba(255, 255, 255, .92);
         font-size: 14px;
         line-height: 1.75;
     }
@@ -130,36 +134,54 @@
         32%, 100% { opacity: 0; }
     }
 
-    /* PANEL FORM */
+    /* PANEL KANAN (FORM) */
     .auth-form-panel {
         display: flex;
         align-items: center;
         justify-content: center;
         min-width: 0;
         min-height: 0;
-        overflow: hidden;
-        padding: 30px clamp(28px, 5vw, 72px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: clamp(24px, 3.8vh, 44px) clamp(26px, 5vw, 72px);
         box-sizing: border-box;
         background: #fff;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(47, 125, 88, .35) transparent;
     }
 
-    /* FORM REGISTRASI */
+    .auth-form-panel::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .auth-form-panel::-webkit-scrollbar-thumb {
+        background: rgba(47, 125, 88, .35);
+        border-radius: 999px;
+    }
+
+    /* WRAPPER FORM REGISTRASI */
     .auth-form {
         width: min(440px, 100%);
-        max-height: none;
-        margin: 0 auto;
-        flex-shrink: 0;
+        margin: auto;
         color: #172b20;
     }
 
     .auth-form .back {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        margin: 0 0 12px;
+        gap: 8px;
+        margin: 0 0 18px;
         color: #64736a;
-        font-size: 12px;
+        font-size: 12.5px;
+        font-weight: 500;
         text-decoration: none;
+        transition: color .18s ease;
+    }
+
+    .auth-form .back svg {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
     }
 
     .auth-form .back:hover {
@@ -167,7 +189,7 @@
     }
 
     .auth-form h2 {
-        margin: 0 0 7px;
+        margin: 0 0 8px;
         color: #172b20;
         font-size: clamp(24px, 2.3vw, 31px);
         line-height: 1.2;
@@ -175,36 +197,46 @@
     }
 
     .auth-intro {
-        margin: 0 0 20px;
+        margin: 0 0 24px;
         color: #68736c;
-        font-size: 12px;
-        line-height: 1.5;
+        font-size: 12.5px;
+        line-height: 1.6;
     }
 
+    /* SUSUNAN FIELD DENGAN GAP TERATUR */
     .auth-form form {
         display: flex;
         flex-direction: column;
+        gap: 16px;
     }
 
-    .auth-form form > label {
-        margin: 0 0 7px;
+    .auth-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .auth-field label {
+        margin: 0;
         color: #20372a;
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 700;
+        letter-spacing: .01em;
     }
 
     .auth-form input:not([type=checkbox]) {
         box-sizing: border-box;
         width: 100%;
-        height: 42px;
-        margin: 0 0 15px;
+        height: 44px;
+        margin: 0;
         padding: 0 14px;
         border: 1px solid #dce5e0;
-        border-radius: 8px;
+        border-radius: 9px;
         outline: none;
         background: #fff;
         color: #172b20;
-        font: 400 12px "Plus Jakarta Sans", sans-serif;
+        font: 400 12.5px "Plus Jakarta Sans", sans-serif;
+        transition: border-color .18s ease, box-shadow .18s ease;
     }
 
     /* Sembunyikan ikon password bawaan browser */
@@ -217,7 +249,6 @@
         pointer-events: none !important;
     }
 
-    /* Samakan tampilan input password di berbagai browser */
     .auth-form input[type="password"] {
         -webkit-appearance: none;
         appearance: none;
@@ -230,28 +261,30 @@
 
     .password-field {
         position: relative;
-        margin: 0 0 15px;
+        margin: 0;
     }
 
     .auth-form .password-field input {
         margin: 0;
-        padding-right: 47px;
+        padding-right: 48px;
     }
 
     .password-toggle {
         position: absolute;
-        top: 5px;
-        right: 5px;
+        top: 50%;
+        right: 6px;
+        transform: translateY(-50%);
         display: grid;
         place-items: center;
         width: 34px;
-        height: 32px;
+        height: 34px;
         padding: 0;
         border: 0;
-        border-radius: 6px;
+        border-radius: 7px;
         background: transparent;
         color: #68736c;
         cursor: pointer;
+        transition: background-color .18s ease, color .18s ease;
     }
 
     .password-toggle:hover {
@@ -266,16 +299,16 @@
 
     .btn.wide {
         width: 100%;
-        min-height: 42px;
-        margin-top: 2px;
+        min-height: 44px;
+        margin-top: 6px;
         border: 1px solid #276b4c;
-        border-radius: 8px;
+        border-radius: 9px;
         background: #2f7d58 !important;
         color: #fff;
-        font-size: 13px;
+        font-size: 13.5px;
         font-weight: 700;
         cursor: pointer;
-        transition: background-color .18s ease;
+        transition: background-color .18s ease, transform .12s ease;
     }
 
     .btn.wide:hover {
@@ -283,103 +316,87 @@
     }
 
     .auth-switch {
-        margin: 14px 0 0;
+        margin: 20px 0 0;
         color: #68736c;
-        font-size: 12px;
+        font-size: 12.5px;
         text-align: center;
     }
 
     .auth-switch a {
+        margin-left: 4px;
         color: #2f7d58 !important;
         font-weight: 700;
         text-decoration: none;
     }
 
+    .auth-switch a:hover {
+        text-decoration: underline;
+    }
+
     .auth-error {
-        margin: -8px 0 9px;
+        margin: 0;
         color: #b32e2e;
-        font-size: 11px;
+        font-size: 11.5px;
+        line-height: 1.45;
     }
 
     .auth-page ~ .flash,
     body > .flash {
         position: fixed;
         z-index: 50;
-        top: 12px;
+        top: 14px;
         left: 50%;
         transform: translateX(-50%);
         max-width: min(520px, 90vw);
     }
 
-    /* LAPTOP DAN DESKTOP DENGAN TINGGI LAYAR TERBATAS */
+    /* LAPTOP & DESKTOP DENGAN TINGGI LAYAR TERBATAS (<= 850px) */
     @media (max-height: 850px) and (min-width: 761px) {
+        .auth-page {
+            padding: clamp(10px, 2vw, 24px);
+        }
 
-    .auth-page {
-        position: fixed;
-        inset: 0;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        padding: clamp(12px, 2.2vw, 30px);
-        overflow: hidden;
+        .auth-form-panel {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .auth-form .back {
+            margin-bottom: 12px;
+        }
+
+        .auth-form h2 {
+            margin-bottom: 6px;
+            font-size: 26px;
+        }
+
+        .auth-intro {
+            margin-bottom: 16px;
+        }
+
+        .auth-form form {
+            gap: 12px;
+        }
+
+        .auth-field {
+            gap: 5px;
+        }
+
+        .auth-form input:not([type=checkbox]) {
+            height: 40px;
+        }
+
+        .btn.wide {
+            min-height: 41px;
+            margin-top: 4px;
+        }
+
+        .auth-switch {
+            margin-top: 14px;
+        }
     }
 
-    .auth-shell {
-        height: 100%;
-        min-height: 0;
-        max-height: 900px;
-    }
-
-    .auth-form-panel {
-        padding-top: 16px;
-        padding-bottom: 16px;
-    }
-
-    .auth-form .back {
-        margin-bottom: 8px;
-    }
-
-    .auth-form h2 {
-        margin-bottom: 5px;
-        font-size: 26px;
-    }
-
-    .auth-intro {
-        margin-bottom: 12px;
-    }
-
-    .auth-form form > label {
-        margin-bottom: 5px;
-    }
-
-    .auth-form input:not([type=checkbox]) {
-        height: 37px;
-        margin-bottom: 9px;
-    }
-
-    .password-field {
-        margin-bottom: 9px;
-    }
-
-    .password-toggle {
-        top: 2px;
-    }
-
-    .btn.wide {
-        min-height: 39px;
-        margin-top: 0;
-    }
-
-    .auth-switch {
-        margin-top: 10px;
-    }
-}
-
-    /* TABLET DAN MOBILE */
+    /* TABLET (<= 760px) */
     @media (max-width: 760px) {
         html,
         body {
@@ -397,49 +414,53 @@
             width: 100%;
             height: auto;
             min-height: 100dvh;
-            padding: 10px;
+            padding: 14px;
             overflow: visible;
         }
 
         .auth-shell {
             width: 100%;
             height: auto;
-            min-height: calc(100dvh - 20px);
+            min-height: calc(100dvh - 28px);
             max-height: none;
-            grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
-            border-radius: 12px;
+            grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+            border-radius: 16px;
             overflow: hidden;
         }
 
         .auth-art {
-            padding: 22px;
+            padding: 26px 24px;
+        }
+
+        .auth-art-copy {
+            gap: 10px;
         }
 
         .auth-art h1 {
-            font-size: clamp(21px, 4vw, 30px);
+            font-size: clamp(22px, 3.8vw, 30px);
         }
 
         .auth-art-copy > p:last-child {
-            font-size: 12px;
+            font-size: 12.5px;
+            line-height: 1.6;
         }
 
         .auth-form-panel {
             align-items: center;
-            padding: 30px 22px;
+            padding: 32px 24px;
             overflow: visible;
         }
 
         .auth-form {
             width: min(440px, 100%);
-            transform: none;
         }
     }
 
-    /* MOBILE */
+    /* MOBILE (<= 560px) */
     @media (max-width: 560px) {
         .auth-page {
             min-height: 100dvh;
-            padding: 10px 10px 30px;
+            padding: 12px 12px 32px;
         }
 
         .auth-shell {
@@ -448,35 +469,39 @@
             grid-template-rows: auto auto;
             min-height: 0;
             height: auto;
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
         }
 
         .auth-art {
-            min-height: 145px;
-            padding: 14px 20px;
+            min-height: 168px;
+            padding: 22px 22px;
         }
 
-        .auth-art h1 {
-            font-size: 20px;
-            line-height: 1.2;
-            margin-bottom: 5px;
+        .auth-art-copy {
+            gap: 8px;
         }
 
         .auth-art .eyebrow {
-            margin-bottom: 5px;
+            font-size: 10px;
+        }
+
+        .auth-art h1 {
+            font-size: 21px;
+            line-height: 1.24;
+            letter-spacing: -.6px;
         }
 
         .auth-art-copy > p:last-child {
-            font-size: 10px;
-            line-height: 1.35;
+            font-size: 11.5px;
+            line-height: 1.5;
         }
 
         .auth-form-panel {
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             min-height: 0;
-            padding: 30px 20px 64px;
+            padding: 28px 22px 44px;
             overflow: visible;
         }
 
@@ -487,73 +512,72 @@
         }
 
         .auth-form .back {
-            margin-bottom: 10px;
+            margin-bottom: 14px;
         }
 
         .auth-form h2 {
             font-size: 25px;
+            margin-bottom: 8px;
         }
 
         .auth-intro {
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            font-size: 12.5px;
         }
 
-        .auth-form form > label {
-            margin-bottom: 7px;
+        .auth-form form {
+            gap: 15px;
+        }
+
+        .auth-field {
+            gap: 7px;
         }
 
         .auth-form input:not([type=checkbox]) {
-            height: 42px;
-            margin-bottom: 14px;
+            height: 44px;
             font-size: 13px;
         }
 
-        .password-field {
-            margin-bottom: 14px;
-        }
-
-        .password-toggle {
-            top: 5px;
-            height: 32px;
-        }
-
         .btn.wide {
-            min-height: 42px;
-            margin-top: 4px;
+            min-height: 44px;
+            margin-top: 6px;
         }
 
         .auth-switch {
-            margin-top: 16px;
-            padding-bottom: 8px;
+            margin-top: 20px;
+            padding-bottom: 4px;
         }
     }
 
-    /* MOBILE DENGAN TINGGI LAYAR PENDEK */
+    /* MOBILE DENGAN TINGGI LAYAR PENDEK (<= 700px) */
     @media (max-width: 560px) and (max-height: 700px) {
         .auth-page {
             padding-bottom: 24px;
         }
 
+        .auth-art {
+            min-height: 145px;
+            padding: 18px 20px;
+        }
+
         .auth-form-panel {
-            padding-top: 24px;
-            padding-bottom: 56px;
+            padding: 24px 20px 36px;
         }
 
         .auth-intro {
-            margin-bottom: 14px;
+            margin-bottom: 18px;
+        }
+
+        .auth-form form {
+            gap: 13px;
         }
 
         .auth-form input:not([type=checkbox]) {
-            height: 38px;
-            margin-bottom: 10px;
-        }
-
-        .password-field {
-            margin-bottom: 10px;
+            height: 41px;
         }
 
         .auth-switch {
-            margin-top: 12px;
+            margin-top: 16px;
         }
     }
 </style>
@@ -589,92 +613,95 @@
                 <h2>Daftar Akun</h2>
 
                 <p class="auth-intro">
-                    Isi data dasar menggunakan email institusi yang sesuai dengan status Anda.
+                    Isi data dasar menggunakan email UPNVJ yang sesuai dengan status Anda.
                 </p>
 
                 <form method="POST" action="{{ route('register.post') }}">
                     @csrf
 
-                    <label for="name">Nama Lengkap</label>
-                    <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        value="{{ old('name') }}"
-                        placeholder="Masukkan nama lengkap"
-                        autocomplete="name"
-                        required
-                    >
-
-                    @error('name')
-                        <p class="auth-error">{{ $message }}</p>
-                    @enderror
-
-                    <label for="email">Email Institusi</label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value="{{ old('email') }}"
-                        placeholder="Masukkan email institusi"
-                        autocomplete="email"
-                        required
-                    >
-
-                    @error('email')
-                        <p class="auth-error">{{ $message }}</p>
-                    @enderror
-
-                    <label for="password">Password</label>
-
-                    <div class="password-field">
+                    <div class="auth-field">
+                        <label for="name">Nama Lengkap</label>
                         <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder="Minimal 8 karakter"
-                            autocomplete="new-password"
-                            minlength="8"
+                            id="name"
+                            name="name"
+                            type="text"
+                            value="{{ old('name') }}"
+                            placeholder="Masukkan nama lengkap"
+                            autocomplete="name"
                             required
                         >
-
-                        <button
-                            class="password-toggle"
-                            type="button"
-                            data-toggle-password="password"
-                            aria-label="Tampilkan password"
-                            aria-pressed="false"
-                        >
-                            <i data-lucide="eye"></i>
-                        </button>
+                        @error('name')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    @error('password')
-                        <p class="auth-error">{{ $message }}</p>
-                    @enderror
-
-                    <label for="password_confirmation">Ulangi Password</label>
-
-                    <div class="password-field">
+                    <div class="auth-field">
+                        <label for="email">Email UPNVJ</label>
                         <input
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            type="password"
-                            placeholder="Ulangi password"
-                            autocomplete="new-password"
-                            minlength="8"
+                            id="email"
+                            name="email"
+                            type="email"
+                            value="{{ old('email') }}"
+                            placeholder="Masukkan email UPNVJ"
+                            autocomplete="email"
                             required
                         >
+                        @error('email')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <button
-                            class="password-toggle"
-                            type="button"
-                            data-toggle-password="password_confirmation"
-                            aria-label="Tampilkan password"
-                            aria-pressed="false"
-                        >
-                            <i data-lucide="eye"></i>
-                        </button>
+                    <div class="auth-field">
+                        <label for="password">Password</label>
+                        <div class="password-field">
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                placeholder="Minimal 8 karakter"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+
+                            <button
+                                class="password-toggle"
+                                type="button"
+                                data-toggle-password="password"
+                                aria-label="Tampilkan password"
+                                aria-pressed="false"
+                            >
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                        @error('password')
+                            <p class="auth-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="password_confirmation">Ulangi Password</label>
+                        <div class="password-field">
+                            <input
+                                id="password_confirmation"
+                                name="password_confirmation"
+                                type="password"
+                                placeholder="Ulangi password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+
+                            <button
+                                class="password-toggle"
+                                type="button"
+                                data-toggle-password="password_confirmation"
+                                aria-label="Tampilkan password"
+                                aria-pressed="false"
+                            >
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn wide">Daftar</button>

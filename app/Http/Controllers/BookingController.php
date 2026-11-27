@@ -26,15 +26,7 @@ class BookingController extends Controller
 
     private function profileIsComplete($user): bool
     {
-        if ($user->role === 'mahasiswa') {
-            return filled($user->nim_nip) && filled($user->faculty) && filled($user->study_program);
-        }
-
-        if ($user->role === 'pegawai') {
-            return filled($user->nim_nip) && filled($user->employee_unit) && filled($user->position);
-        }
-
-        return true;
+        return $user->hasCompleteProfile();
     }
 
     private function redirectToIncompleteProfile($user)

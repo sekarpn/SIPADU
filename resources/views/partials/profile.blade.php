@@ -1426,7 +1426,8 @@
                                    value="{{ old('phone', data_get($user, 'phone')) }}"
                                    data-edit-placeholder="Masukkan nomor telepon (contoh: 081234567890)"
                                    placeholder="{{ $initPersonalEdit ? 'Masukkan nomor telepon (contoh: 081234567890)' : '' }}"
-                                   {{ $initPersonalEdit ? '' : 'readonly tabindex=-1' }}>
+                                   {{ $initPersonalEdit ? '' : 'readonly tabindex=-1' }}
+                                   {{ $isAdmin ? '' : 'required' }}>
                             @error('phone')
                                 <div class="settings-error">{{ $message }}</div>
                             @enderror

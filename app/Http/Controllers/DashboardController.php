@@ -66,7 +66,7 @@ class DashboardController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'nim_nip' => $user->role === 'admin' ? 'nullable|string|max:40|unique:users,nim_nip,' . $user->id : 'required|string|max:40|unique:users,nim_nip,' . $user->id,
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'faculty' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
             'study_program' => $user->role === 'mahasiswa' ? 'required|string|max:150' : 'nullable|string|max:150',
             'employee_unit' => $user->role === 'pegawai' ? 'required|string|max:150' : 'nullable|string|max:150',
