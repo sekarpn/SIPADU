@@ -152,12 +152,23 @@
     align-items: center;
     gap: 14px;
     min-width: 0;
-    transition: transform .2s ease, box-shadow .2s ease;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
 }
 
 .booking-page .bp-stat:hover {
     transform: translateY(-2px);
+    background: linear-gradient(145deg, rgba(255, 255, 255, .86) 0%, rgba(255, 255, 255, .64) 100%);
+    border-color: rgba(35, 124, 77, .35);
     box-shadow: 0 12px 30px rgba(22, 54, 38, .09);
+}
+
+.booking-page .bp-stat.is-active {
+    background: linear-gradient(145deg, rgba(255, 255, 255, .92) 0%, rgba(255, 255, 255, .74) 100%);
+    border-color: #237c4d;
+    box-shadow: 0 8px 24px rgba(35, 124, 77, .14);
 }
 
 .booking-page .bp-stat-icon {
@@ -1320,7 +1331,8 @@ body.bp-drawer-open {
 
     {{-- STATISTIK --}}
     <div class="bp-stats">
-        <div class="bp-stat">
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Pending'])) }}"
+           class="bp-stat {{ request('status') === 'Pending' ? 'is-active' : '' }}">
             <div class="bp-stat-icon is-warning">
                 <i data-lucide="clock"></i>
             </div>
@@ -1328,9 +1340,10 @@ body.bp-drawer-open {
                 <small>Menunggu Verifikasi</small>
                 <strong>{{ $stats['pending'] }}</strong>
             </div>
-        </div>
+        </a>
 
-        <div class="bp-stat">
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Disetujui'])) }}"
+           class="bp-stat {{ request('status') === 'Disetujui' ? 'is-active' : '' }}">
             <div class="bp-stat-icon">
                 <i data-lucide="check-circle-2"></i>
             </div>
@@ -1338,9 +1351,10 @@ body.bp-drawer-open {
                 <small>Disetujui</small>
                 <strong>{{ $stats['approved'] }}</strong>
             </div>
-        </div>
+        </a>
 
-        <div class="bp-stat">
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Ditolak'])) }}"
+           class="bp-stat {{ request('status') === 'Ditolak' ? 'is-active' : '' }}">
             <div class="bp-stat-icon is-danger">
                 <i data-lucide="x-circle"></i>
             </div>
@@ -1348,9 +1362,10 @@ body.bp-drawer-open {
                 <small>Ditolak</small>
                 <strong>{{ $stats['rejected'] }}</strong>
             </div>
-        </div>
+        </a>
 
-        <div class="bp-stat">
+        <a href="{{ route('admin.bookings', request()->except('status', 'page')) }}"
+           class="bp-stat {{ !request('status') ? 'is-active' : '' }}">
             <div class="bp-stat-icon">
                 <i data-lucide="clipboard-list"></i>
             </div>
@@ -1358,9 +1373,10 @@ body.bp-drawer-open {
                 <small>Total Pengajuan</small>
                 <strong>{{ $stats['total'] }}</strong>
             </div>
-        </div>
+        </a>
 
-        <div class="bp-stat">
+        <a href="{{ route('admin.bookings', array_merge(request()->except('page'), ['status' => 'Perlu Revisi'])) }}"
+           class="bp-stat {{ request('status') === 'Perlu Revisi' ? 'is-active' : '' }}">
             <div class="bp-stat-icon is-warning">
                 <i data-lucide="rotate-ccw"></i>
             </div>
@@ -1368,7 +1384,7 @@ body.bp-drawer-open {
                 <small>Perlu Revisi</small>
                 <strong>{{ $stats['revision'] }}</strong>
             </div>
-        </div>
+        </a>
     </div>
 
     {{-- PESAN VALIDASI --}}
