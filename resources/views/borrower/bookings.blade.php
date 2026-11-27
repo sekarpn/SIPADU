@@ -505,7 +505,7 @@
     font-weight: 700;
 }
 
-/* TABLE STYLING (HEADER & ISI SEJAJAR RAPI + OVERRIDE DATATABLES V2) */
+/* TABLE STYLING (HEADER & ISI SEJAJAR RAPI + OVERRIDE DATATABLES) */
 .booking-page .bp-table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -548,98 +548,80 @@
     transition: background .18s ease;
 }
 
-/* PAKSA OVERRIDE FLEXBOX DATATABLES V2 (.dt-column-header) */
-.booking-page table.dataTable thead th .dt-column-header,
-.booking-page thead th .dt-column-header {
-    display: flex !important;
-    width: 100% !important;
-    align-items: center !important;
-}
-
 /* 1. PENGAJUAN (RATA KIRI) */
 .booking-page thead th:nth-child(1),
-.booking-page table.dataTable thead th:nth-child(1),
-.booking-page tbody td:nth-child(1),
-.booking-page table.dataTable tbody td:nth-child(1) {
+.booking-page thead th:nth-child(1) .dt-column-title,
+.booking-page thead th:nth-child(1) > div,
+.booking-page tbody td:nth-child(1) {
     width: 22% !important;
     text-align: left !important;
-}
-.booking-page table.dataTable thead th:nth-child(1) .dt-column-header,
-.booking-page thead th:nth-child(1) .dt-column-header {
-    justify-content: flex-start !important;
 }
 
 /* 2. AUDITORIUM & JADWAL (RATA KIRI) */
 .booking-page thead th:nth-child(2),
-.booking-page table.dataTable thead th:nth-child(2),
-.booking-page tbody td:nth-child(2),
-.booking-page table.dataTable tbody td:nth-child(2) {
+.booking-page thead th:nth-child(2) .dt-column-title,
+.booking-page thead th:nth-child(2) > div,
+.booking-page tbody td:nth-child(2) {
     width: 26% !important;
     text-align: left !important;
-}
-.booking-page table.dataTable thead th:nth-child(2) .dt-column-header,
-.booking-page thead th:nth-child(2) .dt-column-header {
-    justify-content: flex-start !important;
 }
 
 /* 3. STATUS (HEADER & PILL RATA TENGAH) */
 .booking-page thead th:nth-child(3),
-.booking-page table.dataTable thead th:nth-child(3),
-.booking-page tbody td:nth-child(3),
-.booking-page table.dataTable tbody td:nth-child(3) {
+.booking-page thead th:nth-child(3) .dt-column-title,
+.booking-page thead th:nth-child(3) > div,
+.booking-page tbody td:nth-child(3) {
     width: 13% !important;
-    text-align: center !important;
+    text-align: left !important;
     white-space: nowrap;
 }
-.booking-page table.dataTable thead th:nth-child(3) .dt-column-header,
-.booking-page thead th:nth-child(3) .dt-column-header {
-    justify-content: center !important;
-}
-.booking-page table.dataTable thead th:nth-child(3) .dt-column-title,
-.booking-page thead th:nth-child(3) .dt-column-title {
-    flex: 0 1 auto !important;
-    text-align: center !important;
-}
-.booking-page table.dataTable thead th:nth-child(3) .dt-column-order,
-.booking-page thead th:nth-child(3) .dt-column-order {
-    display: none !important;
+
+/* Isi kolom status dimulai dari titik yang sama pada setiap baris */
+.booking-page tbody td:nth-child(3) .bp-status {
+    margin: 0;
 }
 
 /* 4. CATATAN ADMIN (RATA KIRI) */
 .booking-page thead th:nth-child(4),
-.booking-page table.dataTable thead th:nth-child(4),
-.booking-page tbody td:nth-child(4),
-.booking-page table.dataTable tbody td:nth-child(4) {
-    width: 21% !important;
+.booking-page thead th:nth-child(4) .dt-column-title,
+.booking-page thead th:nth-child(4) > div,
+.booking-page tbody td:nth-child(4) {
+    width: 19% !important;
     text-align: left !important;
-}
-.booking-page table.dataTable thead th:nth-child(4) .dt-column-header,
-.booking-page thead th:nth-child(4) .dt-column-header {
-    justify-content: flex-start !important;
 }
 
 /* 5. AKSI (HEADER & TOMBOL SEJAJAR RATA KANAN) */
 .booking-page thead th:nth-child(5),
-.booking-page table.dataTable thead th:nth-child(5),
-.booking-page tbody td:nth-child(5),
-.booking-page table.dataTable tbody td:nth-child(5) {
-    width: 18% !important;
-    text-align: right !important;
+.booking-page thead th:nth-child(5) .dt-column-title,
+.booking-page thead th:nth-child(5) > div,
+.booking-page tbody td:nth-child(5) {
+    width: 20% !important;
+    text-align: left !important;
     white-space: nowrap;
+    padding-left: 20px !important;
     padding-right: 20px !important;
 }
-.booking-page table.dataTable thead th:nth-child(5) .dt-column-header,
-.booking-page thead th:nth-child(5) .dt-column-header {
-    justify-content: flex-end !important;
+
+/* Tombol aksi selalu dimulai dari garis kiri yang sama */
+.booking-page .bp-action-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start !important;
+    gap: 7px;
+    white-space: nowrap;
 }
-.booking-page table.dataTable thead th:nth-child(5) .dt-column-title,
-.booking-page thead th:nth-child(5) .dt-column-title {
-    flex: 0 1 auto !important;
-    text-align: right !important;
+
+.booking-page .bp-action-row form {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 !important;
+    flex: 0 0 auto;
 }
-.booking-page table.dataTable thead th:nth-child(5) .dt-column-order,
-.booking-page thead th:nth-child(5) .dt-column-order {
-    display: none !important;
+
+.booking-page .bp-action-row > .bp-btn,
+.booking-page .bp-action-row form .bp-btn {
+    flex: 0 0 auto;
 }
 
 .booking-page tbody tr:hover td {
@@ -1459,13 +1441,24 @@ body.bp-drawer-open {
         {{-- DAFTAR PENGAJUAN --}}
         <div class="bp-table-wrap">
             <table id="borrowerDataTable">
+                <colgroup>
+                    <col style="width: 22%;">
+                    <col style="width: 26%;">
+                    <col style="width: 13%;">
+                    <col style="width: 19%;">
+                    <col style="width: 20%;">
+                </colgroup>
                 <thead>
                     <tr>
                         <th style="width: 22%;">Pengajuan</th>
                         <th style="width: 26%;">Auditorium & Jadwal</th>
-                        <th style="width: 13%;">Status</th>
-                        <th style="width: 21%;">Catatan Admin</th>
-                        <th style="width: 18%;">Aksi</th>
+                        <th style="width: 13%;" class="dt-center">
+                            <div style="width: 100%; text-align: left;">Status</div>
+                        </th>
+                        <th style="width: 19%;">Catatan Admin</th>
+                        <th style="width: 20%;" class="dt-right">
+                            <div style="width: 100%; text-align: left;">Aksi</div>
+                        </th>
                     </tr>
                 </thead>
 
@@ -1513,7 +1506,7 @@ body.bp-drawer-open {
                             </span>
                         </td>
 
-                        <td style="text-align: center;">
+                        <td style="text-align: left;">
                             <span class="bp-status {{ $statusClass }}">
                                 <span class="bp-status-dot"></span>
                                 {{ $b->status === 'Pending' ? 'Pending' : $b->status }}
@@ -1535,7 +1528,7 @@ body.bp-drawer-open {
                             @endif
                         </td>
 
-                        <td style="text-align: right;">
+                        <td style="text-align: left;">
                             <div class="bp-action-row">
                                 <button
                                     type="button"
