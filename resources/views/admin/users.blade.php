@@ -196,8 +196,8 @@
 /* MAIN TABLE CARD */
 .user-page .up-card {
     background: var(--up-glass-bg);
-    backdrop-filter: blur(4px) saturate(150%);
-    -webkit-backdrop-filter: blur(4px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
     border: var(--up-glass-border);
     box-shadow: var(--up-glass-shadow);
     border-radius: 16px;
@@ -515,8 +515,8 @@
     inset: 0;
     z-index: 99990;
     background: rgba(15, 32, 23, .38);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     display: none;
 }
 
