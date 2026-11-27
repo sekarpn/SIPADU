@@ -2760,7 +2760,11 @@
                         data: initialSeries.approved,
                         backgroundColor: 'rgba(35, 124, 77, 0.85)',
                         hoverBackgroundColor: '#1a633c',
-                        borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 6, bottomRight: 6 },
+                        borderRadius: function (ctx) {
+                            const rejectedVal = Number(ctx.chart.data.datasets[1]?.data?.[ctx.dataIndex] || 0);
+                            const topRadius = rejectedVal === 0 ? 6 : 0;
+                            return { topLeft: topRadius, topRight: topRadius, bottomLeft: 6, bottomRight: 6 };
+                        },
                         borderSkipped: false,
                         barPercentage: 0.62,
                         categoryPercentage: 0.78
@@ -2770,7 +2774,11 @@
                         data: initialSeries.rejected,
                         backgroundColor: 'rgba(220, 69, 69, 0.82)',
                         hoverBackgroundColor: '#b91c1c',
-                        borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
+                        borderRadius: function (ctx) {
+                            const approvedVal = Number(ctx.chart.data.datasets[0]?.data?.[ctx.dataIndex] || 0);
+                            const bottomRadius = approvedVal === 0 ? 6 : 0;
+                            return { topLeft: 6, topRight: 6, bottomLeft: bottomRadius, bottomRight: bottomRadius };
+                        },
                         borderSkipped: false,
                         barPercentage: 0.62,
                         categoryPercentage: 0.78

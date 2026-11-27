@@ -1869,7 +1869,7 @@
         </div>
 
         @if($hasActiveAuditorium)
-            <a class="dashboard-action" href="{{ route('borrower.booking.create') }}">
+            <a class="dashboard-action" href="{{ route('pegawai.booking.create') }}">
                 <i data-lucide="plus"></i>
                 Ajukan Peminjaman
             </a>
@@ -2133,7 +2133,7 @@
                     <p>Ringkasan pengajuan peminjaman Anda</p>
                 </div>
 
-                <a href="{{ route('borrower.bookings') }}">
+                <a href="{{ route('pegawai.bookings') }}">
                     Lihat semua
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -2164,7 +2164,7 @@
                             $hasDistinctEvent = !empty(optional($b->auditorium)->name) && !empty($b->event_name);
                         @endphp
 
-                        <a href="{{ route('borrower.bookings', ['booking_id' => $b->id]) }}" class="proto-card">
+                        <a href="{{ route('pegawai.bookings', ['booking_id' => $b->id]) }}" class="proto-card">
                             <div class="proto-card-top">
                                 <div class="proto-card-heading">
                                     <h3 class="proto-card-title">{{ $bVenue }}</h3>
@@ -2219,7 +2219,7 @@
                     <p>Panduan singkat peminjaman</p>
                 </div>
 
-                <a href="{{ route('borrower.guides') }}">
+                <a href="{{ route('pegawai.guides') }}">
                     Informasi lebih lanjut
                     <i data-lucide="arrow-right"></i>
                 </a>
@@ -2458,7 +2458,7 @@
                         <div class="auditorium-actions">
                             @if($isActive)
                                 <a
-                                    href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
+                                    href="{{ route('pegawai.booking.create', ['auditorium' => $a->id]) }}"
                                     class="btn-booking"
                                     onclick="event.stopPropagation()"
                                 >
@@ -2621,7 +2621,7 @@
                             <div class="modal-actions">
                                 @if($isActive)
                                     <a
-                                        href="{{ route('borrower.booking.create', ['auditorium' => $a->id]) }}"
+                                        href="{{ route('pegawai.booking.create', ['auditorium' => $a->id]) }}"
                                     >
                                         <i data-lucide="calendar-plus"></i>
                                         Ajukan Peminjaman
@@ -2760,7 +2760,11 @@
                         data: initialSeries.approved,
                         backgroundColor: 'rgba(35, 124, 77, 0.85)',
                         hoverBackgroundColor: '#1a633c',
-                        borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 6, bottomRight: 6 },
+                        borderRadius: function (ctx) {
+                            const rejectedVal = Number(ctx.chart.data.datasets[1]?.data?.[ctx.dataIndex] || 0);
+                            const topRadius = rejectedVal === 0 ? 6 : 0;
+                            return { topLeft: topRadius, topRight: topRadius, bottomLeft: 6, bottomRight: 6 };
+                        },
                         borderSkipped: false,
                         barPercentage: 0.62,
                         categoryPercentage: 0.78
@@ -2770,7 +2774,11 @@
                         data: initialSeries.rejected,
                         backgroundColor: 'rgba(220, 69, 69, 0.82)',
                         hoverBackgroundColor: '#b91c1c',
-                        borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
+                        borderRadius: function (ctx) {
+                            const approvedVal = Number(ctx.chart.data.datasets[0]?.data?.[ctx.dataIndex] || 0);
+                            const bottomRadius = approvedVal === 0 ? 6 : 0;
+                            return { topLeft: 6, topRight: 6, bottomLeft: bottomRadius, bottomRight: bottomRadius };
+                        },
                         borderSkipped: false,
                         barPercentage: 0.62,
                         categoryPercentage: 0.78
