@@ -63,7 +63,7 @@
     line-height: 1.55;
 }
 
-/* TOMBOL CRUD */
+/* TOMBOL CRUD (SELARAS DENGAN DATA AUDITORIUM) */
 .user-page .up-btn {
     display: inline-flex;
     align-items: center;
@@ -107,44 +107,46 @@
     color: #fff !important;
 }
 
+/* TOMBOL DETAIL (HIJAU MINT SOFT) */
 .user-page .up-btn.detail {
-    background: #237c4d !important;
-    color: #fff !important;
-    border-color: #237c4d !important;
+    background: #dcfce7 !important;
+    color: #166534 !important;
+    border-color: rgba(22, 163, 74, .24) !important;
 }
 
 .user-page .up-btn.detail:hover {
-    background: #1b663f !important;
-    color: #fff !important;
+    background: #bbf7d0 !important;
+    color: #14532d !important;
 }
 
+/* TOMBOL EDIT (KUNING KREM SOFT SEPERTI DATA AUDITORIUM) */
 .user-page .up-btn.edit {
-    background: #eab308 !important;
-    color: #29220a !important;
-    border-color: #eab308 !important;
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border-color: rgba(217, 119, 6, .24) !important;
 }
 
 .user-page .up-btn.edit:hover {
-    background: #d99b06 !important;
-    color: #29220a !important;
+    background: #fde68a !important;
+    color: #78350f !important;
 }
 
+/* TOMBOL HAPUS (MERAH MUDA SOFT SEPERTI DATA AUDITORIUM) */
 .user-page .up-btn.danger {
-    background: #dc2626 !important;
-    color: #ffffff !important;
-    border-color: #dc2626 !important;
+    background: #fee2e2 !important;
+    color: #991b1b !important;
+    border-color: rgba(220, 38, 38, .22) !important;
 }
 
 .user-page .up-btn.danger:hover {
-    background: #b91c1c !important;
-    color: #ffffff !important;
-    border-color: #b91c1c !important;
+    background: #fecaca !important;
+    color: #7f1d1d !important;
 }
 
 .user-page .up-btn.danger:disabled {
-    background: #dc2626 !important;
-    color: #ffffff !important;
-    border-color: #dc2626 !important;
+    background: #fee2e2 !important;
+    color: #991b1b !important;
+    border-color: rgba(220, 38, 38, .18) !important;
     opacity: .45 !important;
     cursor: not-allowed;
     transform: none;
@@ -359,7 +361,7 @@
     font-weight: 700;
 }
 
-/* DAFTAR KARTU PENGGUNA (GAYA PROTOTYPE CARD) */
+/* DAFTAR KARTU PENGGUNA (SELARAS GLASS CARD DATA AUDITORIUM) */
 .user-page .user-feed-list {
     display: flex;
     flex-direction: column;
@@ -370,19 +372,21 @@
 .user-page .user-proto-card {
     display: block;
     padding: 16px 20px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(22, 54, 38, 0.09);
-    box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, .78) 0%, rgba(255, 255, 255, .56) 100%);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, .65);
+    box-shadow: 0 6px 22px rgba(22, 54, 38, .05);
     color: #163626;
     transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 
 .user-page .user-proto-card:hover {
-    background: #ffffff;
-    border-color: rgba(35, 124, 77, 0.34);
+    background: linear-gradient(145deg, rgba(255, 255, 255, .92) 0%, rgba(255, 255, 255, .75) 100%);
+    border-color: rgba(35, 124, 77, .32);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(22, 54, 38, 0.07);
+    box-shadow: 0 10px 26px rgba(22, 54, 38, .08);
 }
 
 .user-page .user-proto-top {
@@ -444,7 +448,7 @@
     color: #9cb0a4;
 }
 
-/* ROLE PILLS DI KANAN ATAS */
+/* ROLE PILLS DI KANAN ATAS (SELARAS BADGE "AKTIF" DATA AUDITORIUM) */
 .role-pill {
     display: inline-flex;
     align-items: center;
@@ -455,7 +459,7 @@
     font-weight: 700;
     background: #dcfce7;
     color: #166534;
-    border: 1px solid rgba(22, 163, 74, 0.25);
+    border: 1px solid rgba(22, 163, 74, .22);
     white-space: nowrap;
     flex-shrink: 0;
     line-height: 1.2;
@@ -464,19 +468,19 @@
 .role-pill.mahasiswa {
     background: #dcfce7;
     color: #166534;
-    border: 1px solid rgba(22, 163, 74, 0.25);
+    border: 1px solid rgba(22, 163, 74, .22);
 }
 
 .role-pill.admin {
-    background: #ede9fe;
-    color: #5b21b6;
-    border: 1px solid #c4b5fd;
+    background: #e0f2fe;
+    color: #075985;
+    border: 1px solid rgba(2, 132, 199, .22);
 }
 
 .role-pill.pegawai {
-    background: #dbeafe;
-    color: #1e40af;
-    border: 1px solid #93c5fd;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid rgba(217, 119, 6, .22);
 }
 
 /* BARIS BAWAH KARTU: META & TOMBOL AKSI */
@@ -487,7 +491,7 @@
     flex-wrap: wrap;
     gap: 12px;
     padding-top: 11px;
-    border-top: 1px solid rgba(22, 54, 38, 0.06);
+    border-top: 1px solid rgba(22, 54, 38, .07);
 }
 
 .user-page .user-meta-group {
@@ -524,9 +528,9 @@
 }
 
 .user-actions .up-btn {
-    padding: 7px 13px;
+    padding: 7px 14px;
     font-size: 11.5px;
-    border-radius: 9px;
+    border-radius: 10px;
 }
 
 .user-page .up-empty {
@@ -534,8 +538,8 @@
     text-align: center;
     color: var(--up-muted);
     font-size: 13px;
-    background: rgba(255, 255, 255, 0.55);
-    border: 1px dashed rgba(22, 54, 38, 0.16);
+    background: rgba(255, 255, 255, .55);
+    border: 1px dashed rgba(22, 54, 38, .16);
     border-radius: 14px;
 }
 
