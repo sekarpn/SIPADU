@@ -446,7 +446,7 @@
     background: rgba(31, 122, 73, .12);
 }
 
-/* STATUS FILTER TABS (SELARAS DENGAN ADMIN) */
+/* STATUS FILTER TABS */
 .booking-page .bp-tabs {
     display: flex;
     align-items: center;
@@ -505,14 +505,15 @@
     font-weight: 700;
 }
 
-/* TABLE STYLING (HEADER & ISI SEJAJAR RAPI) */
+/* TABLE STYLING (HEADER & ISI SEJAJAR RAPI + OVERRIDE DATATABLES) */
 .booking-page .bp-table-wrap {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-.booking-page table {
+.booking-page table,
+.booking-page table.dataTable {
     width: 100% !important;
     border-collapse: collapse !important;
     table-layout: fixed !important;
@@ -520,7 +521,8 @@
     font-size: 13px;
 }
 
-.booking-page thead th {
+.booking-page thead th,
+.booking-page table.dataTable thead th {
     padding: 13px 20px !important;
     background: rgba(255, 255, 255, .44) !important;
     border-bottom: 1px solid var(--bp-line) !important;
@@ -530,21 +532,26 @@
     text-transform: uppercase;
     color: var(--bp-muted) !important;
     white-space: nowrap;
-    vertical-align: middle;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
 }
 
-.booking-page tbody td {
+.booking-page tbody td,
+.booking-page table.dataTable tbody td {
     padding: 16px 20px !important;
     border-bottom: 1px solid rgba(22, 54, 38, .06) !important;
     vertical-align: middle !important;
     font-size: 12.5px;
     line-height: 1.5;
     color: var(--bp-ink);
+    box-sizing: border-box !important;
     transition: background .18s ease;
 }
 
 /* 1. PENGAJUAN (RATA KIRI) */
 .booking-page thead th:nth-child(1),
+.booking-page thead th:nth-child(1) .dt-column-title,
+.booking-page thead th:nth-child(1) > div,
 .booking-page tbody td:nth-child(1) {
     width: 22% !important;
     text-align: left !important;
@@ -552,6 +559,8 @@
 
 /* 2. AUDITORIUM & JADWAL (RATA KIRI) */
 .booking-page thead th:nth-child(2),
+.booking-page thead th:nth-child(2) .dt-column-title,
+.booking-page thead th:nth-child(2) > div,
 .booking-page tbody td:nth-child(2) {
     width: 26% !important;
     text-align: left !important;
@@ -559,14 +568,19 @@
 
 /* 3. STATUS (HEADER & PILL RATA TENGAH) */
 .booking-page thead th:nth-child(3),
+.booking-page thead th:nth-child(3) .dt-column-title,
+.booking-page thead th:nth-child(3) > div,
 .booking-page tbody td:nth-child(3) {
     width: 13% !important;
     text-align: center !important;
+    justify-content: center !important;
     white-space: nowrap;
 }
 
 /* 4. CATATAN ADMIN (RATA KIRI) */
 .booking-page thead th:nth-child(4),
+.booking-page thead th:nth-child(4) .dt-column-title,
+.booking-page thead th:nth-child(4) > div,
 .booking-page tbody td:nth-child(4) {
     width: 21% !important;
     text-align: left !important;
@@ -574,9 +588,12 @@
 
 /* 5. AKSI (HEADER & TOMBOL SEJAJAR RATA KANAN) */
 .booking-page thead th:nth-child(5),
+.booking-page thead th:nth-child(5) .dt-column-title,
+.booking-page thead th:nth-child(5) > div,
 .booking-page tbody td:nth-child(5) {
     width: 18% !important;
     text-align: right !important;
+    justify-content: flex-end !important;
     white-space: nowrap;
     padding-right: 20px !important;
 }
@@ -587,45 +604,6 @@
 
 .booking-page tbody tr:last-child td {
     border-bottom: 0 !important;
-}
-
-/* PROPORSI LEBAR SETIAP KOLOM */
-.booking-page th:nth-child(1),
-.booking-page td:nth-child(1) {
-    width: 24%;
-}
-
-.booking-page th:nth-child(2),
-.booking-page td:nth-child(2) {
-    width: 27%;
-}
-
-.booking-page th:nth-child(3),
-.booking-page td:nth-child(3) {
-    width: 12%;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.booking-page th:nth-child(4),
-.booking-page td:nth-child(4) {
-    width: 23%;
-}
-
-.booking-page th:last-child,
-.booking-page td:last-child {
-    width: 14%;
-    text-align: right;
-    white-space: nowrap;
-    padding-right: 20px;
-}
-
-.booking-page tbody tr:hover td {
-    background: rgba(255, 255, 255, .52);
-}
-
-.booking-page tbody tr:last-child td {
-    border-bottom: 0;
 }
 
 .booking-page .bp-code,
@@ -889,7 +867,7 @@
 }
 
 /* ==========================================================================
-   POPUP / DRAWER DETAIL PENGAJUAN + BACKDROP BLUR (IDENTIK KELOLA PENGAJUAN)
+   POPUP / DRAWER DETAIL PENGAJUAN + BACKDROP BLUR
    ========================================================================== */
 .sipadu-booking-overlay {
     position: fixed;
@@ -1439,11 +1417,15 @@ body.bp-drawer-open {
             <table id="borrowerDataTable">
                 <thead>
                     <tr>
-                        <th style="width: 22%; text-align: left;">Pengajuan</th>
-                        <th style="width: 26%; text-align: left;">Auditorium & Jadwal</th>
-                        <th style="width: 13%; text-align: center;">Status</th>
-                        <th style="width: 21%; text-align: left;">Catatan Admin</th>
-                        <th style="width: 18%; text-align: right;">Aksi</th>
+                        <th style="width: 22%;">Pengajuan</th>
+                        <th style="width: 26%;">Auditorium & Jadwal</th>
+                        <th style="width: 13%;" class="dt-center">
+                            <div style="width: 100%; text-align: center;">Status</div>
+                        </th>
+                        <th style="width: 21%;">Catatan Admin</th>
+                        <th style="width: 18%;" class="dt-right">
+                            <div style="width: 100%; text-align: right;">Aksi</div>
+                        </th>
                     </tr>
                 </thead>
 
@@ -1576,7 +1558,7 @@ body.bp-drawer-open {
                 </tbody>
             </table>
         </div>
-        
+
         {{-- PAGINATION HALAMAN (MUNCUL OTOMATIS JIKA DATA > 10) --}}
         <div class="bp-pagination" id="borrowerPagination"></div>
     </div>
