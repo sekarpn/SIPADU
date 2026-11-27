@@ -75,6 +75,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/pengajuan/export', [BookingController::class, 'adminPendingExport'])->name('bookings.export');
         Route::get('/laporan', [BookingController::class, 'adminReports'])->name('reports');
         Route::get('/laporan/export', [BookingController::class, 'adminExport'])->name('reports.export');
+        Route::get('/laporan/pdf', [BookingController::class, 'adminReportsPdf'])->name('reports.pdf');
 
         // DOWNLOAD SURAT PEMINJAMAN
         Route::get('/pengajuan/{booking}/surat', [BookingController::class, 'downloadLetter'])
