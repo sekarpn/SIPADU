@@ -25,6 +25,7 @@ class Auditorium extends Model
         'image_path',
         'images',
         'is_active',
+        'deactivation_reason',
     ];
 
     protected $casts = [
@@ -64,5 +65,14 @@ class Auditorium extends Model
         $selesai = Carbon::parse($this->jam_selesai)->format('H:i');
 
         return "{$mulai} - {$selesai}";
+    }
+
+    public function getDeactivationNoteAttribute(): string
+    {
+        if ($this->is_active) {
+            return '';
+        }
+
+        return trim((string) ($this->deactivation_reason ?? $this->keterangan_nonaktif ?? ''));
     }
 }

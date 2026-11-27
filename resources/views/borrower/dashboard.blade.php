@@ -4,6 +4,7 @@
 
 @php
     $user = auth()->user();
+    $hasActiveAuditorium = $auditoriums->contains(fn ($item) => (bool) ($item->is_active ?? true));
 @endphp
 
 <style>
@@ -18,11 +19,35 @@
         min-height: 100vh;
     }
 
-    /* Cegah halaman dashboard melebar dan memunculkan scrollbar horizontal */
+    /* Cegah halaman dashboard melebar dan seragamkan scrollbar layar seperti Pengajuan Terbaru */
     html,
     body {
         max-width: 100%;
         overflow-x: clip !important;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(22, 54, 38, 0.18) transparent;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+
+    html::-webkit-scrollbar-track,
+    body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    html::-webkit-scrollbar-thumb,
+    body::-webkit-scrollbar-thumb {
+        background: rgba(22, 54, 38, 0.18);
+        border-radius: 999px;
+    }
+
+    html::-webkit-scrollbar-thumb:hover,
+    body::-webkit-scrollbar-thumb:hover {
+        background: rgba(22, 54, 38, 0.32);
     }
 
     .app-layout {
@@ -99,6 +124,7 @@
         text-decoration: none;
         font-size: 12.5px;
         font-weight: 700;
+        border: 1px solid #237c4d;
         box-shadow: 0 4px 14px rgba(35, 124, 77, 0.25);
         transition: .2s ease;
         white-space: nowrap;
@@ -108,6 +134,15 @@
         background: #1a633c;
         color: white;
         transform: translateY(-2px);
+    }
+
+    .dashboard-action.is-disabled {
+        background: #d8e2dc;
+        border-color: #c3d1c9;
+        color: #6b7f73;
+        box-shadow: none;
+        cursor: not-allowed;
+        pointer-events: none;
     }
 
     .dashboard-action svg {
@@ -287,9 +322,7 @@
         text-underline-offset: 3px;
     }
 
-    /* ============================================================
-       KARTU PENGAJUAN TERBARU (SELARAS DENGAN DASHBOARD ADMIN)
-       ============================================================ */
+    /* KARTU PENGAJUAN TERBARU */
     .borrower-feed-list {
         display: flex;
         flex-direction: column;
@@ -437,7 +470,7 @@
         color: #475569;
     }
 
-    /* BARIS WAKTU BAWAH: TANGGAL & JAM SEJAJAR RAPI */
+    /* BARIS WAKTU BAWAH */
     .proto-schedule-bar {
         display: flex;
         align-items: center;
@@ -485,7 +518,7 @@
         border-radius: 13px;
     }
 
-    /* INFORMASI SIPADU (KOTAK GLASS SUB-ITEM SIMETRIS) */
+    /* INFORMASI SIPADU */
     .guide-list {
         display: flex;
         flex-direction: column;
@@ -543,7 +576,7 @@
         margin: 0;
     }
 
-    /* AUDITORIUM (GLASS SUB-ITEM, SLIDER MULTI-FOTO & GAMBAR FULL BLEED) */
+    /* AUDITORIUM */
     .auditorium-section {
         margin-top: 0;
     }
@@ -583,11 +616,21 @@
         overflow-y: hidden;
         scroll-behavior: smooth;
         scroll-snap-type: x mandatory;
-        scrollbar-width: none;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(22, 54, 38, 0.18) transparent;
         padding: 3px 2px 12px;
         overscroll-behavior-x: contain;
     }
-    .auditorium-cards::-webkit-scrollbar { display: none; }
+    .auditorium-cards::-webkit-scrollbar {
+        height: 5px;
+    }
+    .auditorium-cards::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .auditorium-cards::-webkit-scrollbar-thumb {
+        background: rgba(22, 54, 38, 0.18);
+        border-radius: 999px;
+    }
     .auditorium-cards > .auditorium-card {
         flex: 0 0 calc((100% - 32px) / 3);
         scroll-snap-align: start;
@@ -619,7 +662,8 @@
     }
 
     .auditorium-card.is-inactive-card {
-        opacity: 0.92;
+        background: rgba(255, 255, 255, 0.34) !important;
+        border-color: rgba(252, 165, 165, 0.55) !important;
     }
 
     .auditorium-image-wrap {
@@ -633,7 +677,7 @@
         background: #eaf4ee;
     }
 
-    /* SLIDER & SLIDESHOW FOTO AUDITORIUM (SAMA DENGAN ADMIN) */
+    /* SLIDER & SLIDESHOW FOTO AUDITORIUM */
     .aud-slider {
         width: 100%;
         height: 175px;
@@ -844,11 +888,12 @@
 
     .auditorium-meta span {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 7px;
         font-size: 11px;
         color: #3c5446;
         font-weight: 500;
+        line-height: 1.4;
     }
 
     .auditorium-meta svg {
@@ -856,21 +901,25 @@
         height: 14px;
         color: #237c4d;
         flex-shrink: 0;
+        margin-top: 1px;
     }
 
     .aud-inactive-alert {
         margin-bottom: 12px;
-        padding: 8px 10px;
+        padding: 9px 11px;
         border-radius: 9px;
-        background: rgba(254, 242, 242, 0.92);
-        border: 1px solid #fecaca;
+        background: rgba(254, 242, 242, 0.96);
+        border: 1px solid #fca5a5;
         color: #991b1b;
         font-size: 11px;
-        line-height: 1.45;
+        line-height: 1.5;
+        word-break: break-word;
     }
 
     .aud-inactive-alert strong {
+        display: block;
         color: #7f1d1d;
+        margin-bottom: 2px;
     }
 
     .auditorium-actions {
@@ -881,6 +930,8 @@
 
     .auditorium-actions a,
     .auditorium-actions .btn-booking-disabled {
+        width: 100%;
+        box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -889,6 +940,7 @@
         text-decoration: none;
         padding: 10px 12px;
         border-radius: 9px;
+        font-family: inherit;
         font-size: 12px;
         font-weight: 700;
         transition: .2s;
@@ -915,9 +967,10 @@
 
     .btn-booking-disabled {
         color: #991b1b;
-        background: rgba(254, 226, 226, 0.85);
+        background: rgba(254, 226, 226, 0.9);
         border: 1px solid #fca5a5;
         cursor: not-allowed;
+        opacity: 0.92;
     }
 
     .empty-auditorium {
@@ -931,7 +984,7 @@
         grid-column: 1 / -1;
     }
 
-    /* SLIDE-OVER DETAIL DRAWER (DISAMAKAN DENGAN DRAWER ADMIN: ROUNDED FLOATING) */
+    /* SLIDE-OVER DETAIL DRAWER */
     .auditorium-modal {
         position: fixed;
         inset: 0;
@@ -965,12 +1018,23 @@
         overflow-y: auto;
         overflow-x: hidden;
         overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(22, 54, 38, 0.18) transparent;
         background: #ffffff;
         border: 1px solid #e2ebe5;
         border-radius: 20px;
         box-shadow: -12px 10px 42px rgba(22, 54, 38, 0.16);
         transform: translate3d(calc(100% + 28px), 0, 0);
         transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .auditorium-modal-box::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .auditorium-modal-box::-webkit-scrollbar-thumb {
+        background: rgba(22, 54, 38, 0.18);
+        border-radius: 999px;
     }
 
     .auditorium-modal.show .auditorium-modal-box {
@@ -1060,19 +1124,20 @@
 
     .modal-deactivation-box {
         margin-bottom: 18px;
-        padding: 11px 14px;
+        padding: 12px 14px;
         border-radius: 12px;
         background: #fef2f2;
-        border: 1px solid #fecaca;
+        border: 1px solid #fca5a5;
         color: #991b1b;
         font-size: 12.5px;
         line-height: 1.55;
+        word-break: break-word;
     }
 
     .modal-deactivation-box strong {
         display: block;
         color: #7f1d1d;
-        margin-bottom: 2px;
+        margin-bottom: 3px;
     }
 
     .modal-info-title {
@@ -1140,6 +1205,7 @@
         gap: 7px;
         border-radius: 10px;
         padding: 11px 18px;
+        font-family: inherit;
         font-size: 12.5px;
         font-weight: 700;
         text-decoration: none;
@@ -1148,6 +1214,7 @@
     .modal-actions a {
         background: #237c4d;
         color: white;
+        border: 1px solid #237c4d;
     }
 
     .modal-actions a:hover {
@@ -1160,6 +1227,7 @@
         color: #991b1b;
         border: 1px solid #fca5a5;
         cursor: not-allowed;
+        opacity: 0.92;
     }
 
     /* RESPONSIVE */
@@ -1264,10 +1332,17 @@
             <p>Temukan auditorium impian Anda untuk pengajuan peminjaman Anda.</p>
         </div>
 
-        <a class="dashboard-action" href="{{ route('borrower.booking.create') }}">
-            <i data-lucide="plus"></i>
-            Ajukan Peminjaman
-        </a>
+        @if($hasActiveAuditorium)
+            <a class="dashboard-action" href="{{ route('borrower.booking.create') }}">
+                <i data-lucide="plus"></i>
+                Ajukan Peminjaman
+            </a>
+        @else
+            <button type="button" class="dashboard-action is-disabled" disabled aria-disabled="true" title="Semua auditorium sedang dinonaktifkan">
+                <i data-lucide="ban"></i>
+                Ajukan Peminjaman
+            </button>
+        @endif
     </div>
 
     {{-- STATISTIK --}}
@@ -1320,7 +1395,7 @@
     {{-- PENGAJUAN DAN INFORMASI --}}
     <div class="dashboard-middle">
 
-        {{-- PENGAJUAN TERBARU (CARD SIMETRIS SEPERTI DASHBOARD ADMIN) --}}
+        {{-- PENGAJUAN TERBARU --}}
         <div class="dashboard-panel">
             <div class="section-head">
                 <div>
@@ -1470,19 +1545,23 @@
 
                 @php
                     $isActive = (bool) ($a->is_active ?? true);
-                    $deactivationReason = trim((string) ($a->deactivation_reason ?? $a->keterangan_nonaktif ?? ''));
+                    $deactivationReason = trim((string) (
+                        $a->deactivation_reason
+                        ?? $a->inactive_reason
+                        ?? $a->keterangan_nonaktif
+                        ?? $a->alasan_nonaktif
+                        ?? $a->notes
+                        ?? $a->note
+                        ?? ''
+                    ));
 
                     $description = is_string($a->description) && trim($a->description) !== ''
                         ? $a->description
                         : 'Informasi auditorium belum tersedia.';
 
-                    $location = is_string($a->location)
-                        ? $a->location
-                        : 'Lokasi belum tersedia';
-
-                    $capacity = is_scalar($a->capacity)
-                        ? $a->capacity
-                        : 'Belum tersedia';
+                    $lokasiKampus = is_string($a->lokasi_kampus) && trim($a->lokasi_kampus) !== ''
+                        ? trim($a->lokasi_kampus)
+                        : (is_string($a->location) && trim($a->location) !== '' ? trim($a->location) : 'Lokasi kampus belum tersedia');
 
                     $lokasiGedung = is_string($a->lokasi_gedung) && trim($a->lokasi_gedung) !== ''
                         ? trim($a->lokasi_gedung)
@@ -1498,8 +1577,20 @@
 
                     $jamOperasional = $jamMulaiFmt . ' - ' . $jamSelesaiFmt;
 
-                    $facilities = is_array($a->facilities)
-                        ? $a->facilities
+                    $capacity = is_scalar($a->capacity) && trim((string) $a->capacity) !== ''
+                        ? (is_numeric($a->capacity) ? $a->capacity . ' orang' : $a->capacity)
+                        : 'Belum tersedia';
+
+                    $rawFacilities = $a->facilities;
+                    if (is_string($rawFacilities)) {
+                        $decodedFacilities = json_decode($rawFacilities, true);
+                        $rawFacilities = is_array($decodedFacilities)
+                            ? $decodedFacilities
+                            : array_filter(array_map('trim', explode(',', $rawFacilities)));
+                    }
+
+                    $facilities = is_array($rawFacilities)
+                        ? $rawFacilities
                         : [];
 
                     $facilities = array_filter($facilities, function ($item) {
@@ -1603,7 +1694,19 @@
                         <div class="auditorium-meta">
                             <span>
                                 <i data-lucide="map-pin"></i>
-                                {{ $location }}
+                                {{ $lokasiKampus }}
+                            </span>
+
+                            @if($lokasiGedung)
+                                <span>
+                                    <i data-lucide="building"></i>
+                                    {{ \Illuminate\Support\Str::limit($lokasiGedung, 55) }}
+                                </span>
+                            @endif
+
+                            <span>
+                                <i data-lucide="clock"></i>
+                                Jam Operasional: {{ $jamOperasional }}
                             </span>
 
                             <span>
@@ -1614,7 +1717,8 @@
 
                         @if(!$isActive && $deactivationReason !== '')
                             <div class="aud-inactive-alert">
-                                <strong>Keterangan Nonaktif:</strong> {{ \Illuminate\Support\Str::limit($deactivationReason, 85) }}
+                                <strong>Catatan Admin:</strong>
+                                {!! nl2br(e($deactivationReason)) !!}
                             </div>
                         @endif
 
@@ -1629,10 +1733,17 @@
                                     Ajukan Peminjaman
                                 </a>
                             @else
-                                <span class="btn-booking-disabled" onclick="event.stopPropagation(); openAuditoriumModal('auditorium-modal-{{ $a->id }}')">
+                                <button
+                                    type="button"
+                                    class="btn-booking-disabled"
+                                    disabled
+                                    aria-disabled="true"
+                                    title="Auditorium sedang dinonaktifkan"
+                                    onclick="event.stopPropagation()"
+                                >
                                     <i data-lucide="ban"></i>
-                                    Sedang Nonaktif
-                                </span>
+                                    Ajukan Peminjaman
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -1707,10 +1818,10 @@
                                 @endif
                             </div>
 
-                            @if(!$isActive)
+                            @if(!$isActive && $deactivationReason !== '')
                                 <div class="modal-deactivation-box">
-                                    <strong>Auditorium Sedang Nonaktif</strong>
-                                    {{ $deactivationReason !== '' ? $deactivationReason : 'Auditorium saat ini tidak tersedia untuk peminjaman baru.' }}
+                                    <strong>Catatan Admin</strong>
+                                    {!! nl2br(e($deactivationReason)) !!}
                                 </div>
                             @endif
 
@@ -1726,8 +1837,24 @@
                                 <div class="modal-info-item">
                                     <i data-lucide="map-pin"></i>
                                     <div>
-                                        <strong>Lokasi</strong><br>
-                                        {{ $location }}
+                                        <strong>Lokasi Kampus</strong><br>
+                                        {{ $lokasiKampus }}
+                                    </div>
+                                </div>
+
+                                <div class="modal-info-item">
+                                    <i data-lucide="building"></i>
+                                    <div>
+                                        <strong>Lokasi Gedung</strong><br>
+                                        {{ $lokasiGedung ?: 'Informasi lokasi gedung belum tersedia' }}
+                                    </div>
+                                </div>
+
+                                <div class="modal-info-item">
+                                    <i data-lucide="clock"></i>
+                                    <div>
+                                        <strong>Jam Operasional</strong><br>
+                                        {{ $jamOperasional }}
                                     </div>
                                 </div>
 
@@ -1767,10 +1894,16 @@
                                         Ajukan Peminjaman
                                     </a>
                                 @else
-                                    <span class="modal-btn-disabled">
+                                    <button
+                                        type="button"
+                                        class="modal-btn-disabled"
+                                        disabled
+                                        aria-disabled="true"
+                                        title="Auditorium sedang dinonaktifkan"
+                                    >
                                         <i data-lucide="ban"></i>
-                                        Tidak Dapat Dipinjam (Nonaktif)
-                                    </span>
+                                        Ajukan Peminjaman
+                                    </button>
                                 @endif
                             </div>
                         </div>

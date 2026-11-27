@@ -7,7 +7,6 @@ use App\Models\SiteContent;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
@@ -101,6 +100,10 @@ class AdminController extends Controller
             ? $r->boolean('is_active')
             : ($auditorium?->is_active ?? true);
 
+        if ($data['is_active']) {
+            $data['deactivation_reason'] = null;
+        }
+
         // Ambil daftar foto lama jika sedang mengedit auditorium
         $currentImages = [];
         if ($auditorium) {
@@ -153,13 +156,42 @@ class AdminController extends Controller
         return back()->with('success', 'Data auditorium berhasil disimpan.');
     }
 
-    public function toggleAuditoriumStatus(Auditorium $auditorium)
+    public function toggleAuditoriumStatus(Request $request, Auditorium $auditorium)
     {
+        if ($auditorium->is_active) {
+            // Sesuaikan dengan attribute name="" di input modal nonaktif admin
+            $note = trim((string) (
+                $request->input('deactivation_reason')
+                ?? $request->input('inactive_reason')
+                ?? $request->input('keterangan_nonaktif')
+                ?? $request->input('alasan_nonaktif')
+                ?? $request->input('notes')
+                ?? $request->input('note')
+                ?? ''
+            ));
+
+            $request->merge(['deactivation_reason' => $note]);
+
+            $validated = $request->validate([
+                'deactivation_reason' => 'required|string|max:1000',
+            ], [
+                'deactivation_reason.required' => 'Catatan/alasan penonaktifan wajib diisi.',
+            ]);
+
+            $auditorium->update([
+                'is_active' => false,
+                'deactivation_reason' => $validated['deactivation_reason'],
+            ]);
+
+            return back()->with('success', "Auditorium {$auditorium->name} dinonaktifkan.");
+        }
+
         $auditorium->update([
-            'is_active' => !$auditorium->is_active,
+            'is_active' => true,
+            'deactivation_reason' => null,
         ]);
 
-        return back()->with('success', 'Status auditorium berhasil diperbarui.');
+        return back()->with('success', "Auditorium {$auditorium->name} diaktifkan kembali.");
     }
 
     public function deleteAuditorium(Auditorium $auditorium)
