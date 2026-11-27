@@ -1436,14 +1436,14 @@ body.bp-drawer-open {
 
         {{-- DAFTAR PENGAJUAN --}}
         <div class="bp-table-wrap">
-            <table>
+            <table id="borrowerDataTable">
                 <thead>
                     <tr>
-                        <th>Pengajuan</th>
-                        <th>Auditorium & Jadwal</th>
-                        <th>Status</th>
-                        <th>Catatan Admin</th>
-                        <th>Aksi</th>
+                        <th style="width: 22%; text-align: left;">Pengajuan</th>
+                        <th style="width: 26%; text-align: left;">Auditorium & Jadwal</th>
+                        <th style="width: 13%; text-align: center;">Status</th>
+                        <th style="width: 21%; text-align: left;">Catatan Admin</th>
+                        <th style="width: 18%; text-align: right;">Aksi</th>
                     </tr>
                 </thead>
 
@@ -1472,7 +1472,7 @@ body.bp-drawer-open {
                         data-date="{{ $dateIso }}"
                         data-search="{{ $searchBlob }}"
                     >
-                        <td>
+                        <td style="text-align: left;">
                             <span class="bp-code">{{ $bookingCode }}</span>
                             <span class="bp-sub">
                                 {{ $b->created_at->format('d M Y, H:i') }}
@@ -1483,7 +1483,7 @@ body.bp-drawer-open {
                             @endif
                         </td>
 
-                        <td>
+                        <td style="text-align: left;">
                             <span class="bp-primary">{{ $b->auditorium->name ?? '-' }}</span>
                             <span class="bp-sub">
                                 {{ $b->booking_date ? $b->booking_date->translatedFormat('d M Y') : '-' }}
@@ -1491,14 +1491,14 @@ body.bp-drawer-open {
                             </span>
                         </td>
 
-                        <td>
+                        <td style="text-align: center;">
                             <span class="bp-status {{ $statusClass }}">
                                 <span class="bp-status-dot"></span>
                                 {{ $b->status === 'Pending' ? 'Pending' : $b->status }}
                             </span>
                         </td>
 
-                        <td>
+                        <td style="text-align: left;">
                             @if(count($feedbackItems) > 0)
                                 <div class="bp-note-stack">
                                     @foreach($feedbackItems as $fb)
@@ -1513,7 +1513,7 @@ body.bp-drawer-open {
                             @endif
                         </td>
 
-                        <td>
+                        <td style="text-align: right;">
                             <div class="bp-action-row">
                                 <button
                                     type="button"
@@ -1544,7 +1544,7 @@ body.bp-drawer-open {
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; width: auto; white-space: normal;">
+                        <td colspan="5" style="text-align: center;">
                             <div class="bp-empty">
                                 <div class="bp-empty-icon">
                                     <i data-lucide="inbox"></i>
@@ -1560,7 +1560,7 @@ body.bp-drawer-open {
 
                 @if($allUserBookings->isNotEmpty())
                     <tr id="borrowerFilterEmptyRow" style="display: none;">
-                        <td colspan="5" style="text-align: center; width: auto; white-space: normal;">
+                        <td colspan="5" style="text-align: center;">
                             <div class="bp-empty">
                                 <div class="bp-empty-icon">
                                     <i data-lucide="inbox"></i>
@@ -1576,7 +1576,7 @@ body.bp-drawer-open {
                 </tbody>
             </table>
         </div>
-
+        
         {{-- PAGINATION HALAMAN (MUNCUL OTOMATIS JIKA DATA > 10) --}}
         <div class="bp-pagination" id="borrowerPagination"></div>
     </div>
