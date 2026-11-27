@@ -11,20 +11,30 @@
     $rejectedPercent = $total > 0 ? (($stats['rejected'] ?? 0) / $total) * 100 : 0;
     $cancelledPercent = $total > 0 ? ($cancelled / $total) * 100 : 0;
 
-    $todayJakarta = \Carbon\Carbon::now('Asia/Jakarta')->toDateString();
+    $nowJakarta = \Carbon\Carbon::now('Asia/Jakarta');
+    $todayJakarta = $nowJakarta->toDateString();
+    $todayStartJakarta = $nowJakarta->copy()->startOfDay();
 
     $pendingBookings = \App\Models\Booking::with(['user', 'auditorium'])
         ->whereRaw('LOWER(TRIM(status)) IN (?, ?)', ['pending', 'menunggu'])
         ->latest()
         ->get();
 
-    // Ambil pengajuan berstatus Disetujui mulai dari HARI H (>= hari ini) saja
+    // Ambil pengajuan berstatus Disetujui yang tanggalnya tidak lewat dan waktu berakhirnya masih > waktu sekarang
     $upcomingBookings = \App\Models\Booking::with(['user', 'auditorium'])
         ->whereRaw('LOWER(TRIM(status)) IN (?, ?)', ['disetujui', 'approved'])
         ->whereDate('booking_date', '>=', $todayJakarta)
         ->orderBy('booking_date', 'asc')
         ->orderBy('start_time', 'asc')
-        ->get();
+        ->get()
+        ->filter(function ($item) use ($nowJakarta) {
+            $dateStr = \Carbon\Carbon::parse($item->booking_date, 'Asia/Jakarta')->toDateString();
+            $endTimeStr = !empty($item->end_time) ? trim((string) $item->end_time) : '23:59:59';
+            $endDateTime = \Carbon\Carbon::parse($dateStr . ' ' . $endTimeStr, 'Asia/Jakarta');
+
+            return $endDateTime->gt($nowJakarta);
+        })
+        ->values();
 @endphp
 
 <style>
@@ -439,7 +449,7 @@
     .dash-feed-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 11px;
         max-height: 430px;
         overflow-y: auto;
         padding: 2px 3px 4px 1px;
@@ -457,12 +467,12 @@
         border-radius: 999px;
     }
 
-    /* KARTU SIMETRIS & SEIMBANG */
+    /* KARTU PENGAJUAN TERBARU */
     .proto-card {
         display: block;
-        padding: 15px 18px;
+        padding: 14px 17px;
         border-radius: 14px;
-        background: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.9);
         border: 1px solid rgba(22, 54, 38, 0.09);
         box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
         text-decoration: none;
@@ -482,7 +492,7 @@
         align-items: flex-start;
         justify-content: space-between;
         gap: 14px;
-        margin-bottom: 12px;
+        margin-bottom: 11px;
     }
 
     .proto-card-heading {
@@ -507,21 +517,37 @@
     }
 
     .proto-card-sub {
-        margin: 3px 0 0;
+        margin: 4px 0 0;
         font-size: 12px;
         color: #5c7265;
         display: flex;
         align-items: center;
-        gap: 6px;
+        flex-wrap: wrap;
+        gap: 8px;
         min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    }
+
+    .proto-sub-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .proto-sub-item svg {
+        width: 13px;
+        height: 13px;
+        color: #237c4d;
+        flex-shrink: 0;
     }
 
     .proto-card-sub .event-name {
         font-weight: 600;
         color: #465d50;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .proto-card-sub .sub-dot {
@@ -537,42 +563,31 @@
         white-space: nowrap;
     }
 
-    /* SOFT STATUS PILL DI KANAN ATAS */
     .proto-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 5px 13px;
+        padding: 4px 12px;
         border-radius: 999px;
-        font-size: 11.5px;
+        font-size: 11px;
         font-weight: 700;
         white-space: nowrap;
         flex-shrink: 0;
         line-height: 1.2;
     }
 
-    .proto-badge.live {
-        background: #dff3e6;
-        color: #1b653c;
-    }
-
-    .proto-badge.upcoming {
+    .proto-badge.pending {
         background: #fef3c7;
         color: #854d0e;
+        border: 1px solid rgba(217, 119, 6, 0.22);
     }
 
-    .proto-badge.pending {
-        background: #ffedd5;
-        color: #9a3412;
-    }
-
-    /* BARIS WAKTU BAWAH: TANGGAL & JAM SEJAJAR RAPI */
     .proto-schedule-bar {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding-top: 10px;
+        padding-top: 9px;
         border-top: 1px solid rgba(22, 54, 38, 0.06);
     }
 
@@ -594,6 +609,192 @@
     }
 
     .proto-meta-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ============================================================
+       KARTU PEMINJAMAN MENDATANG
+       ============================================================ */
+    .upcoming-card {
+        display: flex;
+        align-items: stretch;
+        gap: 13px;
+        padding: 13px 15px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(22, 54, 38, 0.09);
+        box-shadow: 0 2px 8px rgba(22, 54, 38, 0.03);
+        text-decoration: none;
+        color: #163626;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .upcoming-card:hover {
+        background: #ffffff;
+        border-color: rgba(35, 124, 77, 0.34);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(22, 54, 38, 0.07);
+    }
+
+    .upcoming-date-box {
+        flex-shrink: 0;
+        width: 62px;
+        min-height: 64px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #eaf5ed 0%, #dff0e5 100%);
+        border: 1px solid rgba(35, 124, 77, 0.22);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6px 4px;
+        box-sizing: border-box;
+    }
+
+    .upcoming-date-day {
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1.05;
+        color: #163626;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .upcoming-date-month {
+        font-size: 9.5px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #1f7a49;
+        margin-top: 3px;
+        text-transform: uppercase;
+    }
+
+    .upcoming-body {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .upcoming-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .upcoming-heading {
+        min-width: 0;
+    }
+
+    .upcoming-title {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        color: #163626;
+        line-height: 1.3;
+        letter-spacing: -0.015em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+
+    .upcoming-card:hover .upcoming-title {
+        color: #1f7a49;
+    }
+
+    .upcoming-org {
+        margin: 3px 0 0;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #1f7a49;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .upcoming-org svg {
+        width: 13px;
+        height: 13px;
+        color: #237c4d;
+        flex-shrink: 0;
+    }
+
+    .upcoming-org span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .upcoming-status-pill {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+    .upcoming-status-pill.is-ongoing {
+        background: #dff3e6;
+        color: #1b653c;
+        border: 1px solid rgba(35, 124, 77, 0.24);
+    }
+
+    .upcoming-status-pill.is-ongoing::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #237c4d;
+        flex-shrink: 0;
+    }
+
+    .upcoming-status-pill.is-upcoming {
+        background: #fef3c7;
+        color: #854d0e;
+        border: 1px solid rgba(217, 119, 6, 0.22);
+    }
+
+    .upcoming-schedule-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 7px;
+        border-top: 1px solid rgba(22, 54, 38, 0.06);
+    }
+
+    .upcoming-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: #3d5446;
+        min-width: 0;
+    }
+
+    .upcoming-meta-item svg {
+        width: 13.5px;
+        height: 13.5px;
+        color: #6b8274;
+        flex-shrink: 0;
+    }
+
+    .upcoming-meta-item span {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -645,6 +846,31 @@
             padding: 15px 16px 16px !important;
         }
 
+        .upcoming-card {
+            padding: 12px;
+            gap: 10px;
+        }
+
+        .upcoming-date-box {
+            width: 54px;
+            min-height: 56px;
+            border-radius: 10px;
+        }
+
+        .upcoming-date-day {
+            font-size: 16px;
+        }
+
+        .upcoming-date-month {
+            font-size: 9px;
+        }
+
+        .upcoming-card-top {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .upcoming-schedule-bar,
         .proto-schedule-bar {
             flex-direction: column;
             align-items: flex-start;
@@ -688,7 +914,8 @@
         .pie-chart,
         .legend-item,
         .pie-tooltip,
-        .proto-card {
+        .proto-card,
+        .upcoming-card {
             transition: none;
         }
     }
@@ -862,13 +1089,13 @@
                     @foreach($pendingBookings as $b)
                         @php
                             $bDate = $b->booking_date
-                                ? \Carbon\Carbon::parse($b->booking_date)->locale('id')->translatedFormat('d F Y')
+                                ? \Carbon\Carbon::parse($b->booking_date, 'Asia/Jakarta')->locale('id')->translatedFormat('d F Y')
                                 : '-';
                             $bTime = !empty($b->start_time)
                                 ? str_replace(':', '.', substr($b->start_time, 0, 5)) . ' WIB'
                                   . (!empty($b->end_time) ? ' - ' . str_replace(':', '.', substr($b->end_time, 0, 5)) . ' WIB' : '')
                                 : 'Waktu menyesuaikan';
-                            $bOrg = $b->organization ?? $b->organizer ?? optional($b->user)->name ?? 'Pemohon';
+                            $bOrg = trim((string) ($b->organization ?? $b->organizer ?? optional($b->user)->name ?? 'Pemohon'));
                             $bVenue = optional($b->auditorium)->name ?? $b->event_name;
                             $hasDistinctEvent = !empty(optional($b->auditorium)->name) && !empty($b->event_name);
                         @endphp
@@ -876,13 +1103,25 @@
                             <div class="proto-card-top">
                                 <div class="proto-card-heading">
                                     <h3 class="proto-card-title">{{ $bVenue }}</h3>
-                                    <p class="proto-card-sub">
-                                        @if($hasDistinctEvent)
-                                            <span class="event-name">{{ $b->event_name }}</span>
-                                            <span class="sub-dot">•</span>
-                                        @endif
-                                        <span class="org-name">{{ $bOrg }}</span>
-                                    </p>
+                                    @if($hasDistinctEvent || $bOrg !== '')
+                                        <p class="proto-card-sub">
+                                            @if($hasDistinctEvent)
+                                                <span class="proto-sub-item" title="{{ $b->event_name }}">
+                                                    <i data-lucide="bookmark"></i>
+                                                    <span class="event-name">{{ $b->event_name }}</span>
+                                                </span>
+                                            @endif
+                                            @if($hasDistinctEvent && $bOrg !== '')
+                                                <span class="sub-dot">•</span>
+                                            @endif
+                                            @if($bOrg !== '')
+                                                <span class="proto-sub-item" title="{{ $bOrg }}">
+                                                    <i data-lucide="user"></i>
+                                                    <span class="org-name">{{ $bOrg }}</span>
+                                                </span>
+                                            @endif
+                                        </p>
+                                    @endif
                                 </div>
                                 <span class="proto-badge pending">Pending</span>
                             </div>
@@ -907,12 +1146,12 @@
             @endif
         </div>
 
-        {{-- PANEL 2: PEMINJAMAN MENDATANG (MULAI HARI H SAJA) --}}
-        <div class="dash-feed-panel">
+        {{-- PANEL 2: PEMINJAMAN MENDATANG --}}
+        <div class="dash-feed-panel" id="adminUpcomingPanel">
             <div class="dash-feed-head">
                 <div class="dash-feed-head-left">
                     <h2>Peminjaman Mendatang</h2>
-                    <span class="dash-feed-count">({{ $upcomingBookings->count() }})</span>
+                    <span class="dash-feed-count" id="adminUpcomingCount">({{ $upcomingBookings->count() }})</span>
                 </div>
 
                 <a href="{{ route('admin.bookings', ['status' => 'Disetujui']) }}" class="dash-feed-more">
@@ -922,54 +1161,70 @@
             </div>
 
             @if($upcomingBookings->isNotEmpty())
-                <div class="dash-feed-list">
+                <div class="dash-feed-list" id="adminUpcomingList">
                     @foreach($upcomingBookings as $u)
                         @php
-                            $now = \Carbon\Carbon::now('Asia/Jakarta');
-                            $today = $now->copy()->startOfDay();
-                            $eventDay = \Carbon\Carbon::parse($u->booking_date, 'Asia/Jakarta')->startOfDay();
-                            $diffDays = (int) $today->diffInDays($eventDay, false);
+                            $tglObj = \Carbon\Carbon::parse($u->booking_date, 'Asia/Jakarta')->locale('id');
+                            $eventDay = $tglObj->copy()->startOfDay();
+                            $diffDays = (int) $todayStartJakarta->diffInDays($eventDay, false);
 
-                            if ($diffDays > 0) {
-                                $badgeText = 'Dalam ' . $diffDays . ' hari';
-                                $badgeClass = 'upcoming';
-                            } else {
-                                $badgeText = 'Hari ini';
-                                $badgeClass = 'live';
-                            }
+                            $endTimeRaw = !empty($u->end_time) ? trim((string) $u->end_time) : '23:59:59';
+                            $endTimestampMs = \Carbon\Carbon::parse($tglObj->toDateString() . ' ' . $endTimeRaw, 'Asia/Jakarta')->valueOf();
 
-                            $uDate = \Carbon\Carbon::parse($u->booking_date)->locale('id')->translatedFormat('d F Y');
-                            $uTime = !empty($u->start_time)
-                                ? str_replace(':', '.', substr($u->start_time, 0, 5)) . ' WIB'
-                                  . (!empty($u->end_time) ? ' - ' . str_replace(':', '.', substr($u->end_time, 0, 5)) . ' WIB' : '')
+                            $isToday = $diffDays <= 0;
+                            $badgeText = $isToday ? 'Hari ini' : ('Dalam ' . $diffDays . ' hari');
+
+                            $boxDay = $tglObj->format('d');
+                            $boxMonthYear = strtoupper($tglObj->translatedFormat('M Y'));
+                            $fullDateText = $tglObj->translatedFormat('d F Y');
+
+                            $startFmt = !empty($u->start_time)
+                                ? str_replace(':', '.', substr((string) $u->start_time, 0, 5))
+                                : null;
+                            $endFmt = !empty($u->end_time)
+                                ? str_replace(':', '.', substr((string) $u->end_time, 0, 5))
+                                : null;
+                            $timeText = $startFmt
+                                ? ($startFmt . ' WIB' . ($endFmt ? ' - ' . $endFmt . ' WIB' : ''))
                                 : 'Waktu menyesuaikan';
-                            $uOrg = $u->organization ?? $u->organizer ?? optional($u->user)->name ?? 'Pemohon';
-                            $uVenue = optional($u->auditorium)->name ?? $u->event_name;
-                            $hasDistinctEvent = !empty(optional($u->auditorium)->name) && !empty($u->event_name);
+
+                            $venueName = optional($u->auditorium)->name ?? $u->event_name ?? 'Auditorium';
+                            $organizerName = trim((string) ($u->organization ?? $u->organizer ?? optional($u->user)->name ?? '-'));
                         @endphp
-                        <a href="{{ route('admin.bookings', ['booking_id' => $u->id, 'open' => $u->id]) }}" class="proto-card">
-                            <div class="proto-card-top">
-                                <div class="proto-card-heading">
-                                    <h3 class="proto-card-title">{{ $uVenue }}</h3>
-                                    <p class="proto-card-sub">
-                                        @if($hasDistinctEvent)
-                                            <span class="event-name">{{ $u->event_name }}</span>
-                                            <span class="sub-dot">•</span>
-                                        @endif
-                                        <span class="org-name">{{ $uOrg }}</span>
-                                    </p>
-                                </div>
-                                <span class="proto-badge {{ $badgeClass }}">{{ $badgeText }}</span>
+
+                        <a href="{{ route('admin.bookings', ['booking_id' => $u->id, 'open' => $u->id]) }}"
+                           class="upcoming-card"
+                           data-end-ts="{{ $endTimestampMs }}">
+                            <div class="upcoming-date-box">
+                                <span class="upcoming-date-day">{{ $boxDay }}</span>
+                                <span class="upcoming-date-month">{{ $boxMonthYear }}</span>
                             </div>
 
-                            <div class="proto-schedule-bar">
-                                <div class="proto-meta-item">
-                                    <i data-lucide="calendar"></i>
-                                    <span>{{ $uDate }}</span>
+                            <div class="upcoming-body">
+                                <div class="upcoming-card-top">
+                                    <div class="upcoming-heading">
+                                        <h3 class="upcoming-title" title="{{ $venueName }}">{{ $venueName }}</h3>
+                                        <p class="upcoming-org" title="{{ $organizerName }}">
+                                            <i data-lucide="user"></i>
+                                            <span>{{ $organizerName }}</span>
+                                        </p>
+                                    </div>
+
+                                    <span class="upcoming-status-pill {{ $isToday ? 'is-ongoing' : 'is-upcoming' }}">
+                                        {{ $badgeText }}
+                                    </span>
                                 </div>
-                                <div class="proto-meta-item">
-                                    <i data-lucide="clock"></i>
-                                    <span>{{ $uTime }}</span>
+
+                                <div class="upcoming-schedule-bar">
+                                    <div class="upcoming-meta-item">
+                                        <i data-lucide="calendar"></i>
+                                        <span>{{ $fullDateText }}</span>
+                                    </div>
+
+                                    <div class="upcoming-meta-item">
+                                        <i data-lucide="clock"></i>
+                                        <span>{{ $timeText }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </a>
@@ -977,7 +1232,7 @@
                 </div>
             @else
                 <div class="dash-empty-state">
-                    Belum ada jadwal peminjaman mendatang.
+                    Belum ada jadwal peminjaman auditorium mendatang.
                 </div>
             @endif
         </div>
@@ -991,7 +1246,43 @@
         lucide.createIcons();
     }
 
+    function pruneExpiredAdminUpcoming() {
+        const listEl = document.getElementById('adminUpcomingList');
+        if (!listEl) return;
+
+        const nowMs = Date.now();
+        const cards = listEl.querySelectorAll('.upcoming-card[data-end-ts]');
+        let removed = false;
+
+        cards.forEach(function (card) {
+            const endTs = Number(card.dataset.endTs || 0);
+            if (endTs > 0 && nowMs >= endTs) {
+                card.remove();
+                removed = true;
+            }
+        });
+
+        if (removed) {
+            const remaining = listEl.querySelectorAll('.upcoming-card[data-end-ts]').length;
+            const countEl = document.getElementById('adminUpcomingCount');
+            if (countEl) {
+                countEl.textContent = '(' + remaining + ')';
+            }
+
+            if (remaining === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'dash-empty-state';
+                emptyDiv.textContent = 'Belum ada jadwal peminjaman auditorium mendatang.';
+                listEl.replaceWith(emptyDiv);
+            }
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        /* HAPUS OTOMATIS PEMINJAMAN MENDATANG YANG JAMNYA SUDAH BERAKHIR */
+        pruneExpiredAdminUpcoming();
+        setInterval(pruneExpiredAdminUpcoming, 15000);
+
         /* DIAGRAM PIE */
         const pie = document.getElementById('bookingPie');
         const tooltip = document.getElementById('pieTooltip');
