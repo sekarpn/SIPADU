@@ -505,7 +505,7 @@
     font-weight: 700;
 }
 
-/* TABLE STYLING (PROPORSI KOLOM RAPI & SEIMBANG) */
+/* TABLE STYLING (HEADER & ISI SEJAJAR RAPI) */
 .booking-page .bp-table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -513,33 +513,80 @@
 }
 
 .booking-page table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 860px;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    min-width: 900px;
     font-size: 13px;
 }
 
-.booking-page th {
-    padding: 13px 20px;
-    text-align: left;
-    background: rgba(255, 255, 255, .44);
-    border-bottom: 1px solid var(--bp-line);
-    font-size: 10.5px;
-    font-weight: 800;
+.booking-page thead th {
+    padding: 13px 20px !important;
+    background: rgba(255, 255, 255, .44) !important;
+    border-bottom: 1px solid var(--bp-line) !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
     letter-spacing: .07em;
     text-transform: uppercase;
-    color: var(--bp-muted);
+    color: var(--bp-muted) !important;
     white-space: nowrap;
+    vertical-align: middle;
 }
 
-.booking-page td {
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(22, 54, 38, .06);
-    vertical-align: middle;
+.booking-page tbody td {
+    padding: 16px 20px !important;
+    border-bottom: 1px solid rgba(22, 54, 38, .06) !important;
+    vertical-align: middle !important;
     font-size: 12.5px;
     line-height: 1.5;
     color: var(--bp-ink);
     transition: background .18s ease;
+}
+
+/* 1. PENGAJUAN (RATA KIRI) */
+.booking-page thead th:nth-child(1),
+.booking-page tbody td:nth-child(1) {
+    width: 22% !important;
+    text-align: left !important;
+}
+
+/* 2. AUDITORIUM & JADWAL (RATA KIRI) */
+.booking-page thead th:nth-child(2),
+.booking-page tbody td:nth-child(2) {
+    width: 26% !important;
+    text-align: left !important;
+}
+
+/* 3. STATUS (HEADER & PILL RATA TENGAH) */
+.booking-page thead th:nth-child(3),
+.booking-page tbody td:nth-child(3) {
+    width: 13% !important;
+    text-align: center !important;
+    white-space: nowrap;
+}
+
+/* 4. CATATAN ADMIN (RATA KIRI) */
+.booking-page thead th:nth-child(4),
+.booking-page tbody td:nth-child(4) {
+    width: 21% !important;
+    text-align: left !important;
+}
+
+/* 5. AKSI (HEADER & TOMBOL SEJAJAR RATA KANAN) */
+.booking-page thead th:nth-child(5),
+.booking-page tbody td:nth-child(5) {
+    width: 18% !important;
+    text-align: right !important;
+    white-space: nowrap;
+    padding-right: 20px !important;
+}
+
+.booking-page tbody tr:hover td {
+    background: rgba(255, 255, 255, .52);
+}
+
+.booking-page tbody tr:last-child td {
+    border-bottom: 0 !important;
 }
 
 /* PROPORSI LEBAR SETIAP KOLOM */
