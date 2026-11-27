@@ -625,6 +625,21 @@
                         <p class="auth-error">{{ $message }}</p>
                     @enderror
 
+                    <label for="phone">Nomor Telepon</label>
+                    <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value="{{ old('phone') }}"
+                        placeholder="Masukkan nomor telepon aktif"
+                        autocomplete="tel"
+                        required
+                    >
+
+                    @error('phone')
+                        <p class="auth-error">{{ $message }}</p>
+                    @enderror
+
                     <label for="password">Password</label>
 
                     <div class="password-field">
