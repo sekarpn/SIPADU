@@ -165,12 +165,6 @@
     box-shadow: 0 12px 30px rgba(22, 54, 38, .09);
 }
 
-.booking-page .bp-stat.is-active {
-    background: linear-gradient(145deg, rgba(255, 255, 255, .92) 0%, rgba(255, 255, 255, .74) 100%);
-    border-color: #237c4d;
-    box-shadow: 0 8px 24px rgba(35, 124, 77, .14);
-}
-
 .booking-page .bp-stat-icon {
     width: 42px;
     height: 42px;
@@ -1317,6 +1311,16 @@ body.bp-drawer-open {
             <h1>Kelola Peminjaman Auditorium</h1>
             <p>Kelola pengajuan peminjaman, periksa jadwal, dan tentukan keputusan untuk setiap permohonan.</p>
         </div>
+        <a href="{{ route('admin.bookings', request()->except('status', 'page')) }}"
+           class="bp-stat {{ !request('status') ? 'is-active' : '' }}">
+            <div class="bp-stat-icon">
+                <i data-lucide="clipboard-list"></i>
+            </div>
+            <div>
+                <small>Total Pengajuan</small>
+                <strong>{{ $stats['total'] }}</strong>
+            </div>
+        </a>
 
         <a
             href="{{ route('admin.bookings.export', request()->query()) }}"
@@ -1361,17 +1365,6 @@ body.bp-drawer-open {
             <div>
                 <small>Ditolak</small>
                 <strong>{{ $stats['rejected'] }}</strong>
-            </div>
-        </a>
-
-        <a href="{{ route('admin.bookings', request()->except('status', 'page')) }}"
-           class="bp-stat {{ !request('status') ? 'is-active' : '' }}">
-            <div class="bp-stat-icon">
-                <i data-lucide="clipboard-list"></i>
-            </div>
-            <div>
-                <small>Total Pengajuan</small>
-                <strong>{{ $stats['total'] }}</strong>
             </div>
         </a>
 
