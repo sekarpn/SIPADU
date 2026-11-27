@@ -13,8 +13,52 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
+    private function applyReportFilters($query, Request $request)
+    {
+        $query->where('status', '!=', 'Pending');
+
+        if ($request->filled('booking_id')) {
+            $query->where('id', $request->booking_id);
+        }
+
+        if ($request->filled('q')) {
+            $term = trim($request->q);
+
+            $query->where(function ($q) use ($term) {
+                $q->where('event_name', 'like', "%{$term}%")
+                    ->orWhere('organization', 'like', "%{$term}%")
+                    ->orWhereHas('user', fn ($user) => $user->where('name', 'like', "%{$term}%"))
+                    ->orWhereHas('auditorium', fn ($aud) => $aud->where('name', 'like', "%{$term}%"));
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'Pending') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('auditorium')) {
+            $query->where('auditorium_id', $request->auditorium);
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('booking_date', $request->date);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('booking_date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('booking_date', '<=', $request->end_date);
+        }
+
+        return $query;
+    }
+
     public function index(Request $r)
     {
+        Booking::cancelExpiredPendingBookings();
+
         $bookings = Booking::with(['auditorium', 'histories'])
             ->where('user_id', $r->user()->id)
             ->latest()
@@ -143,7 +187,17 @@ class BookingController extends Controller
         $data['applicant_position'] = $user->position;
         $data['status'] = 'Pending';
 
-        Booking::create($data);
+        DB::transaction(function () use ($data, $user) {
+            $booking = Booking::create($data);
+
+            BookingHistory::create([
+                'booking_id' => $booking->id,
+                'admin_id' => null,
+                'from_status' => null,
+                'to_status' => 'Pending',
+                'note' => 'Pengajuan peminjaman dikirim oleh pemohon dan menunggu verifikasi admin.',
+            ]);
+        });
 
         return redirect()->route($user->role === 'pegawai' ? 'pegawai.bookings' : 'borrower.bookings')
             ->with('success', 'Pengajuan berhasil dikirim dan menunggu verifikasi admin.');
@@ -153,17 +207,41 @@ class BookingController extends Controller
     {
         abort_unless($booking->user_id === $r->user()->id, 403);
 
+        Booking::cancelExpiredPendingBookings();
+        $booking->refresh();
+
         if ($booking->status !== 'Pending') {
             return back()->with('warning', 'Pengajuan ini sudah berstatus ' . $booking->status . ' dan tidak dapat dibatalkan.');
         }
 
-        $booking->update(['status' => 'Dibatalkan']);
+        $cancelNote = 'Pengajuan dibatalkan oleh pemohon.';
+
+        DB::transaction(function () use ($booking, $cancelNote) {
+            $oldStatus = $booking->status;
+
+            $booking->update([
+                'status' => 'Dibatalkan',
+                'admin_note' => filled($booking->admin_note)
+                    ? trim($booking->admin_note) . "\n\n" . $cancelNote
+                    : $cancelNote,
+            ]);
+
+            BookingHistory::create([
+                'booking_id' => $booking->id,
+                'admin_id' => null,
+                'from_status' => $oldStatus,
+                'to_status' => 'Dibatalkan',
+                'note' => $cancelNote,
+            ]);
+        });
 
         return back()->with('success', 'Pengajuan berhasil dibatalkan.');
     }
 
     public function adminIndex(Request $request)
     {
+        Booking::cancelExpiredPendingBookings();
+
         $query = Booking::with(['user', 'auditorium', 'histories'])->where('status', 'Pending')->latest();
 
         if ($request->filled('booking_id')) {
@@ -186,6 +264,14 @@ class BookingController extends Controller
 
         if ($request->filled('date')) {
             $query->whereDate('booking_date', $request->date);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('booking_date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('booking_date', '<=', $request->end_date);
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100], true)
@@ -253,90 +339,32 @@ class BookingController extends Controller
 
     public function adminReports(Request $request)
     {
-        $query = Booking::with(['user', 'auditorium', 'histories'])->latest();
+        Booking::cancelExpiredPendingBookings();
 
-        if ($request->filled('booking_id')) {
-            $query->where('id', $request->booking_id);
-        }
+        $query = $this->applyReportFilters(
+            Booking::with(['user', 'auditorium', 'histories']),
+            $request
+        );
 
-        if ($request->filled('q')) {
-            $term = trim($request->q);
+        $sortBy = in_array($request->input('sort_by'), ['created_at', 'booking_date', 'event_name', 'status'], true)
+            ? $request->input('sort_by')
+            : 'created_at';
+        $sortDir = strtolower((string) $request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
 
-            $query->where(function ($q) use ($term) {
-                $q->where('event_name', 'like', "%{$term}%")
-                    ->orWhere('organization', 'like', "%{$term}%")
-                    ->orWhereHas('user', fn ($user) => $user->where('name', 'like', "%{$term}%"));
-            });
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('auditorium')) {
-            $query->where('auditorium_id', $request->auditorium);
-        }
-
-        if ($request->filled('date')) {
-            $query->whereDate('booking_date', $request->date);
-        }
+        $query->orderBy($sortBy, $sortDir);
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100], true)
             ? (int) $request->input('per_page')
             : 10;
 
         $bookings = $query->paginate($perPage)->withQueryString();
-
-        $pageItems = $bookings->getCollection();
         $extraDrawerBookings = collect();
 
-        foreach ($pageItems as $item) {
-            if ($item->status === 'Pending') {
-                $conflicts = Booking::with(['user', 'auditorium', 'histories'])
-                    ->where('id', '!=', $item->id)
-                    ->where('auditorium_id', $item->auditorium_id)
-                    ->whereDate('booking_date', $item->booking_date)
-                    ->whereIn('status', ['Pending', 'Disetujui'])
-                    ->where('start_time', '<', $item->end_time)
-                    ->where('end_time', '>', $item->start_time)
-                    ->orderByRaw("CASE WHEN status = 'Disetujui' THEN 0 ELSE 1 END")
-                    ->orderBy('created_at')
-                    ->get();
-
-                $item->setRelation('conflicts', $conflicts);
-
-                foreach ($conflicts as $conflict) {
-                    if (
-                        !$pageItems->contains('id', $conflict->id) &&
-                        !$extraDrawerBookings->contains('id', $conflict->id)
-                    ) {
-                        $subConflicts = Booking::with(['user', 'auditorium', 'histories'])
-                            ->where('id', '!=', $conflict->id)
-                            ->where('auditorium_id', $conflict->auditorium_id)
-                            ->whereDate('booking_date', $conflict->booking_date)
-                            ->whereIn('status', ['Pending', 'Disetujui'])
-                            ->where('start_time', '<', $conflict->end_time)
-                            ->where('end_time', '>', $conflict->start_time)
-                            ->orderByRaw("CASE WHEN status = 'Disetujui' THEN 0 ELSE 1 END")
-                            ->orderBy('created_at')
-                            ->get();
-
-                        $conflict->setRelation('conflicts', $subConflicts);
-                        $extraDrawerBookings->push($conflict);
-                    }
-                }
-            } else {
-                $item->setRelation('conflicts', collect());
-            }
-        }
-
         $stats = [
-            'pending' => Booking::where('status', 'Pending')->count(),
             'approved' => Booking::where('status', 'Disetujui')->count(),
             'rejected' => Booking::where('status', 'Ditolak')->count(),
             'revision' => Booking::where('status', 'Perlu Revisi')->count(),
             'cancelled' => Booking::where('status', 'Dibatalkan')->count(),
-            'total' => Booking::count(),
         ];
 
         $auditoriums = Auditorium::orderBy('name')->get();
@@ -344,19 +372,45 @@ class BookingController extends Controller
         return view('admin.reports', compact('bookings', 'stats', 'auditoriums', 'extraDrawerBookings'));
     }
 
-    // Export khusus halaman Kelola Pengajuan (hanya Pending).
-    public function adminPendingExport(Request $request)
-    {
-        $request->merge(['status' => 'Pending']);
-        return $this->adminExport($request);
-    }
-
-    // Export data peminjaman ke CSV/Excel oleh admin
-    public function adminExport(Request $request)
+    // Download laporan riwayat peminjaman dalam format PDF (tanpa Pending), mengikuti filter yang aktif.
+    public function adminReportsPdf(Request $request)
     {
         abort_unless(Auth::check() && Auth::user()->role === 'admin', 403);
 
-        $query = Booking::with(['user', 'auditorium'])->latest();
+        Booking::cancelExpiredPendingBookings();
+
+        $query = $this->applyReportFilters(
+            Booking::with(['user', 'auditorium', 'histories']),
+            $request
+        );
+
+        $sortBy = in_array($request->input('sort_by'), ['created_at', 'booking_date', 'event_name', 'status'], true)
+            ? $request->input('sort_by')
+            : 'created_at';
+        $sortDir = strtolower((string) $request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        $query->orderBy($sortBy, $sortDir);
+
+        $bookings = $query->get();
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $periodeLabel = ($startDate || $endDate)
+            ? (($startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Awal')
+                . ' – '
+                . ($endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : 'Akhir'))
+            : 'Semua Tanggal';
+        $generatedAt = now()->timezone('Asia/Jakarta');
+
+        $pdf = Pdf::loadView('admin.reports-pdf', compact('bookings', 'request', 'startDate', 'endDate', 'periodeLabel', 'generatedAt'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('Laporan-Riwayat-Peminjaman-' . now()->format('Ymd-His') . '.pdf');
+    }
+
+    // Export khusus halaman Kelola Pengajuan (hanya Pending).
+    public function adminPendingExport(Request $request)
+    {
+        $query = Booking::with(['user', 'auditorium'])->where('status', 'Pending')->latest();
 
         if ($request->filled('booking_id')) {
             $query->where('id', $request->booking_id);
@@ -372,10 +426,6 @@ class BookingController extends Controller
             });
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
         if ($request->filled('auditorium')) {
             $query->where('auditorium_id', $request->auditorium);
         }
@@ -384,9 +434,44 @@ class BookingController extends Controller
             $query->whereDate('booking_date', $request->date);
         }
 
-        $bookings = $query->get();
-        $filename = 'Data-Peminjaman-Auditorium-' . now()->format('Y-m-d_H-i') . '.csv';
+        if ($request->filled('start_date')) {
+            $query->whereDate('booking_date', '>=', $request->start_date);
+        }
 
+        if ($request->filled('end_date')) {
+            $query->whereDate('booking_date', '<=', $request->end_date);
+        }
+
+        return $this->streamBookingsCsv($query->get(), 'Pengajuan-Pending-Auditorium-' . now()->format('Y-m-d_H-i') . '.csv');
+    }
+
+    // Export data riwayat peminjaman ke CSV/Excel oleh admin (tanpa Pending)
+    public function adminExport(Request $request)
+    {
+        abort_unless(Auth::check() && Auth::user()->role === 'admin', 403);
+
+        Booking::cancelExpiredPendingBookings();
+
+        $query = $this->applyReportFilters(
+            Booking::with(['user', 'auditorium']),
+            $request
+        );
+
+        $sortBy = in_array($request->input('sort_by'), ['created_at', 'booking_date', 'event_name', 'status'], true)
+            ? $request->input('sort_by')
+            : 'created_at';
+        $sortDir = strtolower((string) $request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        $query->orderBy($sortBy, $sortDir);
+
+        $bookings = $query->get();
+        $filename = 'Data-Riwayat-Peminjaman-Auditorium-' . now()->format('Y-m-d_H-i') . '.csv';
+
+        return $this->streamBookingsCsv($bookings, $filename);
+    }
+
+    private function streamBookingsCsv($bookings, string $filename)
+    {
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
@@ -480,8 +565,6 @@ class BookingController extends Controller
             'File surat peminjaman tidak ditemukan.'
         );
 
-        // Kirim file sebagai response PDF inline agar dapat ditampilkan di iframe
-        // pada halaman Kelola Peminjaman, bukan langsung diunduh.
         $disk = Storage::disk('local');
 
         /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
@@ -563,7 +646,6 @@ class BookingController extends Controller
                     $oldStatus = $conflict->status;
                     $autoNote = '[Ditolak otomatis karena bentrok] ' . $data['conflict_rejection_reason'];
 
-                    // Pertahankan catatan lama (misal catatan perbaikan) jika sebelumnya pernah ada
                     $combinedNote = filled($conflict->admin_note)
                         ? trim($conflict->admin_note) . "\n\n" . $autoNote
                         : $autoNote;
@@ -586,7 +668,6 @@ class BookingController extends Controller
             $oldStatus = $target->status;
             $newNote = $data['admin_note'] ?? null;
 
-            // Jika menolak/memutuskan setelah sebelumnya ada catatan (mis. catatan bentrok), gabungkan agar keduanya terbaca
             if (filled($newNote) && filled($target->admin_note) && trim($target->admin_note) !== trim($newNote)) {
                 $finalNote = trim($target->admin_note) . "\n\n" . trim($newNote);
             } else {
